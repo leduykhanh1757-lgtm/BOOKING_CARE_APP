@@ -1,5 +1,5 @@
 'use strict';
-
+require('dotenv').config(); // Load environment variables from .env file
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
