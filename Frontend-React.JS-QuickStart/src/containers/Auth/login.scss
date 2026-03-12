@@ -1,0 +1,156 @@
+.login-background {
+    height: 100vh;
+    background: linear-gradient(135deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1) 100%);
+    /* Dùng flexbox để căn giữa cái form trắng vào giữa màn hình */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .login-container {
+        width: 90%;
+        max-width: 400px;
+        background-color: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+
+        .login-content {
+            padding: 10px;
+
+            .login-title {
+                font-size: 30px;
+                font-weight: 600;
+                margin-bottom: 30px;
+                color: #333;
+            }
+
+            .login-input {
+                margin-bottom: 20px;
+
+                label {
+                    font-size: 13px;
+                    color: #a0a0a0;
+                    font-weight: 500;
+                }
+
+                input {
+                    border: none;
+                    border-bottom: 1px solid #d3d3d3;
+                    /* Chỉ để lại đường kẻ dưới */
+                    border-radius: 0;
+                    padding-left: 0;
+                    box-shadow: none;
+                    /* Xóa hiệu ứng sáng mặc định của Bootstrap */
+
+                    &:focus {
+                        border-bottom: 2px solid #22c1c3;
+                        /* Đổi màu xanh khi click vào */
+                    }
+
+                    &::placeholder {
+                        color: #d3d3d3;
+                    }
+                }
+
+                .custom-input-password {
+                    position: relative;
+                    /* Đặt làm điểm tựa */
+
+                    span {
+                        position: absolute;
+                        right: 10px;
+                        /* Cách mép phải 10px */
+                        top: 50%;
+                        /* Canh giữa theo chiều dọc */
+                        transform: translateY(-50%);
+                        /* Kéo nhích lên cho chuẩn giữa */
+                        cursor: pointer;
+                        color: #a0a0a0;
+                        font-size: 16px;
+
+                        &:hover {
+                            color: #22c1c3;
+                            /* Đổi màu xanh khi di chuột vào */
+                        }
+                    }
+                }
+            }
+
+            .btn-login {
+                width: 100%;
+                border: none;
+                padding: 10px;
+                border-radius: 25px;
+                /* Nút hình viên thuốc */
+                background: linear-gradient(90deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1) 100%);
+                color: white;
+                font-size: 18px;
+                font-weight: 600;
+                margin-top: 10px;
+                cursor: pointer;
+
+                &:hover {
+                    opacity: 0.9;
+                }
+
+            }
+
+            .forgot-password {
+                display: inline-block;
+                font-size: 14px;
+                color: #22c1c3;
+                /* Lấy luôn màu xanh của theme cho tone-sur-tone */
+                cursor: pointer;
+                transition: 0.3s;
+
+                &:hover {
+                    text-decoration: underline;
+                    color: #1a9698;
+                    /* Đậm hơn chút khi di chuột vào */
+                }
+            }
+
+            .text-other-login {
+                font-size: 14px;
+                color: #a0a0a0;
+            }
+
+            .social-login {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                /* Khoảng cách giữa các nút */
+
+                i {
+                    font-size: 18px;
+                    color: white;
+                    width: 40px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                    /* Bo tròn thành hình cầu */
+                    cursor: pointer;
+
+                    /* Đổ màu chuẩn cho từng mạng xã hội */
+                    &.fa-facebook-f {
+                        background-color: #3b5998;
+                    }
+
+                    &.fa-twitter {
+                        background-color: #1da1f2;
+                    }
+
+                    &.fa-google-plus-g {
+                        background-color: #db4437;
+                    }
+
+                    &:hover {
+                        opacity: 0.8;
+                    }
+                }
+            }
+        }
+    }
+}
