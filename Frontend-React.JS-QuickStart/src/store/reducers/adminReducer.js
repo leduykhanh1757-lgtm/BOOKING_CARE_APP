@@ -1,33 +1,62 @@
 import actionTypes from '../actions/actionTypes';
 
-const initialState = {
-    isLoggedIn: false,
-    adminInfo: null
+const initContentOfConfirmModal = {
+    isOpen: false,
+    messageId: "",
+    handleFunc: null,
+    dataFunc: null
 }
 
-const appReducer = (state = initialState, action) => {
+const initialState = {
+    isLoadingGender: false,
+    genders: [],
+    roles: [],
+    positions: [],
+}
+
+const adminReducer = (state = initialState, action) => {
     switch (action.type) {
-        case actionTypes.ADMIN_LOGIN_SUCCESS:
+        case actionTypes.FETCH_GENDER_START:
             return {
                 ...state,
-                isLoggedIn: true,
-                adminInfo: action.adminInfo
+                isLoadingGender: true
             }
-        case actionTypes.ADMIN_LOGIN_FAIL:
+        case actionTypes.FETCH_GENDER_SUCCESS:
             return {
                 ...state,
-                isLoggedIn: false,
-                adminInfo: null
+                genders: action.data,
+                isLoadingGender: false
             }
-        case actionTypes.PROCESS_LOGOUT:
+        case actionTypes.FETCH_GENDER_FAIL:
             return {
                 ...state,
-                isLoggedIn: false,
-                adminInfo: null
+                isLoadingGender: false,
+                genders: []
             }
+        case actionTypes.FETCH_POSITION_SUCCESS:
+            return {
+                ...state,
+                positions: action.data
+            }
+        case actionTypes.FETCH_POSITION_FAIL:
+            return {
+                ...state,
+                positions: []
+            }
+        case actionTypes.FETCH_ROLE_SUCCESS:
+            return {
+                ...state,
+                roles: action.data
+            }
+        case actionTypes.FETCH_ROLE_FAIL:
+            return {
+                ...state,
+                roles: []
+            }
+
         default:
             return state;
     }
 }
 
-export default appReducer;
+export default adminReducer;

@@ -1,0 +1,239 @@
+.home-header-container {
+    height: 60px;
+    width: 100%;
+    background-color: white; // Thêm nền trắng cho Header nổi bật
+    border-bottom: 1px solid #f3f3f3; // Thêm gạch dưới mờ mờ cho tinh tế
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 10000;
+
+    .home-header-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+
+        .left-content {
+            width: 25%;
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
+
+            i {
+                font-size: 24px;
+                color: #949494;
+                cursor: pointer;
+                margin-right: 20px; // Tạo khoảng cách với Logo
+            }
+
+            .header-logo {
+                /* THU NHỎ LOGO LẠI CHO CÂN ĐỐI (từ 60px xuống 45px) */
+                height: 45px;
+                width: 160px; // Thêm chiều rộng cụ thể để logo không bị méo
+                background: url('../../assets/images/bookingcare-2020.svg') center center no-repeat;
+                background-size: contain; // Đảm bảo logo nằm trọn trong ô 160x45
+                cursor: pointer;
+            }
+        }
+
+        .center-content {
+            width: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: space-around; // Dàn đều các mục menu và có khoảng cách rõ ràng
+
+            .child-content {
+                cursor: pointer;
+                text-align: left;
+                padding: 0 10px; // Thêm padding ngang để các mục không bị dính vào nhau
+
+                div:first-child {
+                    /* TINH CHỈNH FONT CHỮ CHÍNH */
+                    font-size: 15px;
+                    color: #222;
+                    font-weight: 600; // Font dày hơn một chút
+                    margin-bottom: 3px; // Tách biệt dòng chính và dòng phụ
+                }
+
+                .subs-title {
+                    /* TINH CHỈNH FONT CHỮ PHỤ */
+                    font-size: 11px;
+                    color: #999;
+                    font-weight: 400;
+                }
+            }
+        }
+
+        .right-content {
+            width: 25%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 20px;
+
+            .support {
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                font-size: 14px;
+                color: #999;
+                font-weight: 500;
+
+                i {
+                    /* TINH CHỈNH ICON HỖ TRỢ */
+                    color: #45c3d2;
+                    font-size: 20px;
+                    margin-right: 8px;
+                }
+
+                span {
+                    /* Căn chỉnh text "Hỗ trợ" cho cân đối */
+                    margin-bottom: 2px;
+                }
+            }
+
+            .language-vi,
+            .language-en {
+                margin-left: 15px;
+                /* Đẩy chúng nó cách xa nhau và cách xa chữ "Hỗ trợ" ra */
+                cursor: pointer;
+
+                span {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #999;
+
+                    &:hover {
+                        color: #45c3d2;
+                    }
+
+                    /* Gắn thẳng active vào span, không trượt đi đâu được */
+                    &.active {
+                        color: #2248bd;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.home-header-banner {
+    width: 100%;
+    height: 550px;
+    background: url('../../assets/images/unnamed.webp') center 20% no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+
+    .content-up {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0));
+        width: 100%;
+        padding-top: 100px;
+        padding-bottom: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .title1 {
+            color: white;
+            font-size: 30px;
+            font-weight: 300;
+            text-shadow: 1px 1px 2px #333;
+            margin-bottom: 10px;
+        }
+
+        .title2 {
+            color: white;
+            font-size: 30px;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px #333;
+            margin-bottom: 30px;
+        }
+
+        .search {
+            padding: 12px 20px;
+            border-radius: 25px;
+            background-color: #f4c21a;
+            display: flex;
+            align-items: center;
+            width: 450px;
+
+            i {
+                color: #333;
+                font-size: 18px;
+                margin-right: 15px;
+            }
+
+            input {
+                border: none;
+                outline: none;
+                background: transparent;
+                width: 100%;
+                font-size: 15px;
+                color: #222;
+
+                &::placeholder {
+                    color: #444;
+                }
+            }
+        }
+    }
+
+    .content-down {
+        margin-top: auto;
+        width: 100%;
+        background-image: linear-gradient(to bottom,
+                rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 1));
+        padding-top: 40px;
+        padding-bottom: 20px;
+        display: flex;
+        justify-content: center;
+
+        .options {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+
+            .option-child {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 120px;
+                cursor: pointer;
+                margin: 0 15px;
+
+                .icon-child {
+                    width: 50px;
+                    height: 50px;
+                    background-color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                    margin-bottom: 10px;
+
+                    i {
+                        font-size: 22px;
+                        color: #45c3d2;
+                    }
+                }
+
+                .text-child {
+                    text-align: center;
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: #333;
+                }
+
+                &:hover {
+                    .text-child {
+                        color: #45c3d2;
+                    }
+                }
+            }
+        }
+    }
+}

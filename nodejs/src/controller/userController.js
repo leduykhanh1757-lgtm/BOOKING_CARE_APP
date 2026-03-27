@@ -1,3 +1,4 @@
+import e from 'cors';
 import userService from '../services/userService';
 let handleLogin = async (req, res) => {
     let email = req.body.email;
@@ -41,7 +42,48 @@ let getAllUsers = async (req, res) => {
 
 }
 
+let createANewUser = async (req, res) => {
+    let message = await userService.createNewUser(req.body);
+    return res.status(200).json(message);
+}
+
+let editUser = async (req, res) => {
+    let data = req.body;
+    let message = await userService.editUser(data);
+    return res.status(200).json(message);
+}
+
+let deleteUser = async (req, res) => {
+    let id = req.body.id;
+    if (!id) {
+        return res.status(200).json({
+            errCode: 1,
+            errMessage: 'Missing required parameters!'
+        })
+    }
+    let message = await userService.deleteUser(id);
+    return res.status(200).json(message);
+}
+
+let getAllCode = async (req, res) => {
+    try {
+        let data = await userService.getAllCodeService(req.query.type);
+        return res.status(200).json(data);
+    }
+    catch (e) {
+        console.log('Get all code error: ', e);
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: 'Error from server'
+        })
+    }
+}
+
 module.exports = {
     handleLogin: handleLogin,
-    getAllUsers: getAllUsers
+    getAllUsers: getAllUsers,
+    createANewUser: createANewUser,
+    editUser: editUser,
+    deleteUser: deleteUser,
+    getAllCode: getAllCode
 }

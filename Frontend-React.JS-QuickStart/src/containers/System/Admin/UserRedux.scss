@@ -1,0 +1,41 @@
+.preview-img-container {
+    display: flex;
+    flex-direction: column;
+
+    /* CSS cho cái nút tải ảnh */
+    .label-upload {
+        display: block;
+        width: fit-content;
+        padding: 5px 10px;
+        background-color: #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+        margin-bottom: 10px;
+
+        i {
+            margin-left: 5px;
+            /* Cách cái icon ra một chút */
+        }
+
+        &:hover {
+            background-color: #ccc;
+            /* Rê chuột vào thì màu đậm lên */
+        }
+    }
+
+    /* CSS cho cái khung vuông hiển thị ảnh */
+    .preview-image {
+        height: 120px;
+        width: 100%;
+        background: center center no-repeat;
+        /* Canh ảnh ra giữa */
+        background-size: contain;
+        /* Ép ảnh hiển thị vừa vặn trong khung, không bị méo */
+        cursor: pointer;
+
+        /* Tạo một màu nền xám nhạt nhẹ lúc chưa có ảnh */
+        background-color: #f8f9fa;
+    }
+}

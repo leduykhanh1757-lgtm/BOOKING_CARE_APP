@@ -1,5 +1,6 @@
 import db from '../models/index';
 import bcrypt from 'bcryptjs';
+import CRUDservices from './CRUDservices';
 
 let handleUserLogin = (email, password) => {
     return new Promise(async (resolve, reject) => {
@@ -90,8 +91,152 @@ let getAllUsers = (userId) => {
         }
     })
 }
+
+let createNewUser = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Kiểm tra email đã tồn tại chưa
+            let check = await checkUserEmail(data.email);
+            if (check === true) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Your email is already in used, please try another email!'
+                })
+            }
+            else {
+                // Nếu chưa tồn tại thì hash password và tạo mới user
+                let hashPasswordFromBcrypt = await CRUDservices.hashUserPassword(data.password);
+                await db.User.create({
+                    email: data.email,
+                    password: hashPasswordFromBcrypt,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    address: data.address,
+                    phoneNumber: data.phoneNumber,
+                    gender: data.gender === '1' ? true : false,
+                    roleId: data.roleId,
+                    positionId: data.positionId,
+                })
+                resolve({
+                    errCode: 0,
+                    errMessage: 'OK'
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+let editUser = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // 1. BƯỚC BẢO VỆ: Kiểm tra đầu vào cực kỳ chặt chẽ
+            // Dùng data.gender === undefined để lách lỗi Javascript coi số 0 là rỗng
+            if (!data.id || !data.roleId || !data.positionId || data.gender === undefined) {
+                // BẮT BUỘC PHẢI CÓ 'return' ĐỂ DỪNG NGAY HÀM LẠI NẾU CÓ LỖI
+                return resolve({
+                    errCode: 2,
+                    errMessage: 'Missing required parameters!'
+                });
+            }
+
+            // 2. TÌM KIẾM: Lôi người dùng từ Database lên
+            let user = await db.User.findOne({
+                where: { id: data.id },
+                raw: false // Bắt buộc raw: false để giữ lại các hàm của Sequelize (như hàm save)
+            });
+
+            // 3. CẬP NHẬT: Nếu tìm thấy thì đổ dữ liệu mới vào
+            if (user) {
+                user.firstName = data.firstName;
+                user.lastName = data.lastName;
+                user.address = data.address;
+                user.roleId = data.roleId;
+                user.positionId = data.positionId;
+                if (data.gender === '1') {
+                    user.gender = true;
+                } else {
+                    user.gender = false;
+                }
+
+                // Nếu DB của bạn có trường phoneNumber thì cập nhật luôn
+                if (data.phoneNumber) {
+                    user.phoneNumber = data.phoneNumber;
+                }
+
+                // 4. LƯU LẠI: Đẩy cục dữ liệu đã cập nhật xuống Database
+                await user.save();
+
+                return resolve({
+                    errCode: 0,
+                    errMessage: 'Update the user succeeds!'
+                });
+            } else {
+                // Truyền một cái ID bậy bạ không tồn tại trong DB
+                return resolve({
+                    errCode: 1,
+                    errMessage: 'User not found!'
+                });
+            }
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
+let deleteUser = (userId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let user = await db.User.findOne({
+                where: { id: userId }
+            })
+            if (!user) {
+                resolve({
+                    errCode: 2,
+                    errMessage: 'The user is not exist'
+                })
+            }
+            await db.User.destroy({
+                where: { id: userId }
+            })
+            resolve({
+                errCode: 0,
+                errMessage: 'The user is deleted'
+            })
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
+let getAllCodeService = (typeInput) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!typeInput) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameters!',
+                })
+            }
+            let res = {};
+            let allcode = await db.Allcode.findAll({
+                where: { type: typeInput }
+            });
+            res.errCode = 0;
+            res.errMessage = 'OK';
+            res.data = allcode;
+            resolve(res);
+        }
+        catch (e) {
+            reject(e);
+        }
+    })
+}
 module.exports = {
     handleUserLogin: handleUserLogin,
     checkUserEmail: checkUserEmail,
-    getAllUsers: getAllUsers
+    getAllUsers: getAllUsers,
+    createNewUser: createNewUser,
+    editUser: editUser,
+    deleteUser: deleteUser,
+    getAllCodeService: getAllCodeService
 }

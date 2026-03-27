@@ -89,6 +89,11 @@ let updateUserData = (data) => {
                 user.lastName = data.lastName;
                 user.address = data.address;
                 user.phoneNumber = data.phoneNumber;
+                user.roleId = data.roleId;
+                user.positionId = data.positionId;
+
+                // Xử lý an toàn cho giới tính (đề phòng React gửi xuống là true/false hoặc '1'/'0')
+                user.gender = (data.gender === '1' || data.gender === true || data.gender === 1) ? true : false;
 
                 // Bước 3: Lưu lại cục thay đổi này vào Database
                 await user.save();
@@ -131,5 +136,6 @@ module.exports = {
     getAllUser: getAllUser,
     getUserInfoById: getUserInfoById,
     updateUserData: updateUserData,
-    deleteUserById: deleteUserById
+    deleteUserById: deleteUserById,
+    hashUserPassword: hashUserPassword
 }

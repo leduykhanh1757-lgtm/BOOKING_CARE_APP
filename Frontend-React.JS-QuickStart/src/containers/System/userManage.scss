@@ -1,0 +1,64 @@
+table {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td,
+th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #ddd;
+}
+
+th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #04AA6D;
+    color: white;
+}
+
+.btn-edit {
+    width: 30px;
+    padding: 5px;
+    margin-right: 10px;
+    /* Đẩy nút Xóa ra xa một chút cho khỏi bấm nhầm */
+    border: none;
+    background-color: #f0ad4e;
+    color: white;
+    cursor: pointer;
+    border-radius: 3px;
+    font-weight: 600;
+    transition: all 0.3s;
+    /* Hiệu ứng chuyển màu mượt mà */
+
+    &:hover {
+        background-color: #ec971f;
+        /* Đậm hơn khi di chuột vào */
+    }
+}
+
+/* Style cho nút Delete (Màu đỏ) */
+.btn-delete {
+    width: 30px;
+    padding: 5px;
+    border: none;
+    background-color: #d9534f;
+    color: white;
+    cursor: pointer;
+    border-radius: 3px;
+    font-weight: 600;
+    transition: all 0.3s;
+
+    &:hover {
+        background-color: #c9302c;
+    }
+}

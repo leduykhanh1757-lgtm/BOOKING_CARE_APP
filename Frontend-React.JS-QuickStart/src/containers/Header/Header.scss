@@ -3,21 +3,52 @@
 .header-container {
     z-index: 99;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; // chia khối thành 3 phần, nếu có 2 phần tử
+    // thì 2 cái 1 cái ở đầu 1 cái ở cuối, có thêm cái thứ 3 thì nó sẽ căn ở giữa
     background-color: $colormain;
     color: $common-text-color;
     height: 40px;
     position: relative;
+
     .btn-logout {
         color: $common-text-color;
         line-height: 40px;
         height: 40px;
         padding: 0 10px;
+
         &:hover {
             background-color: darken($colormain, 5);
         }
+
         i {
             font-size: $base-size + 1px;
+        }
+    }
+
+    .languages {
+        .welcome {
+            margin-right: 15px;
+        }
+
+        .languages-en {
+            margin-right: 15px;
+            margin-left: 10px;
+            cursor: pointer;
+
+            &.active {
+                opacity: 1;
+                color: blue;
+            }
+        }
+
+        .languages-vi {
+            cursor: pointer;
+
+
+            &.active {
+                opacity: 1;
+                color: blue;
+            }
         }
     }
 }
