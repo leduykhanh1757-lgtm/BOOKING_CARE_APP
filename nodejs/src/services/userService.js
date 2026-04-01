@@ -113,9 +113,10 @@ let createNewUser = (data) => {
                     lastName: data.lastName,
                     address: data.address,
                     phoneNumber: data.phoneNumber,
-                    gender: data.gender === '1' ? true : false,
+                    gender: data.gender,
                     roleId: data.roleId,
                     positionId: data.positionId,
+                    image: data.avatar
                 })
                 resolve({
                     errCode: 0,
@@ -153,17 +154,12 @@ let editUser = (data) => {
                 user.address = data.address;
                 user.roleId = data.roleId;
                 user.positionId = data.positionId;
-                if (data.gender === '1') {
-                    user.gender = true;
-                } else {
-                    user.gender = false;
-                }
+                user.gender = data.gender;
+                user.phoneNumber = data.phoneNumber;
 
-                // Nếu DB của bạn có trường phoneNumber thì cập nhật luôn
-                if (data.phoneNumber) {
-                    user.phoneNumber = data.phoneNumber;
+                if (data.avatar) {
+                    user.image = data.avatar;
                 }
-
                 // 4. LƯU LẠI: Đẩy cục dữ liệu đã cập nhật xuống Database
                 await user.save();
 

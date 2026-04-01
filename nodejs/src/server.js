@@ -12,9 +12,8 @@ dotenv.config();
 let app = express();
 app.use(cors({ credentials: true, origin: true })); // Cho phép truy cập từ các domain khác
 // Cấu hình body-parser để server hiểu được dữ liệu client gửi lên
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // Khởi tạo cấu hình View Engine
 configViewEngine(app);
 

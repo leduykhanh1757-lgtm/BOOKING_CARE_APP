@@ -60,10 +60,15 @@ class App extends Component {
                         </div>
 
                         <ToastContainer
-                            className="toast-container" toastClassName="toast-item" bodyClassName="toast-item-body"
-                            autoClose={false} hideProgressBar={true} pauseOnHover={false}
-                            pauseOnFocusLoss={true} closeOnClick={false} draggable={false}
-                            closeButton={<CustomToastCloseButton />}
+                            position="top-right" //  Vị trí hiện: Góc trên bên phải
+                            autoClose={3000}     // Tự động tắt sau 3000ms (3 giây)
+                            hideProgressBar={false} // Bật thanh chạy thời gian lên cho ngầu
+                            newestOnTop={false}
+                            closeOnClick={true}  // Cho phép click thẳng vào thông báo để tắt luôn
+                            rtl={false}
+                            pauseOnFocusLoss={true}
+                            draggable={true}     // Cho phép dùng chuột kéo thả vuốt đi
+                            pauseOnHover={true}  // Rê chuột vào thì dừng thời gian tắt
                         />
                     </div>
                 </Router>

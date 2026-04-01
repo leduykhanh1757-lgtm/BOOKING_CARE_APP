@@ -2,33 +2,44 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // import { FormattedMessage } from 'react-intl'; // Dùng nếu có quốc tế hóa
 import Slider from "react-slick";
-
-import doctorImg from '../../../assets/specialty/CHANTHUONGCHINHHINH.jpg';
-
+import * as actions from '../../../store/actions';
+import { getTopDoctorHomeService } from '../../../services/userService';
+import { languages } from '../../../utils';
 
 class Doctor extends Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            arrDoctors: []
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.topDoctorsRedux !== this.props.topDoctorsRedux) {
+            this.setState({
+                arrDoctors: this.props.topDoctorsRedux
+            })
+        }
+    }
+
+    componentDidMount() {
+        this.props.loadTopDoctors();
+    }
     render() {
-        // Cấu hình Slider giống hệt specialty
+        let arrDoctors = this.state.arrDoctors;
+        let { language } = this.props;
+        arrDoctors = arrDoctors.concat(arrDoctors).concat(arrDoctors); // Nhân đôi mảng để có đủ 12 bác sĩ cho slider
+        console.log('check state arrDoctors: ', this.state.arrDoctors);
         let settings = {
             dots: false,
-            infinite: true,
+            infinite: true, // Nếu data ít hơn 4 bác sĩ, bạn có thể cân nhắc đổi thành false để tránh lỗi UI lặp
             speed: 500,
             slidesToShow: 4,
             slidesToScroll: 1
         };
 
-        // 1. TẠO DỮ LIỆU MẪU ĐỂ MAPPING (Làm app thật là data này lấy từ API về)
-        let dataDoctors = [
-            { name: 'Giáo sư, Tiến sĩ Trần Ngọc Ân', specialty: 'Cơ Xương Khớp 1', image: doctorImg },
-            { name: 'Phó Giáo sư, Tiến sĩ Trần Đình Ngạn', specialty: 'Tim mạch 2', image: doctorImg },
-            { name: 'Tiến sĩ, Bác sĩ Trịnh Thị Ngọc', specialty: 'Gan mật 3', image: doctorImg },
-            { name: 'Bác sĩ CKII Nguyễn Tiến Lang', specialty: 'Tiêu hóa 4', image: doctorImg },
-            { name: 'Giáo sư, Tiến sĩ Trần Ngọc Ân', specialty: 'Cơ Xương Khớp 5', image: doctorImg }, // Copy thêm cho đủ slider
-        ]
-
         return (
-            // Dùng chung class section-share, thêm class riêng section-outstanding-doctor
             <div className="section-share section-outstanding-doctor">
                 <div className="section-container">
                     <div className="section-header">
@@ -37,24 +48,31 @@ class Doctor extends Component {
                     </div>
                     <div className="section-body">
                         <Slider {...settings}>
+                            {arrDoctors && arrDoctors.length > 0 &&
+                                arrDoctors.map((item, index) => {
 
-                            {/* 2. DÙNG .map() ĐỂ HIỂN THỊ */}
-                            {dataDoctors && dataDoctors.length > 0 &&
-                                dataDoctors.map((item, index) => {
+                                    // Lấy trực tiếp item.image do Node.js gửi lên
+                                    let imageBase64 = '';
+                                    if (item.image) {
+                                        imageBase64 = item.image;
+                                    }
+
+                                    let nameVi = `${item.positionData.valueVi}, ${item.lastName} ${item.firstName}`;
+                                    let nameEn = `${item.positionData.valueEn}, ${item.firstName} ${item.lastName}`;
+
                                     return (
-                                        // TUYỆT CHIÊU BỌC VỎ: Thẻ div vô danh bọc ngoài y hệt specialty
                                         <div key={index} className="doctor-wrapper">
                                             <div className="doctor-customize">
-
-                                                {/* Ảnh bác sĩ (hình tròn nhờ CSS) */}
+                                                {/* Gắn vào background */}
                                                 <div
                                                     className="bg-image"
-                                                    style={{ backgroundImage: `url(${item.image})` }}
+                                                    style={{ backgroundImage: `url(${imageBase64})` }}
                                                 ></div>
 
-                                                {/* Chữ: Tên bác sĩ & Chuyên khoa */}
-                                                <h4 className="doctor-name">{item.name}</h4>
-                                                <h5 className="doctor-specialty">{item.specialty}</h5>
+                                                <h4 className="doctor-name">
+                                                    {language === 'vi' ? nameVi : nameEn}
+                                                </h4>
+                                                <h5 className="doctor-specialty">Cơ xương khớp</h5>
                                             </div>
                                         </div>
                                     )
@@ -69,7 +87,17 @@ class Doctor extends Component {
     }
 }
 
-const mapStateToProps = state => { return { isLoggedIn: state.user.isLoggedIn }; };
-const mapDispatchToProps = dispatch => { return {}; };
+const mapStateToProps = state => {
+    return {
+        isLoggedIn: state.user.isLoggedIn,
+        topDoctorsRedux: state.admin.topDoctors,
+        language: state.app.language,
+    };
+};
+const mapDispatchToProps = dispatch => {
+    return {
+        loadTopDoctors: () => dispatch(actions.fetchTopDoctor())
+    };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Doctor);

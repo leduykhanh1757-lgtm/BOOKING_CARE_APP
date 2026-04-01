@@ -1,0 +1,62 @@
+#customers {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Thêm đổ bóng cho nổi bật */
+
+    td,
+    th {
+        border: 1px solid #dee2e6;
+        /* Đổi màu viền nhạt đi cho tinh tế */
+        padding: 12px;
+        /* Tăng khoảng cách chữ cho thoáng */
+    }
+
+    tr:hover {
+        background-color: #e2e6ea;
+    }
+
+    th {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        text-align: left;
+        background-color: #0071ba;
+        color: white;
+        font-weight: 600;
+    }
+
+    /* CSS nút Sửa/Xóa */
+    .btn-edit,
+    .btn-delete {
+        border: none;
+        outline: none;
+        background: transparent;
+        padding: 5px 10px;
+        margin: 0 5px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        i {
+            font-size: 1.2rem;
+        }
+    }
+
+    .btn-edit {
+        color: #f39c12;
+
+        &:hover {
+            color: #e67e22;
+            transform: scale(1.1);
+        }
+    }
+
+    .btn-delete {
+        color: #e74c3c;
+
+        &:hover {
+            color: #c0392b;
+            transform: scale(1.1);
+        }
+    }
+}
