@@ -6,13 +6,6 @@ import handbookImg from '../../../assets/specialty/TAIMUIHONG.jpg';
 
 class Handbook extends Component {
     render() {
-        let settings = {
-            dots: false,
-            infinite: true,
-            speed: 500,
-            slidesToShow: 4,
-            slidesToScroll: 1
-        };
 
         // 1. Dữ liệu bài viết mẫu
         let dataHandbook = [
@@ -32,7 +25,7 @@ class Handbook extends Component {
                         <button>TẤT CẢ BÀI VIẾT</button>
                     </div>
                     <div className="section-body">
-                        <Slider {...settings}>
+                        <Slider {...this.props.settings}>
 
                             {/* 2. DÙNG .map() ĐỂ HIỂN THỊ */}
                             {dataHandbook && dataHandbook.length > 0 &&

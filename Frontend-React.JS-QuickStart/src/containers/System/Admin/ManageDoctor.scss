@@ -1,0 +1,48 @@
+.manage-doctor-container {
+    padding: 0 15px;
+
+    .manage-doctor-title {
+        text-align: center;
+        text-transform: uppercase;
+        font-weight: 600;
+        font-size: 18px;
+        margin: 15px 0;
+    }
+
+    .manage-doctor-editor {
+        margin-bottom: 15px;
+    }
+
+    .save-content-doctor {
+        padding: 5px 15px;
+        border-radius: 3px;
+        outline: none;
+        border: none;
+        background-color: #fca927;
+        color: white;
+        margin-bottom: 50px;
+
+        &:hover {
+            background-color: #d18a1a;
+        }
+    }
+
+    .more-infor {
+        display: flex;
+        gap: 20px; // Khoảng cách giữa các cột
+        margin-bottom: 20px;
+
+        .content-left {
+            width: 40%; // Dropdown chiếm 40% màn hình
+
+            label {
+                font-weight: 600;
+                margin-bottom: 5px;
+            }
+        }
+
+        .content-right {
+            width: 60%;
+        }
+    }
+}

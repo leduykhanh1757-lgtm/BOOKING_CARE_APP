@@ -13,15 +13,27 @@ import "slick-carousel/slick/slick-theme.css";
 
 class HomePage extends Component {
 
+    handleAfterChange = (index) => {
+        console.log('Current slide index:', index);
+    }
+
 
     render() {
+        let settings = {
+            dots: false,
+            infinite: false,
+            speed: 500,
+            slidesToShow: 4,
+            slidesToScroll: 1,
+            afterChange: this.handleAfterChange // Thêm sự kiện sau khi chuyển slide
+        };
         return (
             <div>
                 <HomeHeader />
-                <Specialty />
-                <MedicalFacility />
-                <Doctor />
-                <HandBook />
+                <Specialty settings={settings} />
+                <MedicalFacility settings={settings} />
+                <Doctor settings={settings} />
+                <HandBook settings={settings} />
                 <About />
                 <HomeFooter />
             </div>

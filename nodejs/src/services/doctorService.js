@@ -5,18 +5,28 @@ let getTopDoctorHome = (limitInput) => {
         try {
             let users = await db.User.findAll({
                 limit: limitInput,
-                where: { roleId: 'R2' }, // R2 là mã của Doctor
-                order: [['createdAt', 'DESC']], // Lấy những người mới tạo lên trước
+                where: { roleId: 'R2' },
+                order: [['createdAt', 'DESC']],
                 attributes: {
-                    exclude: ['password'] // Tuyệt đối không gửi password ra ngoài
+                    exclude: ['password']
                 },
                 include: [
                     { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
                     { model: db.Allcode, as: 'genderData', attributes: ['valueEn', 'valueVi'] }
                 ],
                 raw: true,
-                nest: true // Giúp gom nhóm dữ liệu join bảng cho gọn gàng
+                nest: true
             })
+
+            if (users && users.length > 0) {
+                users = users.map(item => {
+                    if (item.image) {
+                        item.image = new Buffer(item.image, 'base64').toString('binary');
+                    }
+                    return item;
+                })
+            }
+
             resolve({
                 errCode: 0,
                 data: users
@@ -27,6 +37,55 @@ let getTopDoctorHome = (limitInput) => {
     })
 }
 
+let getAllDoctors = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let doctors = await db.User.findAll({
+                where: { roleId: 'R2' },
+                attributes: {
+                    exclude: ['password', 'image']
+                }
+            })
+            resolve({
+                errCode: 0,
+                data: doctors
+            })
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
+let saveDetailInforDoctor = (inputData) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // 1. Check xem React có gửi thiếu dữ liệu không (Validate)
+            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing parameter'
+                })
+            } else {
+                // 2. Lưu vào Database bảng Markdown
+                await db.Markdown.create({
+                    contentHTML: inputData.contentHTML,
+                    contentMarkdown: inputData.contentMarkdown,
+                    description: inputData.description,
+                    doctorId: inputData.doctorId,
+                })
+
+                resolve({
+                    errCode: 0,
+                    errMessage: 'Save infor doctor succeed!'
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
 module.exports = {
-    getTopDoctorHome: getTopDoctorHome
+    getTopDoctorHome: getTopDoctorHome,
+    getAllDoctors: getAllDoctors,
+    saveDetailInforDoctor: saveDetailInforDoctor
 }

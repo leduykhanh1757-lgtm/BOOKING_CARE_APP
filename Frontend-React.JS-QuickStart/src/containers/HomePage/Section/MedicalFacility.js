@@ -6,14 +6,6 @@ import facilityImg from '../../../assets/specialty/TAIMUIHONG.jpg';
 
 class MedicalFacility extends Component {
     render() {
-        let settings = {
-            dots: false,
-            infinite: true,
-            speed: 500,
-            slidesToShow: 4,
-            slidesToScroll: 1
-        };
-
         return (
             // Dùng chung class section-share, thêm class riêng section-medical-facility
             <div className="section-share section-medical-facility">
@@ -23,7 +15,7 @@ class MedicalFacility extends Component {
                         <button>XEM THÊM</button>
                     </div>
                     <div className="section-body">
-                        <Slider {...settings}>
+                        <Slider {...this.props.settings}>
                             <div>
                                 <div className="img-customize">
                                     <div className="bg-image" style={{ backgroundImage: `url(${facilityImg})` }} />

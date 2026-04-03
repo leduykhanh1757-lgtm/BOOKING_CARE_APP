@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-// import { FormattedMessage } from 'react-intl'; // Dùng nếu có quốc tế hóa
+import { FormattedMessage } from 'react-intl'; // Dùng nếu có quốc tế hóa
 import Slider from "react-slick";
 import * as actions from '../../../store/actions';
 import { getTopDoctorHomeService } from '../../../services/userService';
 import { languages } from '../../../utils';
+
 
 class Doctor extends Component {
 
@@ -29,33 +30,19 @@ class Doctor extends Component {
     render() {
         let arrDoctors = this.state.arrDoctors;
         let { language } = this.props;
-        arrDoctors = arrDoctors.concat(arrDoctors).concat(arrDoctors); // Nhân đôi mảng để có đủ 12 bác sĩ cho slider
         console.log('check state arrDoctors: ', this.state.arrDoctors);
-        let settings = {
-            dots: false,
-            infinite: true, // Nếu data ít hơn 4 bác sĩ, bạn có thể cân nhắc đổi thành false để tránh lỗi UI lặp
-            speed: 500,
-            slidesToShow: 4,
-            slidesToScroll: 1
-        };
 
         return (
             <div className="section-share section-outstanding-doctor">
                 <div className="section-container">
                     <div className="section-header">
-                        <h3>Bác sĩ nổi bật tuần qua</h3>
-                        <button>XEM THÊM</button>
+                        <h3><FormattedMessage id="homepage.outstanding-doctor" /></h3>
+                        <button><FormattedMessage id="homepage.more-info" /></button>
                     </div>
                     <div className="section-body">
-                        <Slider {...settings}>
+                        <Slider {...this.props.settings}>
                             {arrDoctors && arrDoctors.length > 0 &&
                                 arrDoctors.map((item, index) => {
-
-                                    // Lấy trực tiếp item.image do Node.js gửi lên
-                                    let imageBase64 = '';
-                                    if (item.image) {
-                                        imageBase64 = item.image;
-                                    }
 
                                     let nameVi = `${item.positionData.valueVi}, ${item.lastName} ${item.firstName}`;
                                     let nameEn = `${item.positionData.valueEn}, ${item.firstName} ${item.lastName}`;
@@ -63,10 +50,10 @@ class Doctor extends Component {
                                     return (
                                         <div key={index} className="doctor-wrapper">
                                             <div className="doctor-customize">
-                                                {/* Gắn vào background */}
+
                                                 <div
                                                     className="bg-image"
-                                                    style={{ backgroundImage: `url(${imageBase64})` }}
+                                                    style={{ backgroundImage: `url(${item.image})` }}
                                                 ></div>
 
                                                 <h4 className="doctor-name">
@@ -78,7 +65,6 @@ class Doctor extends Component {
                                     )
                                 })
                             }
-
                         </Slider>
                     </div>
                 </div>

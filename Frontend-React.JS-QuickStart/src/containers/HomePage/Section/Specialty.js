@@ -18,13 +18,7 @@ import NOITIET from '../../../assets/specialty/NOITIET.jpg';
 
 class Specialty extends Component {
     render() {
-        let settings = {
-            dots: false,
-            infinite: true,
-            speed: 500,
-            slidesToShow: 4,
-            slidesToScroll: 1
-        };
+
         return (
             <div className="section-share section-specialty">
                 <div className="section-container">
@@ -33,7 +27,7 @@ class Specialty extends Component {
                         <button>XEM THÊM</button>
                     </div>
                     <div className="section-body">
-                        <Slider {...settings}>
+                        <Slider {...this.props.settings}>
                             <div>
                                 <div className="img-customize">
                                     <div className="bg-image" style={{ backgroundImage: `url(${XUONGKHOP})` }} />

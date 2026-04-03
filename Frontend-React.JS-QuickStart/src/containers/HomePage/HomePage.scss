@@ -108,8 +108,11 @@
                 padding: 15px;
                 color: #333;
             }
+
         }
+
     }
+
 }
 
 .section-medical-facility {
@@ -142,8 +145,11 @@
                 padding: 15px;
                 color: #333;
             }
+
         }
+
     }
+
 }
 
 .section-outstanding-doctor {
@@ -192,9 +198,13 @@
                 margin-top: 5px;
                 font-weight: 400;
                 text-align: center;
+
             }
+
         }
+
     }
+
 }
 
 .section-handbook {
@@ -227,8 +237,11 @@
             &:hover .handbook-title {
                 color: #45c3d2;
             }
+
         }
+
     }
+
 }
 
 .home-footer {
@@ -239,8 +252,8 @@
     background-color: #f5f5f5;
     /* Màu nền xám nhạt nhẹ nhàng */
     border-top: 1px solid #ddd;
-    /* Kẻ một đường viền mỏng ngăn cách với phần trên */
 
+    /* Kẻ một đường viền mỏng ngăn cách với phần trên */
     p {
         margin: 0;
         font-size: 14px;
@@ -254,8 +267,8 @@
             margin-left: 10px;
             font-weight: 600;
             transition: all 0.3s ease;
-            /* Phép thuật làm mượt quen thuộc */
 
+            /* Phép thuật làm mượt quen thuộc */
             &:hover {
                 color: #ffc107;
                 /* Đổi sang màu vàng khi di chuột vào */
@@ -290,6 +303,7 @@
                 border-radius: 10px; // Bo góc cái video cho mềm mại
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); // Đổ bóng nhẹ cho video nổi lên
             }
+
         }
 
         .content-right {
@@ -302,6 +316,14 @@
                 text-align: justify; // Căn đều 2 bên mép chữ
                 margin-top: 20px;
             }
+
         }
+
     }
+
+}
+
+.slick-prev.slick-disabled,
+.slick-next.slick-disabled {
+    display: none !important;
 }
