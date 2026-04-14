@@ -6,30 +6,13 @@
         text-transform: uppercase;
         font-weight: 600;
         font-size: 18px;
-        margin: 15px 0;
+        margin: 15px 0 20px 0;
     }
 
-    .manage-doctor-editor {
-        margin-bottom: 15px;
-    }
-
-    .save-content-doctor {
-        padding: 5px 15px;
-        border-radius: 3px;
-        outline: none;
-        border: none;
-        background-color: #fca927;
-        color: white;
-        margin-bottom: 50px;
-
-        &:hover {
-            background-color: #d18a1a;
-        }
-    }
-
+    // Khu vực chứa Dropdown và Textarea
     .more-infor {
         display: flex;
-        gap: 20px; // Khoảng cách giữa các cột
+        gap: 20px; // Khoảng cách giữa 2 cột
         margin-bottom: 20px;
 
         .content-left {
@@ -37,12 +20,65 @@
 
             label {
                 font-weight: 600;
-                margin-bottom: 5px;
+                margin-bottom: 8px;
+                display: block; // Giúp label đứng độc lập 1 dòng
             }
         }
 
         .content-right {
-            width: 60%;
+            width: 60%; // Textarea chiếm 60% màn hình
+
+            label {
+                font-weight: 600;
+                margin-bottom: 8px;
+                display: block;
+            }
+
+            textarea {
+                width: 100%;
+                border-radius: 4px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                outline: none;
+
+                &:focus {
+                    border-color: #0071ba; // Đổi màu viền khi click vào nhập chữ
+                }
+            }
         }
+    }
+
+    .manage-doctor-editor {
+        margin-bottom: 15px;
+    }
+
+    .save-content-doctor,
+    .create-content-doctor {
+        padding: 8px 25px;
+        border-radius: 4px;
+        outline: none;
+        border: none;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 50px;
+        margin-top: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease; // Chuyển động mượt khi hover
+
+        &:hover {
+            opacity: 0.85;
+            transform: translateY(-2px); // Hiệu ứng nảy lên nhẹ
+        }
+    }
+
+    .create-content-doctor {
+        background-color: #0071ba;
+        box-shadow: 0 4px 6px rgba(0, 113, 186, 0.25);
+    }
+
+    .save-content-doctor {
+        background-color: #fca927;
+        box-shadow: 0 4px 6px rgba(252, 169, 39, 0.25);
     }
 }

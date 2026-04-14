@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       User.belongsTo(models.Allcode, { foreignKey: 'positionId', targetKey: 'keyMap', as: 'positionData' });
       User.belongsTo(models.Allcode, { foreignKey: 'gender', targetKey: 'keyMap', as: 'genderData' });
+      // foreignKey: 'positionId' => positionId trong bảng User
+      // targetKey: 'keyMap' => keyMap trong bảng Allcode
+      // as: 'positionData' => tên alias để truy cập dữ liệu liên kết từ bảng Allcode thông qua positionId
+      User.hasOne(models.Markdown, { foreignKey: 'doctorId', as: 'markdownData' });
     }
   };
   User.init({

@@ -1,0 +1,65 @@
+.doctor-detail-container {
+    padding: 0 100px; // Cách 2 lề giống BookingCare
+
+    .intro-doctor {
+        display: flex;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #ddd; // Kẻ vạch ngang phân cách
+
+        .content-left {
+            width: 20%;
+            display: flex;
+            justify-content: center;
+
+            .doctor-image {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%; // Bo tròn ảnh
+                background-position: center;
+                background-size: cover;
+                background-repeat: no-repeat;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        .content-right {
+            width: 80%;
+            padding-left: 15px;
+            display: flex;
+            flex-direction: column;
+
+            .up {
+                font-size: 24px;
+                font-weight: 600;
+                margin-bottom: 10px;
+                color: #333;
+            }
+
+            .down {
+                font-size: 15px;
+                color: #555;
+                text-align: justify;
+                line-height: 1.5;
+            }
+        }
+    }
+
+    .detail-infor-doctor {
+        // Căn chỉnh cho đoạn text HTML hiển thị đẹp mắt
+        padding: 20px 0;
+        line-height: 1.8;
+        font-size: 15px;
+        color: #333;
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    }
+}

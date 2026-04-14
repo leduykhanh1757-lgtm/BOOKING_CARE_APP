@@ -5,7 +5,7 @@ import Slider from "react-slick";
 import * as actions from '../../../store/actions';
 import { getTopDoctorHomeService } from '../../../services/userService';
 import { languages } from '../../../utils';
-
+import { withRouter } from 'react-router';
 
 class Doctor extends Component {
 
@@ -26,6 +26,10 @@ class Doctor extends Component {
 
     componentDidMount() {
         this.props.loadTopDoctors();
+    }
+
+    handleViewDetailDoctor = (doctor) => {
+        this.props.history.push(`/detail-doctor/${doctor.id}`);
     }
     render() {
         let arrDoctors = this.state.arrDoctors;
@@ -48,7 +52,7 @@ class Doctor extends Component {
                                     let nameEn = `${item.positionData.valueEn}, ${item.firstName} ${item.lastName}`;
 
                                     return (
-                                        <div key={index} className="doctor-wrapper">
+                                        <div key={index} className="doctor-wrapper" onClick={() => this.handleViewDetailDoctor(item)}>
                                             <div className="doctor-customize">
 
                                                 <div
@@ -86,4 +90,4 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Doctor);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Doctor));
