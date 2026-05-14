@@ -1,5 +1,8 @@
 import db from '../models/index';
+require('dotenv').config();
+import _ from 'lodash';
 
+const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 let getTopDoctorHome = (limitInput) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -135,9 +138,64 @@ let getInforDoctorById = (doctorId) => {
         }
     })
 }
+
+let bulkCreateScheduleService = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // 1. Kiểm tra dữ liệu đầu vào
+            if (!data.arrSchedule || !data.doctorId || !data.formatedDate) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameters!'
+                })
+            } else {
+                let schedule = data.arrSchedule;
+
+                // 2. Thêm các trường cần thiết nếu database yêu cầu (maxNumber...)
+                if (schedule && schedule.length > 0) {
+                    schedule = schedule.map(item => {
+                        item.maxNumber = MAX_NUMBER_SCHEDULE;
+                        return item;
+                    })
+                }
+
+                let existing = await db.Schedule.findAll({
+                    where: {
+                        doctorId: data.doctorId,
+                        date: '' + data.formatedDate
+                        // ép kiểu về String để so sánh chính xác
+                        //  với dữ liệu mới (cũng đã được ép kiểu String)
+                    },
+                    attributes: ['timeType', 'date', 'doctorId', 'maxNumber'],
+                    raw: true
+                });
+
+                // ÉP KIỂU KHI SO SÁNH (Biến cả a và b thành String để so sánh chuẩn xác tuyệt đối)
+                let toCreate = _.differenceWith(schedule, existing, (a, b) => {
+                    return a.timeType === b.timeType && '' + a.date === '' + b.date;
+                });
+
+                console.log(">>> [KIỂM TRA] Lịch MỚI TINH chuẩn bị lưu: ", toCreate);
+
+                // Chỉ lưu mảng mới
+                if (toCreate && toCreate.length > 0) {
+                    await db.Schedule.bulkCreate(toCreate);
+                }
+
+                resolve({
+                    errCode: 0,
+                    errMessage: 'OK'
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
     saveDetailInforDoctor: saveDetailInforDoctor,
-    getInforDoctorById: getInforDoctorById
+    getInforDoctorById: getInforDoctorById,
+    bulkCreateScheduleService: bulkCreateScheduleService,
 }

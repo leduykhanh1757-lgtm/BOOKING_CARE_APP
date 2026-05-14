@@ -61,5 +61,12 @@
         "more-info": "More info",
         "handbook": "Health handbook",
         "more-info-handbook": "More health handbook"
+    },
+    "manage-schedule": {
+        "manage-schedule": "Manage medical examination schedule",
+        "choose-doctor": "Choose doctor",
+        "select-date": "Select date",
+        "no-schedule": "No schedule for this day",
+        "save-schedule": "Save information"
     }
 }
