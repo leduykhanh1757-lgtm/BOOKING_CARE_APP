@@ -1,0 +1,100 @@
+.doctor-extra-infor-container {
+    padding-left: 15px;
+
+    .content-up {
+        margin-bottom: 15px;
+
+        .title-address {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .name-clinic {
+            font-weight: 600;
+            padding-top: 5px;
+        }
+
+        .detail-address {
+            font-size: 13px;
+        }
+    }
+
+    .content-down {
+        .short-infor {
+            span {
+                font-weight: 600;
+            }
+
+            .currency {
+                font-weight: 600;
+            }
+
+            .detail {
+                cursor: pointer;
+                color: #45c3d2;
+                margin-left: 10px;
+                font-weight: 400;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        .detail-infor {
+            border: 1px solid #ddd;
+            background: #f8f9f9;
+            padding: 10px;
+            border-radius: 4px;
+
+            .price-info {
+                display: flex;
+                justify-content: space-between;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 10px;
+
+                .left {
+                    display: flex;
+                    flex-direction: column;
+
+                    .title {
+                        font-weight: 600;
+                    }
+
+                    .note {
+                        font-size: 12px;
+                        color: #666;
+                        margin-top: 5px;
+                    }
+                }
+
+                .right {
+                    .currency {
+                        font-weight: 600;
+                    }
+                }
+            }
+
+            .payment-info {
+                padding-top: 10px;
+                font-size: 13px;
+                color: #555;
+            }
+
+            .hide-price {
+                margin-top: 10px;
+
+                span {
+                    cursor: pointer;
+                    color: #45c3d2;
+
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+    }
+}

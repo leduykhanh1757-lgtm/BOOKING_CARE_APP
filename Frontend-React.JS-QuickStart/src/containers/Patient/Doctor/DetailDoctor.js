@@ -4,6 +4,8 @@ import { withRouter } from 'react-router';
 import { getDetailInforDoctor } from '../../../services/userService';
 import HomeHeader from '../../HomePage/HomeHeader';
 import './DetailDoctor.scss';
+import DoctorSchedule from './DoctorSchedule';
+import DoctorExtraInfor from './DoctorExtraInfor';
 
 class DetailDoctor extends Component {
 
@@ -65,7 +67,16 @@ class DetailDoctor extends Component {
                         </div>
                     </div>
                     <div className="schedule-doctor">
-
+                        <div className="content-left">
+                            <DoctorSchedule
+                                doctorId={this.state.detailDoctor && this.state.detailDoctor.id ? this.state.detailDoctor.id : -1}
+                            />
+                        </div>
+                        <div className="content-right">
+                            <DoctorExtraInfor
+                                doctorIdFromParent={this.state.detailDoctor && this.state.detailDoctor.id ? this.state.detailDoctor.id : -1}
+                            />
+                        </div>
                     </div>
 
                     <div className="detail-infor-doctor">

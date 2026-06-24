@@ -1,0 +1,78 @@
+.doctor-schedule-container {
+    .all-schedule {
+        select {
+            margin: 10px 0;
+            padding: 5px;
+            border: none;
+            border-bottom: 1px solid #ccc;
+            outline: none;
+            color: #337ab7;
+            font-weight: 600;
+            text-transform: capitalize;
+            cursor: pointer;
+
+            &:hover {
+                border-bottom: 1px solid #337ab7;
+            }
+        }
+    }
+
+    .all-available-time {
+        .text-calendar {
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 10px;
+            padding: 5px 0;
+
+            i {
+                margin-right: 5px;
+                color: #333;
+            }
+        }
+
+        .time-content {
+            .time-content-btns {
+                display: flex;
+                gap: 15px;
+                flex-wrap: wrap;
+
+                .btn-vie,
+                .btn-en {
+                    padding: 10px 15px;
+                    border: none;
+                    outline: none;
+                    background-color: #fff0b3; // Màu vàng nhạt giống Bookingcare
+                    color: #333;
+                    font-weight: 600;
+                    border-radius: 3px;
+                    min-width: 120px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+
+                    &:hover {
+                        background-color: #f7d549; // Hover đậm hơn
+                    }
+                }
+            }
+
+            .book-free {
+                margin-top: 15px;
+
+                span {
+                    font-size: 14px;
+                    color: #333;
+
+                    i {
+                        margin: 0 5px;
+                    }
+                }
+            }
+
+            .no-schedule {
+                font-style: italic;
+                color: #ff4d4f;
+                padding-top: 10px;
+            }
+        }
+    }
+}

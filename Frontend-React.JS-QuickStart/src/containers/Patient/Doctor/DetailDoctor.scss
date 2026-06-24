@@ -46,6 +46,25 @@
         }
     }
 
+    .schedule-doctor {
+        display: flex; // Ép 2 khối left-right nằm ngang
+        min-height: 200px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ddd; // Đường kẻ mờ ngăn cách phần dưới
+        padding-bottom: 20px;
+
+        .content-left {
+            width: 50%; // Lịch khám chiếm một nửa bên trái
+            padding-right: 15px; // Cách lề ra cho đỡ dính vào nhau
+        }
+
+        .content-right {
+            width: 50%;
+            padding-left: 15px;
+            border-left: 1px solid #eee; // Đường vạch sọc mờ mờ chia đôi 2 cột cho xịn
+        }
+    }
+
     .detail-infor-doctor {
         // Căn chỉnh cho đoạn text HTML hiển thị đẹp mắt
         padding: 20px 0;

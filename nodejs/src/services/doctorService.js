@@ -62,38 +62,71 @@ let getAllDoctors = () => {
 let saveDetailInforDoctor = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
-            // 1. Check xem React có gửi thiếu dữ liệu không (Validate)
-            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown) {
+            // 1. Validate dữ liệu
+            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown || !inputData.action
+                || !inputData.selectedPrice || !inputData.selectedPayment || !inputData.selectedProvince
+                || !inputData.nameClinic || !inputData.addressClinic) {
                 resolve({
                     errCode: 1,
-                    errMessage: 'Missing parameter'
+                    errMessage: 'Missing required parameters!'
                 })
             } else {
-                // 2. Kiểm tra xem bác sĩ này đã có thông tin trong bảng Markdown chưa
-                let markdown = await db.Markdown.findOne({
-                    where: { doctorId: inputData.doctorId },
-                    raw: false
-                })
-
-                if (markdown) {
-                    // NẾU ĐÃ CÓ: Tiến hành Cập nhật (Update)
-                    markdown.contentHTML = inputData.contentHTML;
-                    markdown.contentMarkdown = inputData.contentMarkdown;
-                    markdown.description = inputData.description;
-                    await markdown.save();
-                } else {
-                    // NẾU CHƯA CÓ: Tiến hành Tạo mới (Create)
+                // ========================================================
+                // XỬ LÝ BẢNG MARKDOWN 
+                // ========================================================
+                if (inputData.action === 'CREATE') {
                     await db.Markdown.create({
                         contentHTML: inputData.contentHTML,
                         contentMarkdown: inputData.contentMarkdown,
                         description: inputData.description,
                         doctorId: inputData.doctorId,
                     })
+                } else if (inputData.action === 'EDIT') {
+                    let markdown = await db.Markdown.findOne({
+                        where: { doctorId: inputData.doctorId },
+                        raw: false
+                    })
+                    if (markdown) {
+                        markdown.contentHTML = inputData.contentHTML;
+                        markdown.contentMarkdown = inputData.contentMarkdown;
+                        markdown.description = inputData.description;
+                        await markdown.save();
+                    }
+                }
+
+                // ========================================================
+                // XỬ LÝ BẢNG DOCTOR_INFOR 
+                // ========================================================
+                let doctorInfor = await db.Doctor_Infor.findOne({
+                    where: { doctorId: inputData.doctorId },
+                    raw: false
+                })
+
+                if (doctorInfor) {
+                    // Đã có -> Cập nhật (Upsert)
+                    doctorInfor.priceId = inputData.selectedPrice;
+                    doctorInfor.provinceId = inputData.selectedProvince;
+                    doctorInfor.paymentId = inputData.selectedPayment;
+                    doctorInfor.nameClinic = inputData.nameClinic;
+                    doctorInfor.addressClinic = inputData.addressClinic;
+                    doctorInfor.note = inputData.note;
+                    await doctorInfor.save();
+                } else {
+                    // Chưa có -> Tạo mới (Upsert)
+                    await db.Doctor_Infor.create({
+                        doctorId: inputData.doctorId,
+                        priceId: inputData.selectedPrice,
+                        provinceId: inputData.selectedProvince,
+                        paymentId: inputData.selectedPayment,
+                        nameClinic: inputData.nameClinic,
+                        addressClinic: inputData.addressClinic,
+                        note: inputData.note,
+                    })
                 }
 
                 resolve({
                     errCode: 0,
-                    errMessage: 'Save infor doctor succeed!'
+                    errMessage: 'Save info doctor succeed!'
                 })
             }
         } catch (e) {
@@ -101,44 +134,59 @@ let saveDetailInforDoctor = (inputData) => {
         }
     })
 }
-
-let getInforDoctorById = (doctorId) => {
+let getInforDoctorById = (inputId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!doctorId) {
+            if (!inputId) {
                 resolve({
                     errCode: 1,
-                    errMessage: 'Missing parameter'
+                    errMessage: 'Missing required parameter!'
+                })
+            } else {
+                let data = await db.User.findOne({
+                    where: { id: inputId },
+                    attributes: {
+                        exclude: ['password']
+                    },
+                    include: [
+                        {
+                            model: db.Markdown,
+                            as: 'markdownData',
+                            attributes: ['description', 'contentHTML', 'contentMarkdown']
+                        },
+                        { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
+                        {
+                            model: db.Doctor_Infor,
+                            attributes: {
+                                exclude: ['id', 'doctorId']
+                            },
+                            include: [
+                                { model: db.Allcode, as: 'priceTypeData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'provinceTypeData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'paymentTypeData', attributes: ['valueEn', 'valueVi'] },
+                            ]
+                        }
+                    ],
+                    raw: false,
+                    nest: true
+                })
+
+                if (data && data.image) {
+                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                }
+
+                if (!data) data = {};
+
+                resolve({
+                    errCode: 0,
+                    data: data
                 })
             }
-            let doctor = await db.User.findOne({
-                where: {
-                    id: doctorId
-                },
-                attributes: {
-                    exclude: ['password']
-                },
-                include: [
-                    { model: db.Markdown, as: 'markdownData' },
-                    { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
-                ],
-                raw: false,
-                nest: true
-            })
-            if (doctor && doctor.image) {
-                doctor.image = new Buffer(doctor.image, 'base64').toString('binary');
-            }
-            resolve({
-                errCode: 0,
-                data: doctor
-            })
-        }
-        catch (e) {
+        } catch (e) {
             reject(e);
         }
     })
 }
-
 let bulkCreateScheduleService = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -175,8 +223,6 @@ let bulkCreateScheduleService = (data) => {
                     return a.timeType === b.timeType && '' + a.date === '' + b.date;
                 });
 
-                console.log(">>> [KIỂM TRA] Lịch MỚI TINH chuẩn bị lưu: ", toCreate);
-
                 // Chỉ lưu mảng mới
                 if (toCreate && toCreate.length > 0) {
                     await db.Schedule.bulkCreate(toCreate);
@@ -192,10 +238,80 @@ let bulkCreateScheduleService = (data) => {
         }
     })
 }
+let getScheduleByDate = (doctorId, date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorId || !date) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameters!'
+                })
+            } else {
+                let dataSchedule = await db.Schedule.findAll({
+                    where: {
+                        doctorId: doctorId,
+                        date: date
+                    },
+                    include: [
+                        { model: db.Allcode, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.User, as: 'doctorData', attributes: ['firstName', 'lastName'] },
+                    ],
+                    raw: false,
+                    nest: true
+                })
+                resolve({
+                    errCode: 0,
+                    data: dataSchedule
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
+let getExtraInforDoctorById = (idInput) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!idInput) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameters'
+                })
+            } else {
+                let data = await db.Doctor_Infor.findOne({
+                    where: {
+                        doctorId: idInput
+                    },
+                    attributes: {
+                        exclude: ['id', 'doctorId']
+                    },
+                    include: [
+                        { model: db.Allcode, as: 'priceTypeData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'provinceTypeData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'paymentTypeData', attributes: ['valueEn', 'valueVi'] },
+                    ],
+                    raw: false,
+                    nest: true
+                })
+
+                if (!data) data = {};
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
     saveDetailInforDoctor: saveDetailInforDoctor,
     getInforDoctorById: getInforDoctorById,
+    getExtraInforDoctorById: getExtraInforDoctorById,
     bulkCreateScheduleService: bulkCreateScheduleService,
+    getScheduleByDate: getScheduleByDate,
 }
