@@ -1,0 +1,45 @@
+.profile-doctor-container {
+    .intro-doctor {
+        display: flex;
+
+        .content-left {
+            width: 20%;
+
+            .doctor-image {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background-position: center;
+                background-size: cover;
+                background-repeat: no-repeat;
+            }
+        }
+
+        .content-right {
+            width: 80%;
+            display: flex;
+            flex-direction: column;
+            padding-left: 10px;
+
+            .up {
+                font-size: 20px;
+                font-weight: 600;
+                margin-bottom: 5px;
+                color: #45c3d2;
+            }
+
+            .down {
+                font-size: 14px;
+            }
+
+            .price {
+                margin-top: 10px;
+                font-size: 15px;
+
+                .currency {
+                    font-weight: 600; // In đậm giá tiền lên
+                }
+            }
+        }
+    }
+}

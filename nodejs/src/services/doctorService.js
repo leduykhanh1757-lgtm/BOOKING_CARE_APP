@@ -40,6 +40,21 @@ let getTopDoctorHome = (limitInput) => {
     })
 }
 
+let checkRequiredFields = (inputData, arrFields) => {
+    let isValid = true;
+    let element = '';
+    for (let i = 0; i < arrFields.length; i++) {
+        if (!inputData[arrFields[i]]) {
+            isValid = false;
+            element = arrFields[i];
+            break;
+        }
+    }
+    return {
+        isValid: isValid,
+        element: element
+    }
+}
 let getAllDoctors = () => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -62,13 +77,17 @@ let getAllDoctors = () => {
 let saveDetailInforDoctor = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
-            // 1. Validate dữ liệu
-            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown || !inputData.action
-                || !inputData.selectedPrice || !inputData.selectedPayment || !inputData.selectedProvince
-                || !inputData.nameClinic || !inputData.addressClinic) {
+            // 1. Khai báo danh sách các trường bắt buộc phải có
+            let arrCheck = ['doctorId', 'contentHTML', 'contentMarkdown', 'action', 'selectedPrice', 'selectedPayment', 'selectedProvince', 'nameClinic', 'addressClinic', 'note', 'specialtyId'];
+
+            // 2. Ném vào hàm helper để nó tự động quét
+            let checkObj = checkRequiredFields(inputData, arrCheck);
+
+            // 3. Nếu hàm trả về isValid = false -> Báo lỗi ngay
+            if (checkObj.isValid === false) {
                 resolve({
                     errCode: 1,
-                    errMessage: 'Missing required parameters!'
+                    errMessage: `Missing parameter: ${checkObj.element}` // 🛠️ Báo rõ tên biến bị thiếu
                 })
             } else {
                 // ========================================================
@@ -110,6 +129,7 @@ let saveDetailInforDoctor = (inputData) => {
                     doctorInfor.nameClinic = inputData.nameClinic;
                     doctorInfor.addressClinic = inputData.addressClinic;
                     doctorInfor.note = inputData.note;
+                    doctorInfor.specialtyId = inputData.specialtyId; // 🛠️ GHI VÀO DB BẢN GHI CŨ
                     await doctorInfor.save();
                 } else {
                     // Chưa có -> Tạo mới (Upsert)
@@ -121,6 +141,7 @@ let saveDetailInforDoctor = (inputData) => {
                         nameClinic: inputData.nameClinic,
                         addressClinic: inputData.addressClinic,
                         note: inputData.note,
+                        specialtyId: inputData.specialtyId // 🛠️ GHI VÀO DB BẢN GHI MỚI
                     })
                 }
 
@@ -306,11 +327,65 @@ let getExtraInforDoctorById = (idInput) => {
         }
     })
 }
+let getProfileDoctorById = (inputId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!inputId) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameters'
+                })
+            } else {
+                let data = await db.User.findOne({
+                    where: { id: inputId },
+                    attributes: {
+                        exclude: ['password']
+                    },
+                    include: [
+                        {
+                            model: db.Markdown,
+                            as: 'markdownData',
+                            attributes: ['description', 'contentHTML', 'contentMarkdown']
+                        },
+                        { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
+                        {
+                            model: db.Doctor_Infor,
+                            attributes: {
+                                exclude: ['id', 'doctorId']
+                            },
+                            include: [
+                                { model: db.Allcode, as: 'priceTypeData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'provinceTypeData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'paymentTypeData', attributes: ['valueEn', 'valueVi'] },
+                            ]
+                        }
+                    ],
+                    raw: false,
+                    nest: true
+                })
+
+                if (data && data.image) {
+                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                }
+
+                if (!data) data = {};
+
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
     saveDetailInforDoctor: saveDetailInforDoctor,
     getInforDoctorById: getInforDoctorById,
+    getProfileDoctorById: getProfileDoctorById,
     getExtraInforDoctorById: getExtraInforDoctorById,
     bulkCreateScheduleService: bulkCreateScheduleService,
     getScheduleByDate: getScheduleByDate,

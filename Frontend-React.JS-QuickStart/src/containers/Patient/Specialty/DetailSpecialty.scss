@@ -1,0 +1,41 @@
+.detail-specialty-container {
+    background-color: #f6f6f6;
+    min-height: 100vh;
+
+    .detail-specialty-body {
+        margin: 0 120px;
+        padding-top: 20px;
+
+        // Khối chứa từng bác sĩ
+        .each-doctor {
+            display: flex;
+            /* 🛠️ Lệnh này ép 2 cột nằm ngang */
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+            // Cột bên Trái (Profile)
+            .dt-content-left {
+                width: 50%;
+                border-right: 1px solid #eee;
+                /* Kẻ đường chỉ mờ ngăn cách ở giữa */
+                padding-right: 15px;
+            }
+
+            // Cột bên Phải (Lịch khám, Giá khám)
+            .dt-content-right {
+                width: 50%;
+                padding-left: 15px;
+
+                // CSS thêm một chút cho phần nội dung bên phải nó tách bạch ra
+                .doctor-schedule {
+                    margin-bottom: 15px;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 15px;
+                }
+            }
+        }
+    }
+}

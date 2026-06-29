@@ -1,13 +1,12 @@
 .home-header-container {
     height: 60px;
     width: 100%;
-    background-color: white; // Thêm nền trắng cho Header nổi bật
-    border-bottom: 1px solid #f3f3f3; // Thêm gạch dưới mờ mờ cho tinh tế
+    background-color: white;
+    border-bottom: 1px solid #f3f3f3;
     display: flex;
     align-items: center;
     position: sticky;
     top: 0;
-    background-color: white;
     z-index: 10000;
 
     .home-header-content {
@@ -25,15 +24,14 @@
                 font-size: 24px;
                 color: #949494;
                 cursor: pointer;
-                margin-right: 20px; // Tạo khoảng cách với Logo
+                margin-right: 20px;
             }
 
             .header-logo {
-                /* THU NHỎ LOGO LẠI CHO CÂN ĐỐI (từ 60px xuống 45px) */
                 height: 45px;
-                width: 160px; // Thêm chiều rộng cụ thể để logo không bị méo
+                width: 160px;
                 background: url('../../assets/images/bookingcare-2020.svg') center center no-repeat;
-                background-size: contain; // Đảm bảo logo nằm trọn trong ô 160x45
+                background-size: contain;
                 cursor: pointer;
             }
         }
@@ -42,23 +40,21 @@
             width: 50%;
             display: flex;
             align-items: center;
-            justify-content: space-around; // Dàn đều các mục menu và có khoảng cách rõ ràng
+            justify-content: space-around;
 
             .child-content {
                 cursor: pointer;
                 text-align: left;
-                padding: 0 10px; // Thêm padding ngang để các mục không bị dính vào nhau
+                padding: 0 10px;
 
                 div:first-child {
-                    /* TINH CHỈNH FONT CHỮ CHÍNH */
                     font-size: 15px;
                     color: #222;
-                    font-weight: 600; // Font dày hơn một chút
-                    margin-bottom: 3px; // Tách biệt dòng chính và dòng phụ
+                    font-weight: 600;
+                    margin-bottom: 3px;
                 }
 
                 .subs-title {
-                    /* TINH CHỈNH FONT CHỮ PHỤ */
                     font-size: 11px;
                     color: #999;
                     font-weight: 400;
@@ -82,14 +78,12 @@
                 font-weight: 500;
 
                 i {
-                    /* TINH CHỈNH ICON HỖ TRỢ */
                     color: #45c3d2;
                     font-size: 20px;
                     margin-right: 8px;
                 }
 
                 span {
-                    /* Căn chỉnh text "Hỗ trợ" cho cân đối */
                     margin-bottom: 2px;
                 }
             }
@@ -97,7 +91,6 @@
             .language-vi,
             .language-en {
                 margin-left: 15px;
-                /* Đẩy chúng nó cách xa nhau và cách xa chữ "Hỗ trợ" ra */
                 cursor: pointer;
 
                 span {
@@ -109,7 +102,6 @@
                         color: #45c3d2;
                     }
 
-                    /* Gắn thẳng active vào span, không trượt đi đâu được */
                     &.active {
                         color: #2248bd;
                     }
@@ -228,10 +220,8 @@
                     color: #333;
                 }
 
-                &:hover {
-                    .text-child {
-                        color: #45c3d2;
-                    }
+                &:hover .text-child {
+                    color: #45c3d2;
                 }
             }
         }

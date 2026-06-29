@@ -2,100 +2,74 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import Slider from "react-slick";
-
-
-import TAIMUIHONG from '../../../assets/specialty/TAIMUIHONG.jpg';
-import TIMMACH from '../../../assets/specialty/TIMMACH.jpg';
-import XUONGKHOP from '../../../assets/specialty/XUONGKHOP.png';
-import THANKINH from '../../../assets/specialty/THANKINH.jpg';
-import TIEUHOA from '../../../assets/specialty/TIEUHOA.jpg';
-import SANPHUKHOA from '../../../assets/specialty/SANPHUKHOA.jpg';
-import NHIKHOA from '../../../assets/specialty/NHIKHOA.jpg';
-import DALIEU from '../../../assets/specialty/DALIEU.jpg';
-import CHANTHUONGCHINHHINH from '../../../assets/specialty/CHANTHUONGCHINHHINH.jpg';
-import NOITIET from '../../../assets/specialty/NOITIET.jpg';
-
+import { getAllSpecialty } from '../../../services/userService';
+import './Specialty.scss';
+import { withRouter } from 'react-router';
 
 class Specialty extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            dataSpecialty: []
+        }
+    }
+
+    async componentDidMount() {
+        let res = await getAllSpecialty();
+        if (res && res.errCode === 0) {
+            this.setState({
+                dataSpecialty: res.data ? res.data : []
+            })
+        }
+    }
+
+    handleViewDetailSpecialty = (item) => {
+        if (this.props.history) {
+            this.props.history.push(`/detail-specialty/${item.id}`);
+        }
+    }
+
     render() {
+        let { dataSpecialty } = this.state;
 
         return (
             <div className="section-share section-specialty">
                 <div className="section-container">
                     <div className="section-header">
-                        <h3>Chuyên khoa phổ biến</h3>
-                        <button>XEM THÊM</button>
+                        <span className="title-section">
+                            <FormattedMessage id="homepage.specialty-popular" />
+                        </span>
+                        <button className="btn-section">
+                            <FormattedMessage id="homepage.more-infor" />
+                        </button>
                     </div>
                     <div className="section-body">
                         <Slider {...this.props.settings}>
-                            <div>
-                                <div className="img-customize">
-                                    <div className="bg-image" style={{ backgroundImage: `url(${XUONGKHOP})` }} />
-                                    <h3>Cơ xương khớp</h3>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="img-customize">
-                                    <div className="bg-image" style={{ backgroundImage: `url(${THANKINH})` }} />
-                                    <h3>Thần kinh</h3>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="img-customize">
-                                    <div className="bg-image" style={{ backgroundImage: `url(${TIEUHOA})` }} />
-                                    <h3>Tiêu hóa</h3>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="img-customize">
-                                    <div className="bg-image" style={{ backgroundImage: `url(${TIMMACH})` }} />
-                                    <h3>Tim mạch</h3>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="img-customize">
-                                    <div className="bg-image" style={{ backgroundImage: `url(${TAIMUIHONG})` }} />
-                                    <h3>Tai Mũi Họng</h3>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="img-customize">
-                                    <div className="bg-image" style={{ backgroundImage: `url(${SANPHUKHOA})` }} />
-                                    <h3>Sản Phụ khoa</h3>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="img-customize">
-                                    <div className="bg-image" style={{ backgroundImage: `url(${NHIKHOA})` }} />
-                                    <h3>Nhi khoa</h3>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="img-customize">
-                                    <div className="bg-image" style={{ backgroundImage: `url(${DALIEU})` }} />
-                                    <h3>Da liễu</h3>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="img-customize">
-                                    <div className="bg-image" style={{ backgroundImage: `url(${CHANTHUONGCHINHHINH})` }} />
-                                    <h3>Chấn thương chỉnh hình</h3>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="img-customize">
-                                    <div className="bg-image" style={{ backgroundImage: `url(${NOITIET})` }} />
-                                    <h3>Nội Tiết - Tiểu đường</h3>
-                                </div>
-                            </div>
-
+                            {dataSpecialty && dataSpecialty.length > 0 &&
+                                dataSpecialty.map((item, index) => {
+                                    return (
+                                        <div className="section-customize specialty-child" key={index}>
+                                            <div
+                                                className="img-customize"
+                                                onClick={() => this.handleViewDetailSpecialty(item)}
+                                            >
+                                                <div
+                                                    className="bg-image"
+                                                    style={{ backgroundImage: `url(${item.image})` }}
+                                                />
+                                                <h3>{item.name}</h3>
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
                         </Slider>
                     </div>
                 </div>
             </div>
         );
     }
-
 }
 
 const mapStateToProps = state => {
@@ -106,8 +80,8 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => {
-    return {
-    };
+    return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Specialty);
+// 🛠️ 2. ĐÃ BỌC WITHROUTER Ở DÒNG CUỐI CÙNG
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Specialty));

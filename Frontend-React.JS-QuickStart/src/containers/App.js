@@ -15,6 +15,9 @@ import CustomScrollbars from '../components/CustomScrollbars.js';
 import { CustomToastCloseButton } from '../components/CustomToast';
 import ConfirmModal from '../components/ConfirmModal';
 import Doctor from '../routes/Doctor';
+import 'react-toastify/dist/ReactToastify.css';
+import VerifyEmail from './Patient/VerifyEmail/VerifyEmail';
+import DetailSpecialty from './Patient/Specialty/DetailSpecialty';
 
 class App extends Component {
 
@@ -53,27 +56,31 @@ class App extends Component {
                                     <Route path={'/doctor/'} component={userIsAuthenticated(Doctor)} />
                                     <Route path={path.HOMEPAGE} component={HomePage} />
                                     <Route path={path.DETAIL_DOCTOR} component={DetailDoctor} />
+                                    <Route path={path.VERIFY_EMAIL_BOOKING} component={VerifyEmail} />
+                                    <Route path={path.DETAIL_SPECIALTY} component={DetailSpecialty} />
                                 </Switch>
                             </CustomScrollbars>
                         </div>
 
                         <ToastContainer
-                            position="top-right" //  Vị trí hiện: Góc trên bên phải
-                            autoClose={3000}     // Tự động tắt sau 3000ms (3 giây)
-                            hideProgressBar={false} // Bật thanh chạy thời gian lên cho ngầu
+                            position="bottom-right"
+                            autoClose={3000}
+                            hideProgressBar={false}
                             newestOnTop={false}
-                            closeOnClick={true}  // Cho phép click thẳng vào thông báo để tắt luôn
+                            closeOnClick={true}
                             rtl={false}
                             pauseOnFocusLoss={true}
-                            draggable={true}     // Cho phép dùng chuột kéo thả vuốt đi
-                            pauseOnHover={true}  // Rê chuột vào thì dừng thời gian tắt
+                            draggable={true}
+                            pauseOnHover={true}
                         />
+
                     </div>
                 </Router>
             </Fragment>
         )
     }
 }
+
 
 const mapStateToProps = state => {
     return {

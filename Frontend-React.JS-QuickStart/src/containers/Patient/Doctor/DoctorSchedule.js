@@ -5,24 +5,49 @@ import moment from 'moment';
 import localization from 'moment/locale/vi'; // Import để moment hiểu tiếng Việt
 import { FormattedMessage } from 'react-intl';
 import { getScheduleDoctorByDate } from '../../../services/userService';
+import BookingModal from './Modal/BookingModal';
 
 class DoctorSchedule extends Component {
     constructor(props) {
         super(props);
         this.state = {
             allDays: [],
-            allAvailableTime: []
+            allAvailableTime: [],
+            isOpenModalBooking: false,
+            dataScheduleTimeModal: {}
         }
+    }
+
+    handleClickScheduleTime = (time) => {
+        this.setState({
+            isOpenModalBooking: true,
+            dataScheduleTimeModal: time
+        })
+        console.log("Check time data: ", time);
+    }
+
+    closeBookingClose = () => {
+        this.setState({
+            isOpenModalBooking: false
+        })
     }
 
     async componentDidMount() {
         let { language } = this.props;
         let allDays = this.getArrDays(language);
-        this.setState({
-            allDays: allDays
-        });
 
-        // Tạm thời để trống mảng giờ, sau này bạn gọi API getScheduleDoctorByDate ở đây
+        // GỌI API LỊCH KHÁM NGAY KHI LOAD TRANG
+        if (this.props.doctorIdFromParent) {
+            let res = await getScheduleDoctorByDate(this.props.doctorIdFromParent, allDays[0].value);
+            this.setState({
+                allDays: allDays,
+                allAvailableTime: res.data ? res.data : [] // Chú ý: State của bác là allAvailableTime
+            });
+        } else {
+            this.setState({
+                allDays: allDays
+            });
+        }
     }
 
     // Hàm tạo danh sách 7 ngày tới
@@ -65,9 +90,9 @@ class DoctorSchedule extends Component {
                 allDays: allDays
             });
         }
-        if (this.props.doctorId !== prevProps.doctorId) {
-            let allDays = this.state.allDays;
-            let res = await getScheduleDoctorByDate(this.props.doctorId, allDays[0].value);
+        if (this.props.doctorIdFromParent !== prevProps.doctorIdFromParent) {
+            let allDays = this.getArrDays(this.props.language);
+            let res = await getScheduleDoctorByDate(this.props.doctorIdFromParent, allDays[0].value);
             this.setState({
                 allAvailableTime: res.data ? res.data : []
             })
@@ -120,6 +145,7 @@ class DoctorSchedule extends Component {
                                             <button
                                                 key={index}
                                                 className={language === 'vi' ? 'btn-vie' : 'btn-en'}
+                                                onClick={() => this.handleClickScheduleTime(item)}
                                             >
                                                 {language === 'vi' ? item.timeTypeData.valueVi : item.timeTypeData.valueEn}
                                             </button>
@@ -143,6 +169,11 @@ class DoctorSchedule extends Component {
                         }
                     </div>
                 </div>
+                <BookingModal
+                    isOpenModal={this.state.isOpenModalBooking}
+                    closeBookingClose={this.closeBookingClose}
+                    dataTime={this.state.dataScheduleTimeModal}
+                />
             </div>
         );
     }

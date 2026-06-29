@@ -1,0 +1,53 @@
+.verify-email-container {
+    /* Trừ đi chiều cao của HomeHeader để căn giữa phần còn lại */
+    min-height: calc(100vh - 80px);
+    background-color: #f7f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+
+    .info-card {
+        background: #ffffff;
+        padding: 40px 50px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(149, 157, 165, 0.2);
+        text-align: center;
+        font-size: 22px;
+        font-weight: 600;
+        max-width: 600px;
+        width: 100%;
+        animation: fadeIn 0.5s ease-in-out;
+
+        i {
+            display: block;
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+    }
+
+    .loading-text {
+        color: #45c3d2; // Màu xanh đặc trưng của BookingCare
+    }
+
+    .infor-success {
+        color: #28a745; // Xanh lá cây thành công
+    }
+
+    .infor-failed {
+        color: #dc3545; // Đỏ báo lỗi
+    }
+}
+
+/* Hiệu ứng mờ dần hiện ra cho mượt */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

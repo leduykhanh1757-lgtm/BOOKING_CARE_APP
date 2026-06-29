@@ -11,6 +11,7 @@ import Select from 'react-select';
 import { toast } from 'react-toastify';
 import { getDetailInforDoctor } from '../../../services/userService';
 import { CRUD_actions } from '../../../utils';
+import { getAllSpecialty } from '../../../services/userService';
 // Khởi tạo bộ dịch
 const mdParser = new MarkdownIt();
 
@@ -34,14 +35,23 @@ class ManageDoctor extends Component {
             selectedProvince: '',
             listPrice: [],
             listPayment: [],
-            listProvince: []
+            listProvince: [],
+            listSpecialty: [],
+            selectedSpecialty: '',
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         this.props.fetchAllDoctors(); // Gọi API lấy danh sách bác sĩ khi component được mount
         this.props.getRequiredDoctorInfor(); // Gọi API lấy các thông tin cần thiết khác 
         // (giá, phương thức thanh toán, tỉnh thành)
+        let resSpecialty = await getAllSpecialty();
+        if (resSpecialty && resSpecialty.errCode === 0) {
+            let dataSelectSpecialty = this.buildDataInputSelect(resSpecialty.data, 'SPECIALTY');
+            this.setState({
+                listSpecialty: dataSelectSpecialty
+            })
+        }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -96,13 +106,14 @@ class ManageDoctor extends Component {
             let addressClinic = '', nameClinic = '', note = '';
             let paymentId = '', provinceId = '', priceId = '';
             let selectedPayment = '', selectedPrice = '', selectedProvince = '';
+            let specialtyId = '', selectedSpecialty = '';
 
             // 2. Lấy data từ bảng Doctor_Infor (nếu có)
             if (res.data.Doctor_Infor) {
                 addressClinic = res.data.Doctor_Infor.addressClinic;
                 nameClinic = res.data.Doctor_Infor.nameClinic;
                 note = res.data.Doctor_Infor.note;
-
+                specialtyId = res.data.Doctor_Infor.specialtyId;
                 paymentId = res.data.Doctor_Infor.paymentId;
                 provinceId = res.data.Doctor_Infor.provinceId;
                 priceId = res.data.Doctor_Infor.priceId;
@@ -111,6 +122,7 @@ class ManageDoctor extends Component {
                 selectedPayment = this.state.listPayment.find(item => item && item.value === paymentId) || '';
                 selectedPrice = this.state.listPrice.find(item => item && item.value === priceId) || '';
                 selectedProvince = this.state.listProvince.find(item => item && item.value === provinceId) || '';
+                selectedSpecialty = this.state.listSpecialty.find(item => item && item.value === specialtyId) || '';
             }
 
             // 3. Đổ toàn bộ data lên state để hiển thị ra UI
@@ -119,7 +131,7 @@ class ManageDoctor extends Component {
                 contentMarkdown: markdown.contentMarkdown,
                 description: markdown.description,
                 hasOldData: true,
-
+                selectedSpecialty: selectedSpecialty,
                 addressClinic: addressClinic,
                 nameClinic: nameClinic,
                 note: note,
@@ -170,10 +182,10 @@ class ManageDoctor extends Component {
 
     handleSaveContentMarkdown = () => {
         let {
-            hasOldData, // 🛠️ PHẢI LẤY CÁI NÀY RA ĐỂ CHECK LÀ TẠO HAY SỬA
+            hasOldData,
             contentHTML, contentMarkdown, description, selectedDoctor,
             selectedPrice, selectedPayment, selectedProvince,
-            nameClinic, addressClinic, note
+            nameClinic, addressClinic, note, selectedSpecialty
         } = this.state;
 
         // 1. Kiểm tra Validate phía Frontend
@@ -193,6 +205,11 @@ class ManageDoctor extends Component {
             toast.error("Vui lòng điền tên và địa chỉ phòng khám!");
             return;
         }
+        // 🛠️ BỔ SUNG CHECK CHUYÊN KHOA Ở ĐÂY
+        if (!selectedSpecialty || !selectedSpecialty.value) {
+            toast.error("Vui lòng chọn một Chuyên khoa!");
+            return;
+        }
 
         // 2. Gom hết tất cả đạn dược gửi qua Redux
         this.props.saveDetailDoctor({
@@ -200,8 +217,6 @@ class ManageDoctor extends Component {
             contentMarkdown: contentMarkdown,
             description: description,
             doctorId: selectedDoctor.value,
-
-            // 🛠️ SỬA Ở ĐÂY: CRUD_actions (chữ actions viết thường)
             action: hasOldData === true ? CRUD_actions.EDIT : CRUD_actions.CREATE,
 
             selectedPrice: selectedPrice.value,
@@ -209,8 +224,10 @@ class ManageDoctor extends Component {
             selectedProvince: selectedProvince.value,
             nameClinic: nameClinic,
             addressClinic: addressClinic,
-            note: note
+            note: note,
+            specialtyId: selectedSpecialty.value // 🛠️ ĐÃ BỔ SUNG DATA GỬI XUỐNG
         });
+
         // 3. Xóa sạch form về trạng thái ban đầu sau khi lưu
         this.setState({
             contentHTML: '',
@@ -223,7 +240,8 @@ class ManageDoctor extends Component {
             selectedPrice: '',
             selectedPayment: '',
             selectedProvince: '',
-            hasOldData: false // Reset luôn cả cờ này
+            selectedSpecialty: '', // 🛠️ Xóa state sau khi lưu
+            hasOldData: false
         });
     }
 
@@ -251,6 +269,10 @@ class ManageDoctor extends Component {
                     let labelEn = `${item.valueEn}`;
                     object.label = language === 'vi' ? labelVi : labelEn;
                     object.value = item.keyMap;
+                }
+                if (type === 'SPECIALTY') {
+                    object.label = item.name;
+                    object.value = item.id;
                 }
                 result.push(object);
             })
@@ -287,6 +309,16 @@ class ManageDoctor extends Component {
                     </div>
                 </div>
                 <div className="row more-infor-extra my-4">
+                    <div className="col-4 form-group">
+                        <label><FormattedMessage id="admin.manage-doctor.specialty" /></label>
+                        <Select
+                            value={this.state.selectedSpecialty}
+                            options={this.state.listSpecialty}
+                            placeholder={<FormattedMessage id="admin.manage-doctor.select-specialty" />}
+                            onChange={this.handleChangeSelectDoctorInfor}
+                            name="selectedSpecialty"
+                        />
+                    </div>
                     <div className="col-4 form-group">
                         <label><FormattedMessage id="admin.manage-doctor.price" /></label>
                         <Select

@@ -1,0 +1,85 @@
+.manage-specialty-container {
+    padding: 30px;
+    background-color: #f2f4f5; // Nền xám nhạt để làm nổi bật khối trắng bên trong
+    min-height: calc(100vh - 60px);
+
+    .ms-title {
+        text-align: center;
+        font-size: 26px;
+        font-weight: 600;
+        margin-bottom: 30px;
+        text-transform: uppercase;
+        color: #333;
+        letter-spacing: 1px;
+    }
+
+    .add-new-specialty {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+
+        // Styling cho phần Upload ảnh mới
+        .preview-img-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            margin-top: 5px;
+
+            .label-upload {
+                display: inline-block;
+                padding: 10px 15px;
+                background-color: #e9ecef;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.3s;
+                margin: 0;
+
+                &:hover {
+                    background-color: #ced4da;
+                }
+
+                i {
+                    margin-left: 5px;
+                }
+            }
+
+            .preview-image {
+                width: 120px;
+                height: 100px;
+                border: 2px dashed #ccc;
+                border-radius: 5px;
+                background-position: center;
+                background-size: contain; // Hiển thị trọn vẹn ảnh
+                background-repeat: no-repeat;
+                background-color: #fafafa;
+            }
+        }
+
+        .md-editor {
+            margin-top: 30px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+            overflow: hidden; // Để viền không bị lòi
+        }
+
+        .btn-save-specialty {
+            padding: 10px 30px;
+            border-radius: 5px;
+            border: none;
+            background-color: #f1c40f;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(241, 196, 15, 0.2);
+
+            &:hover {
+                background-color: #f39c12;
+                transform: translateY(-2px); // Hiệu ứng nảy lên xíu khi trỏ chuột
+            }
+        }
+    }
+}
