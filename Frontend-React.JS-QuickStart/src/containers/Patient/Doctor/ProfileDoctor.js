@@ -6,7 +6,7 @@ import { getProfileDoctorById } from '../../../services/userService';
 import { NumericFormat as NumberFormat } from 'react-number-format';
 import _ from 'lodash';
 import moment from 'moment';
-
+import { Link } from 'react-router-dom';
 class ProfileDoctor extends Component {
 
     constructor(props) {
@@ -69,7 +69,9 @@ class ProfileDoctor extends Component {
     }
     render() {
         let { dataProfile } = this.state;
-        let { language, isShowDescriptionDoctor, dataTime } = this.props;
+
+        // 🛠️ 1. Lấy thêm 3 biến (isShowLinkDetail, isShowPrice, doctorId) từ props ra
+        let { language, isShowDescriptionDoctor, dataTime, isShowLinkDetail, isShowPrice, doctorId } = this.props;
 
         let nameVi = '', nameEn = '';
         if (dataProfile && dataProfile.positionData) {
@@ -80,11 +82,19 @@ class ProfileDoctor extends Component {
         return (
             <div className="profile-doctor-container">
                 <div className="intro-doctor">
+
                     {/* Hiển thị Ảnh đại diện */}
                     <div className='content-left'>
                         <div className="doctor-image"
                             style={{ backgroundImage: `url(${dataProfile && dataProfile.image ? dataProfile.image : ''})` }}
                         ></div>
+
+                        {/* 🛠️ 2. CHÈN NÚT "XEM THÊM" VÀO NGAY DƯỚI CÁI ẢNH (Bên cột trái) */}
+                        {isShowLinkDetail === true &&
+                            <div className="view-detail-doctor">
+                                <Link to={`/detail-doctor/${doctorId}`}>Xem thêm</Link>
+                            </div>
+                        }
                     </div>
 
                     {/* Hiển thị Tên bác sĩ và Ghi chú */}
@@ -94,40 +104,43 @@ class ProfileDoctor extends Component {
                         </div>
                         <div className='down'>
                             {isShowDescriptionDoctor === true ?
-                                // NẾU TRUE: Hiện mô tả dài (dùng cho trang Chi tiết bác sĩ)
                                 <>
                                     {dataProfile && dataProfile.markdownData && dataProfile.markdownData.description
                                         && <span>{dataProfile.markdownData.description}</span>
                                     }
                                 </>
                                 :
-                                // NẾU FALSE: Hiện thời gian khám (dùng cho Modal đặt lịch)
                                 <>
                                     {this.renderTimeBooking(dataTime)}
                                 </>
                             }
                         </div>
-                        <div className="price">
-                            <FormattedMessage id="patient.extra-infor-doctor.price" />:
-                            {dataProfile && dataProfile.Doctor_Infor && language === 'vi' &&
-                                <NumberFormat
-                                    className="currency"
-                                    value={dataProfile.Doctor_Infor.priceTypeData.valueVi}
-                                    displayType={'text'}
-                                    thousandSeparator={true}
-                                    suffix={' VNĐ'}
-                                />
-                            }
-                            {dataProfile && dataProfile.Doctor_Infor && language === 'en' &&
-                                <NumberFormat
-                                    className="currency"
-                                    value={dataProfile.Doctor_Infor.priceTypeData.valueEn}
-                                    displayType={'text'}
-                                    thousandSeparator={true}
-                                    suffix={' $'}
-                                />
-                            }
-                        </div>
+
+                        {/* 🛠️ 3. DÙNG ĐIỀU KIỆN ĐỂ ẨN/HIỆN CÁI GIÁ KHÁM NÀY */}
+                        {/* (Nếu thằng cha truyền isShowPrice={false} thì khối này sẽ tàng hình) */}
+                        {isShowPrice !== false &&
+                            <div className="price">
+                                <FormattedMessage id="patient.extra-infor-doctor.price" />:
+                                {dataProfile && dataProfile.Doctor_Infor && language === 'vi' &&
+                                    <NumberFormat
+                                        className="currency"
+                                        value={dataProfile.Doctor_Infor.priceTypeData.valueVi}
+                                        displayType={'text'}
+                                        thousandSeparator={true}
+                                        suffix={' VNĐ'}
+                                    />
+                                }
+                                {dataProfile && dataProfile.Doctor_Infor && language === 'en' &&
+                                    <NumberFormat
+                                        className="currency"
+                                        value={dataProfile.Doctor_Infor.priceTypeData.valueEn}
+                                        displayType={'text'}
+                                        thousandSeparator={true}
+                                        suffix={' $'}
+                                    />
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

@@ -1,5 +1,5 @@
-.section-specialty {
-    .specialty-child {
+.section-medical-facility {
+    .clinic-child {
         padding: 15px 5px;
 
         .img-customize {
@@ -12,9 +12,8 @@
             border: 1px solid #eee;
             display: flex !important;
             flex-direction: column;
-            margin: 0 5px; // Tạo khoảng cách đều giữa các thẻ trong Slider
+            margin: 0 5px;
 
-            /* Hiệu ứng nảy thẻ lên khi trỏ chuột vào */
             &:hover {
                 transform: translateY(-5px);
                 box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
@@ -35,6 +34,12 @@
                 text-align: center;
                 padding: 15px 10px;
                 margin: 0;
+                height: 52px;
+                line-height: 22px;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
         }
     }

@@ -38,6 +38,8 @@ class ManageDoctor extends Component {
             listProvince: [],
             listSpecialty: [],
             selectedSpecialty: '',
+            listClinic: [],
+            selectedClinic: ''
         }
     }
 
@@ -77,11 +79,13 @@ class ManageDoctor extends Component {
 
         // 3. Hứng dữ liệu bắt buộc (Giá, Thanh toán, Tỉnh thành)
         if (prevProps.allRequiredDoctorInfor !== this.props.allRequiredDoctorInfor) {
-            let { resPrice, resPayment, resProvince } = this.props.allRequiredDoctorInfor;
+            let { resPrice, resPayment, resProvince, resSpecialty, resClinic } = this.props.allRequiredDoctorInfor;
             this.setState({
                 listPrice: this.buildDataInputSelect(resPrice, 'PRICE'),
                 listPayment: this.buildDataInputSelect(resPayment, 'PAYMENT'),
                 listProvince: this.buildDataInputSelect(resProvince, 'PROVINCE'),
+                listSpecialty: this.buildDataInputSelect(resSpecialty, 'SPECIALTY'),
+                listClinic: this.buildDataInputSelect(resClinic, 'CLINIC'),
             })
         }
     }
@@ -94,65 +98,64 @@ class ManageDoctor extends Component {
 
     handleChangeSelect = async (selectedDoctor) => {
         this.setState({ selectedDoctor });
-        console.log('Selected doctor:', selectedDoctor);
 
-        // Gọi API lấy thông tin bác sĩ
         let res = await getDetailInforDoctor(selectedDoctor.value);
 
         if (res && res.errCode === 0 && res.data && res.data.markdownData) {
             let markdown = res.data.markdownData;
 
-            // 1. Khai báo biến tạm cho các trường Doctor_Infor
             let addressClinic = '', nameClinic = '', note = '';
             let paymentId = '', provinceId = '', priceId = '';
             let selectedPayment = '', selectedPrice = '', selectedProvince = '';
-            let specialtyId = '', selectedSpecialty = '';
 
-            // 2. Lấy data từ bảng Doctor_Infor (nếu có)
+            // 🛠️ 1. Khai báo thêm biến hứng chuyên khoa và phòng khám
+            let specialtyId = '', selectedSpecialty = '';
+            let clinicId = '', selectedClinic = '';
+
             if (res.data.Doctor_Infor) {
                 addressClinic = res.data.Doctor_Infor.addressClinic;
                 nameClinic = res.data.Doctor_Infor.nameClinic;
                 note = res.data.Doctor_Infor.note;
-                specialtyId = res.data.Doctor_Infor.specialtyId;
                 paymentId = res.data.Doctor_Infor.paymentId;
                 provinceId = res.data.Doctor_Infor.provinceId;
                 priceId = res.data.Doctor_Infor.priceId;
 
-                // Dùng .find() để lọc ra object chuẩn cho cái thẻ Select
+                // 🛠️ 2. Hứng Id từ DB trả ra
+                specialtyId = res.data.Doctor_Infor.specialtyId;
+                clinicId = res.data.Doctor_Infor.clinicId;
+
                 selectedPayment = this.state.listPayment.find(item => item && item.value === paymentId) || '';
                 selectedPrice = this.state.listPrice.find(item => item && item.value === priceId) || '';
                 selectedProvince = this.state.listProvince.find(item => item && item.value === provinceId) || '';
+
+                // 🛠️ 3. Lọc tìm object chuẩn cho Select
                 selectedSpecialty = this.state.listSpecialty.find(item => item && item.value === specialtyId) || '';
+                selectedClinic = this.state.listClinic.find(item => item && item.value === clinicId) || '';
             }
 
-            // 3. Đổ toàn bộ data lên state để hiển thị ra UI
             this.setState({
                 contentHTML: markdown.contentHTML,
                 contentMarkdown: markdown.contentMarkdown,
                 description: markdown.description,
                 hasOldData: true,
-                selectedSpecialty: selectedSpecialty,
                 addressClinic: addressClinic,
                 nameClinic: nameClinic,
                 note: note,
                 selectedPayment: selectedPayment,
                 selectedPrice: selectedPrice,
-                selectedProvince: selectedProvince
+                selectedProvince: selectedProvince,
+
+                // 🛠️ 4. Set lên State
+                selectedSpecialty: selectedSpecialty,
+                selectedClinic: selectedClinic
             });
         } else {
-            // Nếu bác sĩ mới toanh chưa có thông tin -> Xóa trắng toàn bộ form
+            // 🛠️ 5. Reset trắng toàn bộ nếu bác sĩ chưa có data
             this.setState({
-                contentHTML: '',
-                contentMarkdown: '',
-                description: '',
-                hasOldData: false,
-
-                addressClinic: '',
-                nameClinic: '',
-                note: '',
-                selectedPayment: '',
-                selectedPrice: '',
-                selectedProvince: ''
+                contentHTML: '', contentMarkdown: '', description: '',
+                hasOldData: false, addressClinic: '', nameClinic: '', note: '',
+                selectedPayment: '', selectedPrice: '', selectedProvince: '',
+                selectedSpecialty: '', selectedClinic: ''
             });
         }
     };
@@ -225,7 +228,8 @@ class ManageDoctor extends Component {
             nameClinic: nameClinic,
             addressClinic: addressClinic,
             note: note,
-            specialtyId: selectedSpecialty.value // 🛠️ ĐÃ BỔ SUNG DATA GỬI XUỐNG
+            specialtyId: selectedSpecialty.value,
+            clinicId: this.state.selectedClinic ? this.state.selectedClinic.value : null
         });
 
         // 3. Xóa sạch form về trạng thái ban đầu sau khi lưu
@@ -240,8 +244,9 @@ class ManageDoctor extends Component {
             selectedPrice: '',
             selectedPayment: '',
             selectedProvince: '',
-            selectedSpecialty: '', // 🛠️ Xóa state sau khi lưu
-            hasOldData: false
+            selectedSpecialty: '',
+            hasOldData: false,
+            selectedClinic: '',
         });
     }
 
@@ -250,8 +255,10 @@ class ManageDoctor extends Component {
         let { language } = this.props;
 
         if (inputData && inputData.length > 0) {
+            // Vòng lặp cha duy nhất duyệt qua danh sách
             inputData.map((item, index) => {
                 let object = {};
+
                 if (type === 'USERS') {
                     let labelVi = `${item.lastName} ${item.firstName}`;
                     let labelEn = `${item.firstName} ${item.lastName}`;
@@ -274,6 +281,13 @@ class ManageDoctor extends Component {
                     object.label = item.name;
                     object.value = item.id;
                 }
+                // Chỉ cần gán object giống hệt Specialty, bỏ vòng lặp thừa
+                if (type === 'CLINIC') {
+                    object.label = item.name;
+                    object.value = item.id;
+                }
+
+                // Đẩy object vào mảng kết quả
                 result.push(object);
             })
         }
@@ -309,24 +323,15 @@ class ManageDoctor extends Component {
                     </div>
                 </div>
                 <div className="row more-infor-extra my-4">
-                    <div className="col-4 form-group">
-                        <label><FormattedMessage id="admin.manage-doctor.specialty" /></label>
-                        <Select
-                            value={this.state.selectedSpecialty}
-                            options={this.state.listSpecialty}
-                            placeholder={<FormattedMessage id="admin.manage-doctor.select-specialty" />}
-                            onChange={this.handleChangeSelectDoctorInfor}
-                            name="selectedSpecialty"
-                        />
-                    </div>
+                    {/* HÀNG 1: Giá - Thanh toán - Tỉnh thành */}
                     <div className="col-4 form-group">
                         <label><FormattedMessage id="admin.manage-doctor.price" /></label>
                         <Select
                             value={this.state.selectedPrice}
-                            onChange={this.handleChangeSelectDoctorInfor} //Gắn hàm vừa tạo
-                            options={this.state.listPrice} //Đổ data từ state vào
+                            onChange={this.handleChangeSelectDoctorInfor}
+                            options={this.state.listPrice}
                             placeholder={<FormattedMessage id="admin.manage-doctor.select-price" />}
-                            name="selectedPrice" // để hàm onChange biết đang đổi state nào
+                            name="selectedPrice"
                         />
                     </div>
                     <div className="col-4 form-group">
@@ -349,6 +354,8 @@ class ManageDoctor extends Component {
                             name="selectedProvince"
                         />
                     </div>
+
+                    {/* HÀNG 2: Tên PK - Địa chỉ PK - Ghi chú */}
                     <div className="col-4 form-group mt-3">
                         <label><FormattedMessage id="admin.manage-doctor.nameClinic" /></label>
                         <input className="form-control"
@@ -368,6 +375,28 @@ class ManageDoctor extends Component {
                         <input className="form-control"
                             onChange={(event) => this.handleOnChangeText(event, 'note')}
                             value={this.state.note}
+                        />
+                    </div>
+
+                    {/* HÀNG 3: Chuyên khoa - Phòng khám */}
+                    <div className="col-4 form-group mt-3">
+                        <label><FormattedMessage id="admin.manage-doctor.specialty" /></label>
+                        <Select
+                            value={this.state.selectedSpecialty}
+                            options={this.state.listSpecialty}
+                            placeholder={<FormattedMessage id="admin.manage-doctor.select-specialty" />}
+                            onChange={this.handleChangeSelectDoctorInfor}
+                            name="selectedSpecialty"
+                        />
+                    </div>
+                    <div className="col-4 form-group mt-3">
+                        <label><FormattedMessage id="admin.manage-doctor.select-clinic" /></label>
+                        <Select
+                            value={this.state.selectedClinic}
+                            options={this.state.listClinic}
+                            placeholder={<FormattedMessage id="admin.manage-doctor.select-clinic" />}
+                            onChange={this.handleChangeSelectDoctorInfor}
+                            name="selectedClinic" // Quan trọng để hàm handleChangeSelectDoctorInfor hoạt động
                         />
                     </div>
                 </div>

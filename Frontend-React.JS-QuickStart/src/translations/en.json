@@ -62,7 +62,8 @@
         "handbook": "Health handbook",
         "more-info-handbook": "More health handbook",
         "specialty-popular": "Popular specialties",
-        "more-infor": "SEE MORE"
+        "more-infor": "SEE MORE",
+        "outstanding-medical-facility": "Outstanding medical facility"
     },
     "manage-schedule": {
         "manage-schedule": "Manage medical examination schedule",
@@ -117,7 +118,26 @@
             "select-payment": "Select payment method",
             "select-province": "Select province",
             "specialty": "Specialty",
-            "select-specialty": "Select specialty"
+            "select-specialty": "Select specialty",
+            "select-clinic": "Select clinic"
+        },
+        "manage-clinic": {
+            "title": "Manage Clinic",
+            "name": "Clinic name",
+            "address": "Clinic address",
+            "image": "Clinic image",
+            "description": "Description",
+            "save": "Save changes",
+            "add": "Add new clinic",
+            "select-clinic": "Select clinic (to edit)"
+        },
+        "manage-specialty": {
+            "title": "Manage Specialty",
+            "name": "Specialty name",
+            "image": "Specialty image",
+            "save": "Save changes",
+            "add": "Add new specialty",
+            "select-specialty": "Select specialty (to edit)"
         }
     }
 }

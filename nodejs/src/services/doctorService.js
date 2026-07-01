@@ -24,7 +24,7 @@ let getTopDoctorHome = (limitInput) => {
             if (users && users.length > 0) {
                 users = users.map(item => {
                     if (item.image) {
-                        item.image = new Buffer(item.image, 'base64').toString('binary');
+                        item.image = Buffer.from(item.image, 'base64').toString('binary'); // 🛠️ Sửa chỗ này
                     }
                     return item;
                 })
@@ -78,7 +78,7 @@ let saveDetailInforDoctor = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
             // 1. Khai báo danh sách các trường bắt buộc phải có
-            let arrCheck = ['doctorId', 'contentHTML', 'contentMarkdown', 'action', 'selectedPrice', 'selectedPayment', 'selectedProvince', 'nameClinic', 'addressClinic', 'note', 'specialtyId'];
+            let arrCheck = ['doctorId', 'contentHTML', 'contentMarkdown', 'action', 'selectedPrice', 'selectedPayment', 'selectedProvince', 'nameClinic', 'addressClinic', 'note', 'specialtyId', 'clinicId'];
 
             // 2. Ném vào hàm helper để nó tự động quét
             let checkObj = checkRequiredFields(inputData, arrCheck);
@@ -129,7 +129,8 @@ let saveDetailInforDoctor = (inputData) => {
                     doctorInfor.nameClinic = inputData.nameClinic;
                     doctorInfor.addressClinic = inputData.addressClinic;
                     doctorInfor.note = inputData.note;
-                    doctorInfor.specialtyId = inputData.specialtyId; // 🛠️ GHI VÀO DB BẢN GHI CŨ
+                    doctorInfor.specialtyId = inputData.specialtyId;
+                    doctorInfor.clinicId = inputData.clinicId;
                     await doctorInfor.save();
                 } else {
                     // Chưa có -> Tạo mới (Upsert)
@@ -141,7 +142,8 @@ let saveDetailInforDoctor = (inputData) => {
                         nameClinic: inputData.nameClinic,
                         addressClinic: inputData.addressClinic,
                         note: inputData.note,
-                        specialtyId: inputData.specialtyId // 🛠️ GHI VÀO DB BẢN GHI MỚI
+                        specialtyId: inputData.specialtyId,
+                        clinicId: inputData.clinicId
                     })
                 }
 
@@ -193,7 +195,7 @@ let getInforDoctorById = (inputId) => {
                 })
 
                 if (data && data.image) {
-                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                    data.image = Buffer.from(data.image, 'base64').toString('binary');
                 }
 
                 if (!data) data = {};
@@ -365,7 +367,7 @@ let getProfileDoctorById = (inputId) => {
                 })
 
                 if (data && data.image) {
-                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                    data.image = Buffer.from(data.image, 'base64').toString('binary'); // 🛠️ Sửa chỗ này
                 }
 
                 if (!data) data = {};

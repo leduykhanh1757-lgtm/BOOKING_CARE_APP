@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       // as: 'positionData' => tên alias để truy cập dữ liệu liên kết từ bảng Allcode thông qua positionId
       User.hasOne(models.Markdown, { foreignKey: 'doctorId', as: 'markdownData' });
       User.hasOne(models.Doctor_Infor, { foreignKey: 'doctorId' });
+      User.hasMany(models.Booking, { foreignKey: 'patientId', as: 'bookingData' });
     }
   };
   User.init({

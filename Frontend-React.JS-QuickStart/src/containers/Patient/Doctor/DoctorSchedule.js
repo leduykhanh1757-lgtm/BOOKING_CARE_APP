@@ -100,8 +100,8 @@ class DoctorSchedule extends Component {
     }
 
     handleOnChangeSelect = async (event) => {
-        if (this.props.doctorId && this.props.doctorId !== -1) {
-            let doctorId = this.props.doctorId;
+        if (this.props.doctorIdFromParent && this.props.doctorIdFromParent !== -1) {
+            let doctorId = this.props.doctorIdFromParent;
             let date = event.target.value;
 
             let res = await getScheduleDoctorByDate(doctorId, date);

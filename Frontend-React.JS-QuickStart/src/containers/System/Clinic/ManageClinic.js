@@ -1,36 +1,39 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import './ManageSpecialty.scss';
+import './ManageClinic.scss';
 import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
 import { CommonUtils } from '../../../utils';
-import { createNewSpecialty, getAllSpecialty, getAllDetailSpecialtyById, editSpecialtyService } from '../../../services/userService';
+import { createNewClinic, getAllClinic, getAllDetailClinicById, editClinicService } from '../../../services/userService';
 import { toast } from 'react-toastify';
-import Select from 'react-select';
+import Select from 'react-select'; // 🛠️ Import thêm thư viện Select
 import { FormattedMessage } from 'react-intl';
 
 const mdParser = new MarkdownIt();
 
-class ManageSpecialty extends Component {
+class ManageClinic extends Component {
     constructor(props) {
         super(props);
         this.state = {
             name: '',
+            address: '',
             imageBase64: '',
             descriptionHTML: '',
             descriptionMarkdown: '',
 
-            listSpecialty: [],
-            selectedSpecialty: '',
-            hasOldData: false,
+            // 🛠️ State cho chức năng Dropdown
+            listClinic: [],
+            selectedClinic: '',
+            hasOldData: false, // Cờ hiệu để biết là Sửa hay Tạo mới
         }
     }
 
     async componentDidMount() {
-        let res = await getAllSpecialty();
+        // Vừa vào trang là lấy danh sách phòng khám đổ vào ô Dropdown
+        let res = await getAllClinic();
         if (res && res.errCode === 0) {
             let dataSelect = this.buildDataInputSelect(res.data);
-            this.setState({ listSpecialty: dataSelect })
+            this.setState({ listClinic: dataSelect })
         }
     }
 
@@ -48,26 +51,29 @@ class ManageSpecialty extends Component {
     }
 
     handleChangeSelect = async (selectedOption) => {
-        this.setState({ selectedSpecialty: selectedOption });
+        this.setState({ selectedClinic: selectedOption });
 
-        // Gửi kèm location='ALL' vì API cũ đang yêu cầu
-        let res = await getAllDetailSpecialtyById({ id: selectedOption.value, location: 'ALL' });
+        // Khi chọn 1 phòng khám, gọi API lấy chi tiết để fill lên form
+        let res = await getAllDetailClinicById({ id: selectedOption.value });
         if (res && res.errCode === 0 && res.data) {
             let data = res.data;
             this.setState({
                 name: data.name,
+                address: data.address,
                 descriptionHTML: data.descriptionHTML,
                 descriptionMarkdown: data.descriptionMarkdown,
                 imageBase64: data.image ? data.image : '',
-                hasOldData: true
+                hasOldData: true // Bật cờ hiệu là đang Edit
             })
         }
     }
 
+    // Nút Clear Form để tạo mới
     handleClearForm = () => {
         this.setState({
-            selectedSpecialty: '',
+            selectedClinic: '',
             name: '',
+            address: '',
             imageBase64: '',
             descriptionHTML: '',
             descriptionMarkdown: '',
@@ -97,32 +103,35 @@ class ManageSpecialty extends Component {
         }
     }
 
-    handleSaveNewSpecialty = async () => {
+    handleSaveNewClinic = async () => {
         let { hasOldData } = this.state;
 
         if (hasOldData === false) {
-            let res = await createNewSpecialty(this.state);
+            // TẠO MỚI
+            let res = await createNewClinic(this.state);
             if (res && res.errCode === 0) {
-                toast.success('Thêm chuyên khoa thành công!');
-                this.handleClearForm();
-                this.componentDidMount();
+                toast.success('Thêm phòng khám thành công!');
+                this.handleClearForm(); // Tạo xong xóa form
+                this.componentDidMount(); // Tải lại danh sách dropdown
             } else {
-                toast.error('Lỗi thêm mới chuyên khoa!');
+                toast.error('Lỗi thêm mới phòng khám!');
             }
         } else {
-            let res = await editSpecialtyService({
-                id: this.state.selectedSpecialty.value,
+            // CHỈNH SỬA
+            let res = await editClinicService({
+                id: this.state.selectedClinic.value,
                 name: this.state.name,
+                address: this.state.address,
                 imageBase64: this.state.imageBase64,
                 descriptionHTML: this.state.descriptionHTML,
                 descriptionMarkdown: this.state.descriptionMarkdown,
             });
             if (res && res.errCode === 0) {
-                toast.success('Cập nhật chuyên khoa thành công!');
+                toast.success('Cập nhật phòng khám thành công!');
+                this.componentDidMount(); // Tải lại tên phòng khám trên dropdown lỡ người dùng có đổi tên
                 this.handleClearForm();
-                this.componentDidMount();
             } else {
-                toast.error('Lỗi cập nhật chuyên khoa!');
+                toast.error('Lỗi cập nhật phòng khám!');
             }
         }
     }
@@ -130,17 +139,17 @@ class ManageSpecialty extends Component {
     render() {
         let { hasOldData } = this.state;
         return (
-            <div className="manage-specialty-container">
-                <div className="ms-title"><FormattedMessage id="admin.manage-specialty.title" /></div>
+            <div className="manage-clinic-container">
+                <div className="ms-title"><FormattedMessage id="admin.manage-clinic.title" /></div>
 
-                <div className="add-new-specialty row">
+                <div className="add-new-clinic row">
                     <div className="col-6 form-group">
-                        <label><FormattedMessage id="admin.manage-specialty.select-specialty" /></label>
+                        <label><FormattedMessage id="admin.manage-clinic.select-clinic" /></label>
                         <Select
-                            value={this.state.selectedSpecialty}
+                            value={this.state.selectedClinic}
                             onChange={this.handleChangeSelect}
-                            options={this.state.listSpecialty}
-                            placeholder={<FormattedMessage id="admin.manage-specialty.select-specialty" />}
+                            options={this.state.listClinic}
+                            placeholder={<FormattedMessage id="admin.manage-clinic.select-clinic" />}
                         />
                         <button className="btn btn-secondary mt-2" onClick={() => this.handleClearForm()}>
                             <i className="fas fa-plus"></i> Reset Form
@@ -148,12 +157,12 @@ class ManageSpecialty extends Component {
                     </div>
 
                     <div className="col-6 form-group">
-                        <label><FormattedMessage id="admin.manage-specialty.image" /></label>
+                        <label><FormattedMessage id="admin.manage-clinic.image" /></label>
                         <div className="preview-img-container">
-                            <input id="previewImgSpecialty" type="file" hidden
+                            <input id="previewImgClinic" type="file" hidden
                                 onChange={(event) => this.handleOnChangeImage(event)}
                             />
-                            <label className="label-upload" htmlFor="previewImgSpecialty">
+                            <label className="label-upload" htmlFor="previewImgClinic">
                                 Tải ảnh lên <i className="fas fa-upload"></i>
                             </label>
                             <div className="preview-image"
@@ -163,13 +172,19 @@ class ManageSpecialty extends Component {
                     </div>
 
                     <div className="col-6 form-group mt-3">
-                        <label><FormattedMessage id="admin.manage-specialty.name" /></label>
+                        <label><FormattedMessage id="admin.manage-clinic.name" /></label>
                         <input className="form-control" type="text" value={this.state.name}
                             onChange={(event) => this.handleOnChangeInput(event, 'name')}
                         />
                     </div>
+                    <div className="col-6 form-group mt-3">
+                        <label><FormattedMessage id="admin.manage-clinic.address" /></label>
+                        <input className="form-control" type="text" value={this.state.address}
+                            onChange={(event) => this.handleOnChangeInput(event, 'address')}
+                        />
+                    </div>
 
-                    <div className="col-12 md-editor mt-4">
+                    <div className="col-12 manage-clinic-editor mt-4">
                         <MdEditor
                             style={{ height: '350px' }}
                             renderHTML={text => mdParser.render(text)}
@@ -181,11 +196,11 @@ class ManageSpecialty extends Component {
                     <div className="col-12">
                         <button
                             className={hasOldData === true ? "btn btn-warning mt-3" : "btn btn-primary mt-3"}
-                            onClick={() => this.handleSaveNewSpecialty()}
+                            onClick={() => this.handleSaveNewClinic()}
                         >
                             {hasOldData === true ?
-                                <FormattedMessage id="admin.manage-specialty.save" /> :
-                                <FormattedMessage id="admin.manage-specialty.add" />
+                                <FormattedMessage id="admin.manage-clinic.save" /> :
+                                <FormattedMessage id="admin.manage-clinic.add" />
                             }
                         </button>
                     </div>
@@ -197,4 +212,4 @@ class ManageSpecialty extends Component {
 
 const mapStateToProps = state => { return { language: state.app.language }; };
 const mapDispatchToProps = dispatch => { return {}; };
-export default connect(mapStateToProps, mapDispatchToProps)(ManageSpecialty);
+export default connect(mapStateToProps, mapDispatchToProps)(ManageClinic);

@@ -1,0 +1,65 @@
+.manage-patient-container {
+    padding: 0 15px;
+
+    .m-p-title {
+        text-align: center;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 20px 0;
+        text-transform: uppercase;
+    }
+
+    .manage-patient-body {
+        .table-manage-patient {
+            margin-top: 20px;
+
+            table {
+                border-collapse: collapse;
+                width: 100%;
+
+                th,
+                td {
+                    border: 1px solid #ccc;
+                    padding: 8px;
+                    text-align: left;
+                }
+
+                th {
+                    background-color: #f2f2f2;
+                }
+
+                /* 🛠️ MÀU NÚT CHUẨN THEO VIDEO */
+                .mp-btn-confirm {
+                    border: none;
+                    outline: none;
+                    padding: 5px 10px;
+                    background: #f0ad4e;
+                    /* Màu cam vàng */
+                    color: #fff;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    margin-right: 10px;
+
+                    &:hover {
+                        background: #ec971f;
+                    }
+                }
+
+                .mp-btn-remedy {
+                    border: none;
+                    outline: none;
+                    padding: 5px 10px;
+                    background: #36c6d3;
+                    /* Màu xanh ngọc */
+                    color: #fff;
+                    border-radius: 3px;
+                    cursor: pointer;
+
+                    &:hover {
+                        background: #2bb8c4;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -62,7 +62,8 @@
         "handbook": "Cẩm nang sức khỏe",
         "more-info-handbook": "Xem thêm cẩm nang",
         "specialty-popular": "Chuyên khoa phổ biến",
-        "more-infor": "XEM THÊM"
+        "more-infor": "XEM THÊM",
+        "outstanding-medical-facility": "Cơ sở y tế nổi bật"
     },
     "manage-schedule": {
         "manage-schedule": "Quản lý lịch khám bệnh",
@@ -117,7 +118,26 @@
             "select-payment": "Chọn phương thức thanh toán",
             "select-province": "Chọn tỉnh thành",
             "specialty": "Chuyên khoa",
-            "select-specialty": "Chọn chuyên khoa"
+            "select-specialty": "Chọn chuyên khoa",
+            "select-clinic": "Chọn phòng khám"
+        },
+        "manage-clinic": {
+            "title": "Quản lý phòng khám",
+            "name": "Tên phòng khám",
+            "address": "Địa chỉ phòng khám",
+            "image": "Ảnh phòng khám",
+            "description": "Thông tin giới thiệu",
+            "save": "Lưu thông tin",
+            "add": "Thêm mới phòng khám",
+            "select-clinic": "Chọn phòng khám (để chỉnh sửa)"
+        },
+        "manage-specialty": {
+            "title": "Quản lý chuyên khoa",
+            "name": "Tên chuyên khoa",
+            "image": "Ảnh chuyên khoa",
+            "save": "Lưu thay đổi",
+            "add": "Thêm mới chuyên khoa",
+            "select-specialty": "Chọn chuyên khoa (để chỉnh sửa)"
         }
     }
 }

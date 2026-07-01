@@ -1,0 +1,92 @@
+.manage-clinic-container {
+    padding: 20px;
+    background: #f4f6f8;
+    /* Nền xám nhạt cho toàn trang */
+    min-height: 100vh;
+
+    .ms-title {
+        text-align: center;
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        color: #333;
+    }
+
+    .add-new-clinic {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        /* Tạo bóng đổ cho form */
+
+        .form-group {
+            margin-bottom: 20px;
+
+            label {
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+        }
+
+        /* 🛠️ CSS cho phần tải ảnh và xem trước */
+        .preview-img-container {
+            display: flex;
+            flex-direction: row;
+            /* Xếp nút tải và ảnh ngang nhau */
+            gap: 20px;
+
+            .label-upload {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                height: 38px;
+                padding: 0 15px;
+                background: #e9ecef;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: normal;
+                border: 1px solid #ced4da;
+                transition: all 0.3s;
+
+                &:hover {
+                    background: #dde2e6;
+                }
+            }
+
+            .preview-image {
+                height: 80px;
+                width: 150px;
+                border: 1px dashed #ccc;
+                border-radius: 4px;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                background-color: #fafafa;
+            }
+        }
+
+        .manage-clinic-editor {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-save-clinic {
+            padding: 8px 25px;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            background: #f0a322;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+
+            &:hover {
+                background: #f1b34a;
+                transform: translateY(-1px);
+                /* Hiệu ứng nảy lên xíu khi trỏ chuột */
+            }
+        }
+    }
+}

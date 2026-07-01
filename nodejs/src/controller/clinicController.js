@@ -1,33 +1,8 @@
-import specialtyService from '../services/specialtyService';
+import clinicService from '../services/clinicService';
 
-let createSpecialty = async (req, res) => {
+let createClinic = async (req, res) => {
     try {
-        let infor = await specialtyService.createSpecialty(req.body);
-        return res.status(200).json(infor);
-    } catch (e) {
-        console.log(e);
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from the server'
-        })
-    }
-}
-
-let getAllSpecialty = async (req, res) => {
-    try {
-        let infor = await specialtyService.getAllSpecialty();
-        return res.status(200).json(infor);
-    } catch (e) {
-        console.log(e);
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from the server'
-        })
-    }
-}
-let getDetailSpecialtyById = async (req, res) => {
-    try {
-        let info = await specialtyService.getDetailSpecialtyById(req.query.id, req.query.location);
+        let info = await clinicService.createClinic(req.body);
         return res.status(200).json(info);
     } catch (e) {
         console.log(e);
@@ -37,18 +12,45 @@ let getDetailSpecialtyById = async (req, res) => {
         })
     }
 }
-let editSpecialty = async (req, res) => {
+
+let getAllClinic = async (req, res) => {
     try {
-        let info = await specialtyService.editSpecialty(req.body);
+        let info = await clinicService.getAllClinic();
+        return res.status(200).json(info);
+    } catch (e) {
+        console.log(e);
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: 'Error from the server'
+        })
+    }
+}
+
+let getDetailClinicById = async (req, res) => {
+    try {
+        let info = await clinicService.getDetailClinicById(req.query.id);
+        return res.status(200).json(info);
+    } catch (e) {
+        console.log(e);
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: 'Error from the server'
+        })
+    }
+}
+let editClinic = async (req, res) => {
+    try {
+        let info = await clinicService.editClinic(req.body);
         return res.status(200).json(info);
     } catch (e) {
         console.log(e);
         return res.status(200).json({ errCode: -1, errMessage: 'Error from the server' })
     }
 }
+
 module.exports = {
-    createSpecialty: createSpecialty,
-    getAllSpecialty: getAllSpecialty,
-    getDetailSpecialtyById: getDetailSpecialtyById,
-    editSpecialty: editSpecialty
+    createClinic: createClinic,
+    getAllClinic: getAllClinic,
+    getDetailClinicById: getDetailClinicById,
+    editClinic: editClinic
 }

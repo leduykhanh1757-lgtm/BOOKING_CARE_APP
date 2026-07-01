@@ -2,7 +2,8 @@ import actionTypes from './actionTypes';
 import {
     getAllCodeService, createNewUserService, getAllUsers,
     deleteUserService, editUserService, getTopDoctorHomeService,
-    getAllDoctorsService, saveDetailDoctorService
+    getAllDoctorsService, saveDetailDoctorService, getAllSpecialty, getAllClinic,
+    getAllPatientForDoctor
 } from '../../services/userService';
 import { toast } from 'react-toastify';
 //gender
@@ -341,20 +342,26 @@ export const getRequiredDoctorInfor = () => {
         try {
             dispatch({ type: actionTypes.FETCH_REQUIRED_DOCTOR_INFOR_START });
 
-            // Gọi 3 API cùng lúc để lấy dữ liệu Allcodes
             let resPrice = await getAllCodeService("PRICE");
             let resPayment = await getAllCodeService("PAYMENT");
             let resProvince = await getAllCodeService("PROVINCE");
 
+            // 🛠️ SỬA Ở ĐÂY: Dùng đúng hàm gọi API của Specialty và Clinic
+            let resSpecialty = await getAllSpecialty();
+            let resClinic = await getAllClinic();
+
             if (resPrice && resPrice.errCode === 0
                 && resPayment && resPayment.errCode === 0
-                && resProvince && resProvince.errCode === 0) {
+                && resProvince && resProvince.errCode === 0
+                && resSpecialty && resSpecialty.errCode === 0
+                && resClinic && resClinic.errCode === 0) {
 
-                // Gom 3 cục data lại thành 1 Object
                 let data = {
                     resPrice: resPrice.data,
                     resPayment: resPayment.data,
-                    resProvince: resProvince.data
+                    resProvince: resProvince.data,
+                    resSpecialty: resSpecialty.data,
+                    resClinic: resClinic.data,
                 }
                 dispatch(fetchRequiredDoctorInforSuccess(data));
             } else {
@@ -374,4 +381,30 @@ export const fetchRequiredDoctorInforSuccess = (allRequiredData) => ({
 
 export const fetchRequiredDoctorInforFailed = () => ({
     type: actionTypes.FETCH_REQUIRED_DOCTOR_INFOR_FAILD
+})
+
+// Fetch all patient for doctor
+export const fetchAllPatientForDoctor = (data) => {
+    return async (dispatch, getState) => {
+        try {
+            let res = await getAllPatientForDoctor(data);
+            if (res && res.errCode === 0) {
+                dispatch(fetchAllPatientForDoctorSuccess(res.data));
+            } else {
+                dispatch(fetchAllPatientForDoctorFail());
+            }
+        } catch (e) {
+            console.log('fetchAllPatientForDoctor error', e);
+            dispatch(fetchAllPatientForDoctorFail());
+        }
+    }
+}
+
+export const fetchAllPatientForDoctorSuccess = (data) => ({
+    type: actionTypes.FETCH_ALL_PATIENT_DOCTOR_SUCCESS,
+    data: data
+})
+
+export const fetchAllPatientForDoctorFail = () => ({
+    type: actionTypes.FETCH_ALL_PATIENT_DOCTOR_FAIL
 })

@@ -12,7 +12,8 @@ class DetailDoctor extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            detailDoctor: {}
+            detailDoctor: {},
+            currentDoctorId: -1
         }
     }
 
@@ -22,7 +23,8 @@ class DetailDoctor extends Component {
             let res = await getDetailInforDoctor(id);
             if (res && res.errCode === 0) {
                 this.setState({
-                    detailDoctor: res.data
+                    detailDoctor: res.data,
+                    currentDoctorId: id
                 })
             }
         }
@@ -69,12 +71,12 @@ class DetailDoctor extends Component {
                     <div className="schedule-doctor">
                         <div className="content-left">
                             <DoctorSchedule
-                                doctorId={this.state.detailDoctor && this.state.detailDoctor.id ? this.state.detailDoctor.id : -1}
+                                doctorIdFromParent={this.state.currentDoctorId}
                             />
                         </div>
                         <div className="content-right">
                             <DoctorExtraInfor
-                                doctorIdFromParent={this.state.detailDoctor && this.state.detailDoctor.id ? this.state.detailDoctor.id : -1}
+                                doctorIdFromParent={this.state.currentDoctorId}
                             />
                         </div>
                     </div>

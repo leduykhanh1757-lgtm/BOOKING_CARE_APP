@@ -11,45 +11,51 @@ let buildUrlEmail = (doctorId, token) => {
 let postBookAppointment = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            // Kiểm tra xem User có gửi thiếu trường dữ liệu nào không
-            if (!data.email || !data.doctorId || !data.timeType || !data.date) {
+            // 1. Kiểm tra validate theo chuẩn video (thêm fullName, selectedGender, address...)
+            if (!data.email || !data.doctorId || !data.timeType || !data.date
+                || !data.fullName || !data.selectedGender || !data.address
+            ) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing required parameters'
                 })
             } else {
-                let user = await db.User.findOne({
-                    where: { email: data.email }
+                let token = uuidv4();
+
+                // 2. TÌM HOẶC TẠO MỚI BỆNH NHÂN (Find or Create)
+                // Nếu email đã tồn tại thì lấy user đó, nếu chưa có thì tạo mới với role R3
+                let [user, created] = await db.User.findOrCreate({
+                    where: { email: data.email },
+                    defaults: {
+                        email: data.email,
+                        roleId: 'R3', // R3 là quyền Bệnh nhân
+                        gender: data.selectedGender,
+                        address: data.address,
+                        firstName: data.fullName,
+                        phoneNumber: data.phoneNumber ? data.phoneNumber : ''
+                    },
                 });
 
-                if (!user) {
-                    return resolve({
-                        errCode: 2,
-                        errMessage: 'Email chưa được đăng ký. Vui lòng đăng ký tài khoản trước khi đặt lịch!'
-                    });
-                }
-
+                // 3. TẠO LỊCH HẸN (BOOKING) VÀO DATABASE
                 if (user) {
-                    let token = uuidv4(); // 🛠️ SỬA LỖI: Sinh mã token chống hack
-
-                    let [booking, created] = await db.Booking.findOrCreate({
+                    let [booking, isCreated] = await db.Booking.findOrCreate({
                         where: {
                             patientId: user.id,
                             date: data.date,
                             timeType: data.timeType
                         },
                         defaults: {
-                            statusId: 'S1',
+                            statusId: 'S1', // S1: Trạng thái lịch hẹn mới (New)
                             doctorId: data.doctorId,
                             patientId: user.id,
                             date: data.date,
                             timeType: data.timeType,
-                            token: token // 🛠️ SỬA LỖI: Lưu token vào DB
+                            token: token
                         }
                     });
 
-                    if (created === true) {
-                        // SỬA LỖI: Gửi đủ một đống đồ chơi này cho Nodemailer nó vẽ HTML
+                    // 4. GỬI EMAIL XÁC NHẬN CHO BỆNH NHÂN
+                    if (isCreated) {
                         await emailService.sendSimpleEmail({
                             receiverEmail: data.email,
                             patientName: data.fullName,
@@ -115,7 +121,52 @@ let postVerifyBookAppointment = (data) => {
     })
 }
 
+let getListPatientForDoctor = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.doctorId || !data.date) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing parameter'
+                })
+            } else {
+                let dataPatient = await db.Booking.findAll({
+                    where: {
+                        statusId: 'S2', // S2 là trạng thái "Đã xác nhận"
+                        doctorId: data.doctorId,
+                        date: data.date
+                    },
+                    include: [
+                        {
+                            model: db.User, as: 'patientData', // Thông tin bệnh nhân
+                            attributes: ['email', 'firstName', 'address', 'gender'],
+                            include: [
+                                { model: db.Allcode, as: 'genderData', attributes: ['valueEn', 'valueVi'] }
+                            ]
+                        },
+                        {
+                            model: db.Allcode, as: 'timeTypeDataPatient', // Thông tin thời gian khám
+                            attributes: ['valueEn', 'valueVi']
+                        }
+                    ],
+                    raw: false,
+                    nest: true,
+
+                })
+
+                resolve({
+                    errCode: 0,
+                    data: dataPatient
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
 module.exports = {
     postBookAppointment: postBookAppointment,
-    postVerifyBookAppointment: postVerifyBookAppointment
+    postVerifyBookAppointment: postVerifyBookAppointment,
+    getListPatientForDoctor: getListPatientForDoctor
 }

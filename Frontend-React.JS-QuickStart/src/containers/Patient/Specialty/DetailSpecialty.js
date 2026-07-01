@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 import './DetailSpecialty.scss';
 import HomeHeader from '../../HomePage/HomeHeader';
-import { getAllDetailSpecialtyById } from '../../../services/userService';
 import DoctorSchedule from '../Doctor/DoctorSchedule';
 import DoctorExtraInfor from '../Doctor/DoctorExtraInfor';
 import ProfileDoctor from '../Doctor/ProfileDoctor';
 import _ from 'lodash';
+import { getAllDetailSpecialtyById, getAllCodeService } from '../../../services/userService';
+import Select from 'react-select';
 
 class DetailSpecialty extends Component {
     constructor(props) {
@@ -14,41 +15,57 @@ class DetailSpecialty extends Component {
         this.state = {
             arrDoctorId: [], // Mảng này để chứa ID của các bác sĩ
             dataDetailSpecialty: {},
+            listProvince: [],      //  Mảng chứa danh sách tỉnh thành
+            selectedProvince: ''
         }
     }
 
     async componentDidMount() {
         if (this.props.match && this.props.match.params && this.props.match.params.id) {
             let id = this.props.match.params.id;
-
-            // Gọi API với location mặc định là 'ALL' (lấy toàn bộ bác sĩ toàn quốc)
-            let res = await getAllDetailSpecialtyById({
-                id: id,
-                location: 'ALL'
-            });
-
-            if (res && res.errCode === 0) {
-                let data = res.data;
-                let arrDoctorId = [];
-
-                // Bóc tách lấy đúng cái mảng doctorSpecialty từ data trả về
-                if (data && data.doctorSpecialty) {
-                    let arr = data.doctorSpecialty;
-                    if (arr && arr.length > 0) {
-                        // Lặp qua mảng và chỉ nhặt lấy đúng cái doctorId nhét vào arrDoctorId
-                        arr.map(item => {
-                            arrDoctorId.push(item.doctorId)
-                        })
-                    }
+            // Gọi API lấy danh sách tỉnh thành
+            let resProvince = await getAllCodeService('PROVINCE');
+            if (resProvince && resProvince.errCode === 0) {
+                let data = resProvince.data;
+                let result = [];
+                // Thêm option "Toàn quốc"
+                result.push({ label: 'Toàn quốc', value: 'ALL' });
+                if (data && data.length > 0) {
+                    data.map(item => {
+                        let object = {};
+                        let labelVi = item.valueVi;
+                        let labelEn = item.valueEn;
+                        object.label = this.props.language === 'vi' ? labelVi : labelEn;
+                        object.value = item.keyMap;
+                        result.push(object);
+                    });
                 }
-
-                // Cập nhật lại State
-                this.setState({
-                    dataDetailSpecialty: res.data,
-                    arrDoctorId: arrDoctorId,
-                })
+                this.setState({ listProvince: result });
             }
+            // Gọi API với location mặc định là 'ALL' (lấy toàn bộ bác sĩ toàn quốc)
+            this.getDetailSpecialty(id, 'ALL');
         }
+    }
+
+    getDetailSpecialty = async (id, location) => {
+        let res = await getAllDetailSpecialtyById({ id: id, location: location });
+        if (res && res.errCode === 0) {
+            let data = res.data;
+            let arrDoctorId = [];
+            if (data && data.doctorSpecialty) {
+                data.doctorSpecialty.map(item => arrDoctorId.push(item.doctorId));
+            }
+            this.setState({
+                dataDetailSpecialty: res.data,
+                arrDoctorId: arrDoctorId,
+            });
+        }
+    }
+
+    handleOnChangeSelect = async (event) => {
+        let location = event.value;
+        this.setState({ selectedProvince: event });
+        this.getDetailSpecialty(this.props.match.params.id, location);
     }
 
     render() {
@@ -67,13 +84,18 @@ class DetailSpecialty extends Component {
 
                     {/* 2. HIỂN THỊ DANH SÁCH BÁC SĨ */}
                     <div className="search-sp-doctor">
-                        {/* Lát nữa mình làm ô Select chọn Tỉnh thành ở đây */}
+                        <Select
+                            value={this.state.selectedProvince}
+                            onChange={(event) => this.handleOnChangeSelect(event)}
+                            options={this.state.listProvince}
+                            placeholder="Chọn tỉnh thành"
+                        />
                     </div>
 
                     {arrDoctorId && arrDoctorId.length > 0 &&
                         arrDoctorId.map((item, index) => {
                             return (
-                                <div className="each-doctor" key={index}>
+                                <div className="each-doctor" key={item}>
 
                                     {/* CỘT TRÁI: Hiện ảnh, tên và thông tin chung */}
                                     <div className="dt-content-left">

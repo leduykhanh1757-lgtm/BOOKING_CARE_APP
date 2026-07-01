@@ -32,25 +32,21 @@ let createSpecialty = (data) => {
 let getAllSpecialty = () => {
     return new Promise(async (resolve, reject) => {
         try {
-            // Móc toàn bộ data từ bảng Specialties
             let data = await db.Specialty.findAll({
-                // Tùy chọn: bỏ qua descriptionHTML và descriptionMarkdown để API trả về nhanh hơn nếu trang chủ không cần dùng đến
+                attributes: ['id', 'name', 'image']
             });
-
-            // Nếu có data, tiến hành dịch ngược ảnh BLOB sang chuỗi Base64
             if (data && data.length > 0) {
                 data.map(item => {
+                    // Dùng Buffer.from cho chuẩn bảo mật
                     if (item.image) {
-                        //  (Dùng Buffer.from thay vì new Buffer để không bị văng warning gạch ngang đỏ)
                         item.image = Buffer.from(item.image, 'base64').toString('binary');
                     }
                     return item;
                 })
             }
-
             resolve({
                 errCode: 0,
-                errMessage: 'ok',
+                errMessage: 'OK',
                 data
             })
         } catch (e) {
@@ -71,11 +67,14 @@ let getDetailSpecialtyById = (inputId, location) => {
                 // 1. Tìm thông tin miêu tả của Chuyên khoa
                 let data = await db.Specialty.findOne({
                     where: { id: inputId },
-                    attributes: ['descriptionHTML', 'descriptionMarkdown'],
+                    attributes: ['descriptionHTML', 'descriptionMarkdown', 'name', 'image'],
                     raw: true
                 })
 
                 if (data) {
+                    if (data.image) {
+                        data.image = Buffer.from(data.image, 'base64').toString('binary');
+                    }
                     let doctorSpecialty = [];
                     // 2. Tìm danh sách bác sĩ thuộc chuyên khoa này
                     if (location === 'ALL') {
@@ -112,8 +111,42 @@ let getDetailSpecialtyById = (inputId, location) => {
     })
 }
 
+let editSpecialty = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.id || !data.name || !data.descriptionHTML || !data.descriptionMarkdown) {
+                resolve({ errCode: 1, errMessage: 'Missing required parameters!' })
+            } else {
+                let specialty = await db.Specialty.findOne({
+                    where: { id: data.id },
+                    raw: false // Phải để false để xài hàm save() của Sequelize
+                })
+
+                if (specialty) {
+                    specialty.name = data.name;
+                    specialty.descriptionHTML = data.descriptionHTML;
+                    specialty.descriptionMarkdown = data.descriptionMarkdown;
+
+                    // Nếu bác up ảnh mới thì lưu, không thì giữ nguyên ảnh cũ
+                    if (data.imageBase64) {
+                        specialty.image = data.imageBase64;
+                    }
+
+                    await specialty.save();
+                    resolve({ errCode: 0, errMessage: 'Update specialty succeed!' })
+                } else {
+                    resolve({ errCode: 2, errMessage: 'Specialty not found!' })
+                }
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
 module.exports = {
     createSpecialty: createSpecialty,
     getAllSpecialty: getAllSpecialty,
-    getDetailSpecialtyById: getDetailSpecialtyById
+    getDetailSpecialtyById: getDetailSpecialtyById,
+    editSpecialty: editSpecialty
 }

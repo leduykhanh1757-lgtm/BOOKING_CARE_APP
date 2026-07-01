@@ -71,6 +71,24 @@ const getAllDetailSpecialtyById = (data) => {
     // Truyền lên 2 tham số: id của chuyên khoa và location (ALL hoặc mã tỉnh)
     return axios.get(`/api/get-detail-specialty-by-id?id=${data.id}&location=${data.location}`);
 }
+const createNewClinic = (data) => {
+    return axios.post('/api/create-new-clinic', data)
+}
+const getAllClinic = () => {
+    return axios.get('/api/get-clinic');
+}
+const getAllDetailClinicById = (data) => {
+    return axios.get(`/api/get-detail-clinic-by-id?id=${data.id}`)
+}
+const editClinicService = (data) => {
+    return axios.put('/api/edit-clinic', data);
+}
+const editSpecialtyService = (data) => {
+    return axios.put('/api/edit-specialty', data);
+}
+const getAllPatientForDoctor = (data) => {
+    return axios.get(`/api/get-list-patient-for-doctor?doctorId=${data.doctorId}&date=${data.date}`);
+}
 export {
     handleLoginApi, getAllUsers,
     createNewUserService, deleteUserService,
@@ -80,5 +98,8 @@ export {
     getExtraInforDoctorById, getProfileDoctorById,
     postPatientBookAppointment, postVerifyBookAppointment,
     createNewSpecialty, getAllSpecialty,
-    getAllDetailSpecialtyById
+    getAllDetailSpecialtyById,
+    createNewClinic, getAllClinic, getAllDetailClinicById, editClinicService,
+    editSpecialtyService,
+    getAllPatientForDoctor
 };
