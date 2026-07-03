@@ -1,0 +1,63 @@
+.detail-handbook-container {
+    background-color: #fcfcfc;
+    min-height: 100vh; // Ép chiều cao tối thiểu bằng màn hình
+
+    .handbook-body {
+        width: 1200px; // Ép chiều rộng chuẩn
+        max-width: 100%; // Responsive cho màn hình nhỏ
+        margin: 0 auto; // Đẩy ra giữa màn hình
+        padding: 40px 15px 100px 15px; // Lề trên 40px, lề dưới 100px cho thoáng
+
+        .handbook-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .handbook-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+            /* 🛠️ CSS can thiệp vào bên trong cục HTML được sinh ra từ Markdown */
+            p {
+                font-size: 16px;
+                line-height: 1.6;
+                color: #555;
+                text-align: justify;
+                margin-bottom: 15px;
+            }
+
+            img {
+                max-width: 100%; // Không cho ảnh tràn viền
+                height: auto;
+                border-radius: 5px;
+                display: block;
+                margin: 20px auto; // Đưa ảnh ra giữa
+            }
+
+            h2,
+            h3,
+            h4 {
+                color: #333;
+                font-weight: 600;
+                margin-top: 25px;
+                margin-bottom: 15px;
+            }
+
+            ul {
+                font-size: 16px;
+                color: #555;
+                line-height: 1.6;
+                margin-bottom: 20px;
+
+                li {
+                    margin-bottom: 8px;
+                }
+            }
+        }
+    }
+}

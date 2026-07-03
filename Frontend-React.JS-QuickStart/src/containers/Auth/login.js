@@ -36,11 +36,7 @@ class Login extends Component {
 
         try {
             let data = await handleLoginApi(this.state.username, this.state.password);
-
-            // 1. MÁY QUÉT: In ra xem vỏ ngoài của dữ liệu trông như thế nào
-            console.log(">>> CHECK RAW DATA TỪ BACKEND: ", data);
-
-            // 2. LỘT VỎ: Nếu thư viện bọc thêm lớp data bên ngoài thì mình lột nó ra
+            // 2. Nếu thư viện bọc thêm lớp data bên ngoài thì mình lột nó ra
             let realData = data && data.data ? data.data : data;
 
             // 3. Xử lý như bình thường với cục dữ liệu đã lột vỏ
@@ -51,12 +47,10 @@ class Login extends Component {
             }
 
             if (realData && realData.errCode === 0) {
-                console.log(">>> Đã vào được IF thành công, chuẩn bị chuyển trang!");
                 this.props.userLoginSuccess(realData.user);
             }
 
         } catch (error) {
-            console.log(">>> LỖI CATCH:", error);
             if (error.response && error.response.data) {
                 this.setState({
                     errMessage: error.response.data.message

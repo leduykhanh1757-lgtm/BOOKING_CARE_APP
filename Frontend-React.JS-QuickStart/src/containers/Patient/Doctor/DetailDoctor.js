@@ -6,6 +6,8 @@ import HomeHeader from '../../HomePage/HomeHeader';
 import './DetailDoctor.scss';
 import DoctorSchedule from './DoctorSchedule';
 import DoctorExtraInfor from './DoctorExtraInfor';
+import LikeAndShare from '../SocialPlugin/LikeAndShare';
+import Comment from '../SocialPlugin/Comment';
 
 class DetailDoctor extends Component {
 
@@ -43,6 +45,11 @@ class DetailDoctor extends Component {
             nameEn = `${detailDoctor.positionData.valueEn}, ${detailDoctor.firstName} ${detailDoctor.lastName}`;
         }
 
+        // Khai báo link cho Facebook
+        // Nếu chạy localhost thì dùng 1 cái link ảo, nếu chạy thật trên mạng thì lấy link website thật
+        let currentURL = process.env.REACT_APP_IS_LOCALHOST === "1" ?
+            "https://bookingcare.vn/" : window.location.href;
+
         return (
             <React.Fragment>
                 <HomeHeader isShowBanner={false} />
@@ -65,6 +72,14 @@ class DetailDoctor extends Component {
                                 {detailDoctor && detailDoctor.markdownData && detailDoctor.markdownData.description
                                     && <span>{detailDoctor.markdownData.description}</span>
                                 }
+
+                                {/* CHÈN NÚT LIKE & SHARE VÀO DƯỚI ĐOẠN GIỚI THIỆU */}
+                                <div className="like-share-plugin" style={{ marginTop: '10px' }}>
+                                    <LikeAndShare
+                                        dataHref={currentURL}
+                                    />
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -87,7 +102,14 @@ class DetailDoctor extends Component {
                             </div>
                         }
                     </div>
+
+                    {/*  CHÈN KHUNG COMMENT VÀO PHẦN ĐUÔI CÙNG */}
                     <div className="comment-doctor">
+                        <Comment
+                            dataHref={currentURL}
+                            width={"100%"}
+                            doctorIdFromParent={this.state.currentDoctorId}
+                        />
                     </div>
                 </div>
             </React.Fragment>

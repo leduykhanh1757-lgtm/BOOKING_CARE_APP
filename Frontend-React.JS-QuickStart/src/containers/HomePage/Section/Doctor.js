@@ -6,6 +6,7 @@ import * as actions from '../../../store/actions';
 import { getTopDoctorHomeService } from '../../../services/userService';
 import { languages } from '../../../utils';
 import { withRouter } from 'react-router';
+import './Doctor.scss';
 
 class Doctor extends Component {
 

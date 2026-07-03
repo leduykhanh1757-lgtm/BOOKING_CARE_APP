@@ -12,7 +12,8 @@ let handleUserLogin = (email, password) => {
             if (isExist) {
                 // Nếu tồn tại -> Chui vào DB lấy user đó ra
                 let user = await db.User.findOne({
-                    attributes: ['email', 'roleId', 'password', 'firstName', 'lastName'],
+                    // Đã thêm 'id' vào danh sách lấy dữ liệu
+                    attributes: ['id', 'email', 'roleId', 'password', 'firstName', 'lastName'],
                     where: { email: email },
                     raw: true
                 });

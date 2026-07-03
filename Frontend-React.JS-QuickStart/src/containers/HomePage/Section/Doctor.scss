@@ -1,0 +1,59 @@
+/* Doctor.scss */
+.section-outstanding-doctor {
+    .section-body {
+        .doctor-wrapper {
+            padding: 10px;
+            /* Căn đệm bằng với các component khác */
+        }
+
+        .doctor-customize {
+            outline: none;
+            cursor: pointer;
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            /* Bóng mềm */
+            padding: 25px 10px;
+            transition: all 0.3s ease;
+
+            &:hover {
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+                transform: translateY(-5px);
+            }
+
+            .bg-image {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+                border: 4px solid #f8f9fa;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+            }
+
+            .doctor-name {
+                font-size: 16px;
+                font-weight: 600;
+                color: #333;
+                text-align: center;
+                padding: 0 10px;
+            }
+
+            .doctor-specialty {
+                font-size: 14px;
+                color: #666;
+                margin-top: 8px;
+                font-weight: 400;
+                text-align: center;
+                padding: 0 10px;
+            }
+        }
+    }
+}

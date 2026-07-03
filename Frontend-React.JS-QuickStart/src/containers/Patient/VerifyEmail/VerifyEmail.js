@@ -3,13 +3,15 @@ import { connect } from "react-redux";
 import { postVerifyBookAppointment } from '../../../services/userService';
 import './VerifyEmail.scss';
 import HomeHeader from '../../HomePage/HomeHeader';
+import LoadingOverlay from 'react-loading-overlay';
 
 class VerifyEmail extends Component {
     constructor(props) {
         super(props);
         this.state = {
             statusVerify: false, // Trạng thái đã gọi API xong chưa
-            errCode: 0 // Kết quả trả về
+            errCode: 0, // Kết quả trả về
+            isShowLoading: true
         }
     }
 
@@ -29,44 +31,52 @@ class VerifyEmail extends Component {
             if (res && res.errCode === 0) {
                 this.setState({
                     statusVerify: true,
-                    errCode: res.errCode
+                    errCode: res.errCode,
+                    isShowLoading: false
                 })
             } else {
                 this.setState({
                     statusVerify: true,
-                    errCode: res && res.errCode ? res.errCode : -1
+                    errCode: res && res.errCode ? res.errCode : -1,
+                    isShowLoading: false
                 })
             }
         }
     }
 
     render() {
-        let { statusVerify, errCode } = this.state;
+        let { statusVerify, errCode, isShowLoading } = this.state;
 
         return (
-            <>
-                <HomeHeader isShowBanner={false} />
+            <LoadingOverlay
+                active={isShowLoading}
+                spinner
+                text='Đang tải dữ liệu...'
+            >
+                <div>
+                    <HomeHeader isShowBanner={false} />
 
-                <div className="verify-email-container">
-                    {statusVerify === false ?
-                        <div className="info-card loading-text">
-                            <i className="fas fa-spinner fa-spin"></i> Đang xác nhận thông tin đặt lịch...
-                        </div>
-                        :
-                        <div className="info-card result-text">
-                            {errCode === 0 ?
-                                <div className="infor-success">
-                                    <i className="fas fa-check-circle"></i> Xác nhận lịch hẹn thành công! Cảm ơn bạn đã sử dụng BookingCare.
-                                </div>
-                                :
-                                <div className="infor-failed">
-                                    <i className="fas fa-times-circle"></i> Lịch hẹn không tồn tại hoặc đã được xác nhận trước đó!
-                                </div>
-                            }
-                        </div>
-                    }
+                    <div className="verify-email-container">
+                        {statusVerify === false ?
+                            <div className="info-card loading-text">
+                                <i className="fas fa-spinner fa-spin"></i> Đang xác nhận thông tin đặt lịch...
+                            </div>
+                            :
+                            <div className="info-card result-text">
+                                {errCode === 0 ?
+                                    <div className="infor-success">
+                                        <i className="fas fa-check-circle"></i> Xác nhận lịch hẹn thành công! Cảm ơn bạn đã sử dụng BookingCare.
+                                    </div>
+                                    :
+                                    <div className="infor-failed">
+                                        <i className="fas fa-times-circle"></i> Lịch hẹn không tồn tại hoặc đã được xác nhận trước đó!
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
                 </div>
-            </>
+            </LoadingOverlay>
         );
     }
 }

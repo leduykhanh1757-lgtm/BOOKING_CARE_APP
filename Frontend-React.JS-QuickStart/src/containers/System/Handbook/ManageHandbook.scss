@@ -1,0 +1,58 @@
+.manage-handbook-container {
+    padding: 20px;
+
+    .ms-title {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    .add-new-handbook {
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .preview-img-container {
+            display: flex;
+            flex-direction: column;
+
+            .label-upload {
+                display: block;
+                width: fit-content;
+                padding: 6px 15px;
+                border-radius: 4px;
+                background-color: #ebebeb;
+                color: #333;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                border: 1px solid #ccc;
+                font-weight: normal;
+
+                &:hover {
+                    background-color: #d8d8d8;
+                }
+
+                i {
+                    margin-left: 5px;
+                }
+            }
+
+            .preview-image {
+                margin-top: 10px;
+                height: 120px;
+                width: 150px;
+                border: 1px dashed #ccc;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: contain;
+                background-color: #fcfcfc;
+                border-radius: 5px;
+            }
+        }
+    }
+}

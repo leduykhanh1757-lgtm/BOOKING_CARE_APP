@@ -1,55 +1,91 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Slider from "react-slick";
+import { getAllHandbook } from '../../../services/userService'; // 🛠️ Import API
+import { withRouter } from 'react-router'; // 🛠️ Import để lát bấm vào bài viết thì chuyển trang
+import './HandBook.scss';
+import { FormattedMessage } from 'react-intl';
 
-import handbookImg from '../../../assets/specialty/TAIMUIHONG.jpg';
+// 🛠️ Cắt chữ theo TỪ (không cắt đứt giữa chữ), thêm "..." nếu vượt quá độ dài cho phép
+// Dùng thay cho -webkit-line-clamp vì property này hay bị build tool (autoprefixer/cssnano)
+// loại bỏ khi build production, gây lỗi tràn chữ ra ngoài card.
+const truncateText = (text, maxLength = 60) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+
+    const trimmed = text.slice(0, maxLength);
+    // Cắt lùi về khoảng trắng gần nhất để không đứt giữa từ
+    const lastSpace = trimmed.lastIndexOf(' ');
+    const safeText = lastSpace > 0 ? trimmed.slice(0, lastSpace) : trimmed;
+
+    return safeText.trim() + '...';
+};
 
 class Handbook extends Component {
-    render() {
+    constructor(props) {
+        super(props);
+        this.state = {
+            dataHandbooks: [] // Khởi tạo state chứa mảng cẩm nang rỗng
+        }
+    }
 
-        // 1. Dữ liệu bài viết mẫu
-        let dataHandbook = [
-            { title: '7 Chuyên gia Tham vấn Tâm lý hôn nhân gia đình online uy tín', image: handbookImg },
-            { title: 'Top 5 Phòng khám Nha khoa uy tín tại TP.HCM', image: handbookImg },
-            { title: 'Review 5 Bệnh viện khám xương khớp tốt nhất Hà Nội', image: handbookImg },
-            { title: 'Dấu hiệu sớm nhận biết bệnh trào ngược dạ dày', image: handbookImg },
-            { title: 'Kinh nghiệm đi khám tại Bệnh viện Đại học Y Dược 1', image: handbookImg },
-        ];
+    async componentDidMount() {
+        // Gọi API lấy toàn bộ danh sách Cẩm nang từ Database
+        let res = await getAllHandbook();
+        if (res && res.errCode === 0) {
+            this.setState({
+                dataHandbooks: res.data ? res.data : []
+            })
+        }
+    }
+
+    handleViewDetailHandbook = (handbook) => {
+        if (this.props.history) {
+            // Chuyển hướng sang trang chi tiết (Tương tự Chuyên khoa/Phòng khám)
+            this.props.history.push(`/detail-handbook/${handbook.id}`);
+        }
+    }
+
+    render() {
+        let { dataHandbooks } = this.state;
 
         return (
-            // Dùng chung class section-share, thêm class riêng section-handbook
             <div className="section-share section-handbook">
                 <div className="section-container">
                     <div className="section-header">
-                        <h3>Cẩm nang</h3>
-                        <button>TẤT CẢ BÀI VIẾT</button>
+                        <h3><FormattedMessage id="homepage.handbook" /></h3>
+                        <button><FormattedMessage id="homepage.all-articles" /></button>
                     </div>
                     <div className="section-body">
-                        <Slider {...this.props.settings}>
-
-                            {/* 2. DÙNG .map() ĐỂ HIỂN THỊ */}
-                            {dataHandbook && dataHandbook.length > 0 &&
-                                dataHandbook.map((item, index) => {
+                        {/* Kiểm tra nếu có data thì mới render Slider để không bị lỗi trắng trang */}
+                        {dataHandbooks && dataHandbooks.length > 0 &&
+                            <Slider {...this.props.settings}>
+                                {dataHandbooks.map((item, index) => {
                                     return (
-                                        // Vẫn giữ tuyệt chiêu bọc màng co
-                                        <div key={index}>
+                                        <div
+                                            key={index}
+                                            onClick={() => this.handleViewDetailHandbook(item)}
+                                        >
                                             <div className="handbook-customize">
-
-                                                {/* Ảnh bài viết */}
                                                 <div
                                                     className="bg-image"
                                                     style={{ backgroundImage: `url(${item.image})` }}
                                                 ></div>
 
-                                                {/* Tiêu đề bài viết */}
-                                                <h3 className="handbook-title">{item.title}</h3>
+                                                {/* 🛠️ Chú ý: Dưới DB mình đặt là 'name' nên lấy ra phải là item.name */}
+                                                {/* 🛠️ Cắt chữ bằng JS (truncateText) thay vì dựa vào -webkit-line-clamp */}
+                                                <h3
+                                                    className="handbook-title"
+                                                    title={item.name}
+                                                >
+                                                    {truncateText(item.name, 60)}
+                                                </h3>
                                             </div>
                                         </div>
                                     )
-                                })
-                            }
-
-                        </Slider>
+                                })}
+                            </Slider>
+                        }
                     </div>
                 </div>
             </div>
@@ -60,4 +96,5 @@ class Handbook extends Component {
 const mapStateToProps = state => { return { isLoggedIn: state.user.isLoggedIn }; };
 const mapDispatchToProps = dispatch => { return {}; };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Handbook);
+// Bọc withRouter ở ngoài cùng để dùng được this.props.history
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Handbook));

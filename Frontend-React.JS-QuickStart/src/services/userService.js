@@ -89,6 +89,27 @@ const editSpecialtyService = (data) => {
 const getAllPatientForDoctor = (data) => {
     return axios.get(`/api/get-list-patient-for-doctor?doctorId=${data.doctorId}&date=${data.date}`);
 }
+const postSendRemedy = (data) => {
+    return axios.post('/api/send-remedy', data);
+}
+const createNewHandbook = (data) => {
+    return axios.post('/api/create-new-handbook', data);
+}
+const getAllHandbook = () => {
+    return axios.get('/api/get-all-handbook');
+}
+const editHandbookService = (data) => {
+    return axios.put('/api/edit-handbook', data);
+}
+const getDetailHandbookById = (data) => {
+    return axios.get(`/api/get-detail-handbook-by-id?id=${data.id}`);
+}
+const createNewCommentApi = (data) => {
+    return axios.post('/api/create-new-comment', data);
+}
+const getCommentsByIdApi = (doctorId) => {
+    return axios.get(`/api/get-comments-by-doctor-id?doctorId=${doctorId}`);
+}
 export {
     handleLoginApi, getAllUsers,
     createNewUserService, deleteUserService,
@@ -101,5 +122,8 @@ export {
     getAllDetailSpecialtyById,
     createNewClinic, getAllClinic, getAllDetailClinicById, editClinicService,
     editSpecialtyService,
-    getAllPatientForDoctor
+    getAllPatientForDoctor,
+    postSendRemedy,
+    createNewHandbook, getAllHandbook, editHandbookService, getDetailHandbookById,
+    createNewCommentApi, getCommentsByIdApi
 };

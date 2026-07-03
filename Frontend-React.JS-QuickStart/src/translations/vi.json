@@ -37,7 +37,7 @@
         },
         "doctor": {
             "manage-schedule": "Quản lý lịch khám",
-            "manage-patient": "Quản lý bệnh nhân khám bệnh",
+            "manage-patient": "Quản lý bệnh nhân",
             "manage-infor": "Quản lý thông tin bác sĩ"
         }
     },
@@ -60,7 +60,7 @@
         "outstanding-doctor": "Bác sĩ nổi bật tuần qua",
         "more-info": "Xem thêm",
         "handbook": "Cẩm nang sức khỏe",
-        "more-info-handbook": "Xem thêm cẩm nang",
+        "all-articles": "TẤT CẢ BÀI VIẾT",
         "specialty-popular": "Chuyên khoa phổ biến",
         "more-infor": "XEM THÊM",
         "outstanding-medical-facility": "Cơ sở y tế nổi bật"

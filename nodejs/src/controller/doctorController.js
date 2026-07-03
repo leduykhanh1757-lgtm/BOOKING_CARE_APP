@@ -111,6 +111,35 @@ let getProfileDoctorById = async (req, res) => {
         })
     }
 }
+let sendRemedy = async (req, res) => {
+    try {
+        let info = await doctorService.sendRemedy(req.body);
+        return res.status(200).json(info);
+    } catch (e) {
+        console.log(e);
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: 'Error from the server'
+        })
+    }
+}
+let createNewComment = async (req, res) => {
+    try {
+        let info = await doctorService.createNewComment(req.body);
+        return res.status(200).json(info);
+    } catch (e) {
+        return res.status(200).json({ errCode: -1, errMessage: 'Error from server' });
+    }
+}
+
+let getCommentsByDoctorId = async (req, res) => {
+    try {
+        let info = await doctorService.getCommentsByDoctorId(req.query.doctorId);
+        return res.status(200).json(info);
+    } catch (e) {
+        return res.status(200).json({ errCode: -1, errMessage: 'Error from server' });
+    }
+}
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
@@ -119,5 +148,8 @@ module.exports = {
     bulkCreateSchedule: bulkCreateSchedule,
     getScheduleByDate: getScheduleByDate,
     getExtraInforDoctorById: getExtraInforDoctorById,
-    getProfileDoctorById: getProfileDoctorById
+    getProfileDoctorById: getProfileDoctorById,
+    sendRemedy: sendRemedy,
+    createNewComment: createNewComment,
+    getCommentsByDoctorId: getCommentsByDoctorId
 }

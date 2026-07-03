@@ -1,6 +1,7 @@
 import db from '../models/index';
 require('dotenv').config();
 import _ from 'lodash';
+import emailService from '../services/emailService';
 
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 let getTopDoctorHome = (limitInput) => {
@@ -382,6 +383,76 @@ let getProfileDoctorById = (inputId) => {
         }
     })
 }
+let sendRemedy = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.email || !data.doctorId || !data.patientId || !data.timeType || !data.imgBase64) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameters!'
+                })
+            } else {
+                // 1. Cập nhật trạng thái Booking S2 -> S3
+                let appointment = await db.Booking.findOne({
+                    where: {
+                        doctorId: data.doctorId,
+                        patientId: data.patientId,
+                        timeType: data.timeType,
+                        statusId: 'S2'
+                    },
+                    raw: false // Bắt buộc raw: false để dùng hàm save()
+                });
+
+                if (appointment) {
+                    appointment.statusId = 'S3';
+                    await appointment.save();
+                }
+
+                // 2. Gửi email đính kèm hóa đơn
+                await emailService.sendAttachment(data);
+
+                resolve({
+                    errCode: 0,
+                    errMessage: 'Ok'
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+let createNewComment = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.doctorId || !data.content) {
+                resolve({ errCode: 1, errMessage: 'Missing parameter' });
+            } else {
+                await db.Comment.create({
+                    doctorId: data.doctorId,
+                    authorName: data.authorName || 'Khách viếng thăm',
+                    content: data.content
+                });
+                resolve({ errCode: 0, errMessage: 'Create comment succeed!' });
+            }
+        } catch (e) { reject(e); }
+    });
+}
+
+let getCommentsByDoctorId = (doctorId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorId) {
+                resolve({ errCode: 1, errMessage: 'Missing parameter' });
+            } else {
+                let data = await db.Comment.findAll({
+                    where: { doctorId: doctorId },
+                    order: [['createdAt', 'DESC']] // Lấy bình luận mới nhất đẩy lên đầu
+                });
+                resolve({ errCode: 0, errMessage: 'Ok', data });
+            }
+        } catch (e) { reject(e); }
+    });
+}
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
@@ -391,4 +462,7 @@ module.exports = {
     getExtraInforDoctorById: getExtraInforDoctorById,
     bulkCreateScheduleService: bulkCreateScheduleService,
     getScheduleByDate: getScheduleByDate,
+    sendRemedy: sendRemedy,
+    createNewComment: createNewComment,
+    getCommentsByDoctorId: getCommentsByDoctorId
 }
