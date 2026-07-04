@@ -453,6 +453,55 @@ let getCommentsByDoctorId = (doctorId) => {
         } catch (e) { reject(e); }
     });
 }
+let toggleLikeDoctor = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.doctorId || !data.patientId) {
+                resolve({ errCode: 1, errMessage: 'Missing parameter' });
+            } else {
+                // Kiểm tra xem user này đã like bác sĩ này chưa
+                let existingLike = await db.Like.findOne({
+                    where: { doctorId: data.doctorId, patientId: data.patientId }
+                });
+
+                if (existingLike) {
+                    // Nếu đã Like rồi -> Bấm lần nữa là Hủy Like (Xóa record)
+                    await existingLike.destroy();
+                    resolve({ errCode: 0, errMessage: 'Unliked', isLiked: false });
+                } else {
+                    // Nếu chưa Like -> Tạo record mới
+                    await db.Like.create({
+                        doctorId: data.doctorId,
+                        patientId: data.patientId
+                    });
+                    resolve({ errCode: 0, errMessage: 'Liked', isLiked: true });
+                }
+            }
+        } catch (e) { reject(e); }
+    });
+}
+
+let getLikesByDoctorId = (doctorId, patientId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorId) {
+                resolve({ errCode: 1, errMessage: 'Missing parameter' });
+            } else {
+                // Đếm tổng số Like của Bác sĩ
+                let totalLikes = await db.Like.count({ where: { doctorId: doctorId } });
+
+                // Kiểm tra xem User hiện tại đã Like chưa
+                let isLiked = false;
+                if (patientId) {
+                    let check = await db.Like.findOne({ where: { doctorId: doctorId, patientId: patientId } });
+                    if (check) isLiked = true;
+                }
+
+                resolve({ errCode: 0, errMessage: 'Ok', data: { totalLikes, isLiked } });
+            }
+        } catch (e) { reject(e); }
+    });
+}
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
@@ -464,5 +513,7 @@ module.exports = {
     getScheduleByDate: getScheduleByDate,
     sendRemedy: sendRemedy,
     createNewComment: createNewComment,
-    getCommentsByDoctorId: getCommentsByDoctorId
+    getCommentsByDoctorId: getCommentsByDoctorId,
+    toggleLikeDoctor: toggleLikeDoctor,
+    getLikesByDoctorId: getLikesByDoctorId
 }

@@ -110,6 +110,15 @@ const createNewCommentApi = (data) => {
 const getCommentsByIdApi = (doctorId) => {
     return axios.get(`/api/get-comments-by-doctor-id?doctorId=${doctorId}`);
 }
+const toggleLikeDoctorApi = (data) => {
+    return axios.post('/api/toggle-like-doctor', data);
+}
+const getLikesDoctorApi = (doctorId, patientId) => {
+    return axios.get(`/api/get-likes-by-doctor-id?doctorId=${doctorId}&patientId=${patientId}`);
+}
+const askChatbotApi = (message) => {
+    return axios.post('/api/ask-chatbot', { message });
+}
 export {
     handleLoginApi, getAllUsers,
     createNewUserService, deleteUserService,
@@ -125,5 +134,7 @@ export {
     getAllPatientForDoctor,
     postSendRemedy,
     createNewHandbook, getAllHandbook, editHandbookService, getDetailHandbookById,
-    createNewCommentApi, getCommentsByIdApi
+    createNewCommentApi, getCommentsByIdApi,
+    toggleLikeDoctorApi, getLikesDoctorApi,
+    askChatbotApi
 };

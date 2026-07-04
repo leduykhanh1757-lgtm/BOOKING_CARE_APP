@@ -30,6 +30,13 @@ class Specialty extends Component {
         }
     }
 
+    // THÊM HÀM CHUYỂN TRANG TẤT CẢ CHUYÊN KHOA
+    handleViewMoreSpecialty = () => {
+        if (this.props.history) {
+            this.props.history.push(`/all-specialty`);
+        }
+    }
+
     render() {
         let { dataSpecialty } = this.state;
 
@@ -40,7 +47,8 @@ class Specialty extends Component {
                         <span className="title-section">
                             <FormattedMessage id="homepage.specialty-popular" />
                         </span>
-                        <button className="btn-section">
+                        {/* GẮN SỰ KIỆN ONCLICK VÀO NÚT NÀY */}
+                        <button className="btn-section" onClick={() => this.handleViewMoreSpecialty()}>
                             <FormattedMessage id="homepage.more-infor" />
                         </button>
                     </div>
@@ -83,5 +91,4 @@ const mapDispatchToProps = dispatch => {
     return {};
 };
 
-// 🛠️ 2. ĐÃ BỌC WITHROUTER Ở DÒNG CUỐI CÙNG
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Specialty));

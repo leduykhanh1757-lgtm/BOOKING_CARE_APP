@@ -140,6 +140,19 @@ let getCommentsByDoctorId = async (req, res) => {
         return res.status(200).json({ errCode: -1, errMessage: 'Error from server' });
     }
 }
+let toggleLikeDoctor = async (req, res) => {
+    try {
+        let info = await doctorService.toggleLikeDoctor(req.body);
+        return res.status(200).json(info);
+    } catch (e) { return res.status(200).json({ errCode: -1, errMessage: 'Error from server' }); }
+}
+
+let getLikesByDoctorId = async (req, res) => {
+    try {
+        let info = await doctorService.getLikesByDoctorId(req.query.doctorId, req.query.patientId);
+        return res.status(200).json(info);
+    } catch (e) { return res.status(200).json({ errCode: -1, errMessage: 'Error from server' }); }
+}
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
@@ -151,5 +164,7 @@ module.exports = {
     getProfileDoctorById: getProfileDoctorById,
     sendRemedy: sendRemedy,
     createNewComment: createNewComment,
-    getCommentsByDoctorId: getCommentsByDoctorId
+    getCommentsByDoctorId: getCommentsByDoctorId,
+    toggleLikeDoctor: toggleLikeDoctor,
+    getLikesByDoctorId: getLikesByDoctorId
 }

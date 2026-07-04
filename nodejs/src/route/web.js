@@ -56,6 +56,10 @@ let initWebRoute = (app) => {
 
     router.post('/api/create-new-comment', doctorController.createNewComment);
     router.get('/api/get-comments-by-doctor-id', doctorController.getCommentsByDoctorId);
+    router.post('/api/toggle-like-doctor', doctorController.toggleLikeDoctor);
+    router.get('/api/get-likes-by-doctor-id', doctorController.getLikesByDoctorId);
+
+    router.post('/api/ask-chatbot', userController.handleAskBot);
 
     return app.use('/', router);
 }

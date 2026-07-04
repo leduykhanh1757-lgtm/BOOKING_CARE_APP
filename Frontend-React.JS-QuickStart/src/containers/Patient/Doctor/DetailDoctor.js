@@ -76,6 +76,7 @@ class DetailDoctor extends Component {
                                 {/* CHÈN NÚT LIKE & SHARE VÀO DƯỚI ĐOẠN GIỚI THIỆU */}
                                 <div className="like-share-plugin" style={{ marginTop: '10px' }}>
                                     <LikeAndShare
+                                        doctorIdFromParent={this.state.currentDoctorId}
                                         dataHref={currentURL}
                                     />
                                 </div>

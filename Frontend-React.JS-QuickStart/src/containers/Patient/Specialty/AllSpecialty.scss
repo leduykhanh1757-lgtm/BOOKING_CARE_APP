@@ -1,0 +1,68 @@
+.all-specialty-container {
+    /* 🛠️ Bỏ height: 100vh và flex đi, dùng min-height để trang tự do kéo dài */
+    min-height: 100vh;
+    background-color: #f9f9f9;
+
+    .all-specialty-body {
+        /* 🛠️ Bỏ flex: 1 đi */
+        padding-top: 20px;
+        /* Cách Header ra một chút cho thoáng */
+        padding-bottom: 50px;
+
+        .all-specialty-content {
+            width: 1200px;
+            margin: 0 auto;
+
+            .title-section {
+                font-size: 24px;
+                font-weight: 600;
+                margin: 0 0 20px 0;
+                color: #333;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #45c3d2;
+                display: inline-block;
+            }
+
+            .list-specialty {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+
+                .specialty-item {
+                    background-color: white;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+
+                    &:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+                        .specialty-name {
+                            color: #45c3d2;
+                        }
+                    }
+
+                    .bg-image {
+                        width: 100%;
+                        height: 160px;
+                        background-position: center center;
+                        background-repeat: no-repeat;
+                        background-size: cover;
+                    }
+
+                    .specialty-name {
+                        padding: 15px 10px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #333;
+                        text-align: center;
+                        transition: color 0.3s;
+                    }
+                }
+            }
+        }
+    }
+}

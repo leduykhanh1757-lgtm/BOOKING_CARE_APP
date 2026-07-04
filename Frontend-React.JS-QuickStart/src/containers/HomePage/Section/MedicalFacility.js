@@ -29,6 +29,13 @@ class MedicalFacility extends Component {
         }
     }
 
+    // THÊM HÀM CHUYỂN TRANG TẤT CẢ PHÒNG KHÁM
+    handleViewMoreClinic = () => {
+        if (this.props.history) {
+            this.props.history.push(`/all-clinic`);
+        }
+    }
+
     render() {
         let { dataClinics } = this.state;
 
@@ -37,15 +44,16 @@ class MedicalFacility extends Component {
                 <div className="section-container">
                     <div className="section-header">
                         <h3><FormattedMessage id="homepage.outstanding-medical-facility" /></h3>
-                        <button><FormattedMessage id="homepage.more-info" /></button>
+                        {/* GẮN SỰ KIỆN ONCLICK VÀO NÚT NÀY */}
+                        <button onClick={() => this.handleViewMoreClinic()}>
+                            <FormattedMessage id="homepage.more-info" />
+                        </button>
                     </div>
                     <div className="section-body">
-                        {/* 🛠️ Sửa 1: Đưa điều kiện check rỗng ra NGOÀI thẻ Slider */}
                         {dataClinics && dataClinics.length > 0 &&
                             <Slider {...this.props.settings}>
                                 {dataClinics.map((item, index) => {
                                     return (
-                                        /* 🛠️ Sửa 2: Bổ sung class và gắn sự kiện onClick */
                                         <div
                                             className="section-customize clinic-child"
                                             key={index}

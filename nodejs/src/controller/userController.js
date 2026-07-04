@@ -79,11 +79,24 @@ let getAllCode = async (req, res) => {
     }
 }
 
+const chatbotService = require('../services/chatbotService');
+
+let handleAskBot = async (req, res) => {
+    try {
+        let info = await chatbotService.askChatBot(req.body.message);
+        return res.status(200).json(info);
+    } catch (e) {
+        console.log("LỖI CHATBOT AI:", e);
+        return res.status(500).json({ errCode: -1, errMessage: 'Error from server' });
+    }
+}
+
 module.exports = {
     handleLogin: handleLogin,
     getAllUsers: getAllUsers,
     createANewUser: createANewUser,
     editUser: editUser,
     deleteUser: deleteUser,
-    getAllCode: getAllCode
+    getAllCode: getAllCode,
+    handleAskBot: handleAskBot
 }

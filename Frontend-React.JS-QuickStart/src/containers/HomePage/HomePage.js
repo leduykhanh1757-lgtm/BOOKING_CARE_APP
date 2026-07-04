@@ -10,6 +10,7 @@ import HomeFooter from './HomeFooter';
 import './HomePage.scss';
 import "slick-carousel/slick/slick.css";// thư viện chứa cái <- và -> và slick-prev, slick-next
 import "slick-carousel/slick/slick-theme.css";
+import Chatbot from './Chatbot/Chatbot';
 
 class HomePage extends Component {
 
@@ -38,6 +39,7 @@ class HomePage extends Component {
                 <HandBook settings={settings} />
                 <About />
                 <HomeFooter />
+                <Chatbot />
             </div>
 
         );

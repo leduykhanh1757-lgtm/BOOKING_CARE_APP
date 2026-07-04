@@ -5,6 +5,7 @@ import initWebRoute from "./route/web";
 import dotenv from "dotenv";
 import connectDB from "./config/connectDB";
 import cors from "cors";
+require('cross-fetch/polyfill');
 
 // Tải các biến môi trường từ file .env
 dotenv.config();

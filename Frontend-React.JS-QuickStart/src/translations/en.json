@@ -19,7 +19,8 @@
         "child3": "General examination",
         "child4": "Medical test",
         "child5": "Mental health",
-        "child6": "Dental examination"
+        "child6": "Dental examination",
+        "search": "Find a medical specialty"
     },
     "menu": {
         "admin": {

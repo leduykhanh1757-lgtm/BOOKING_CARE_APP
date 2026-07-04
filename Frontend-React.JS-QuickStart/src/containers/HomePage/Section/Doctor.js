@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { FormattedMessage } from 'react-intl'; // Dùng nếu có quốc tế hóa
+import { FormattedMessage } from 'react-intl';
 import Slider from "react-slick";
 import * as actions from '../../../store/actions';
-import { getTopDoctorHomeService } from '../../../services/userService';
 import { languages } from '../../../utils';
 import { withRouter } from 'react-router';
 import './Doctor.scss';
@@ -32,17 +31,27 @@ class Doctor extends Component {
     handleViewDetailDoctor = (doctor) => {
         this.props.history.push(`/detail-doctor/${doctor.id}`);
     }
+
+    // THÊM HÀM CHUYỂN TRANG TẤT CẢ BÁC SĨ
+    handleViewMoreDoctor = () => {
+        if (this.props.history) {
+            this.props.history.push(`/all-doctors`);
+        }
+    }
+
     render() {
         let arrDoctors = this.state.arrDoctors;
         let { language } = this.props;
-        console.log('check state arrDoctors: ', this.state.arrDoctors);
 
         return (
             <div className="section-share section-outstanding-doctor">
                 <div className="section-container">
                     <div className="section-header">
                         <h3><FormattedMessage id="homepage.outstanding-doctor" /></h3>
-                        <button><FormattedMessage id="homepage.more-info" /></button>
+                        {/* GẮN SỰ KIỆN ONCLICK VÀO NÚT NÀY */}
+                        <button onClick={() => this.handleViewMoreDoctor()}>
+                            <FormattedMessage id="homepage.more-info" />
+                        </button>
                     </div>
                     <div className="section-body">
                         <Slider {...this.props.settings}>

@@ -20,6 +20,10 @@ import VerifyEmail from './Patient/VerifyEmail/VerifyEmail';
 import DetailSpecialty from './Patient/Specialty/DetailSpecialty';
 import DetailClinic from './Patient/Clinic/DetailClinic';
 import DetailHandbook from './Patient/Handbook/DetailHandbook';
+import AllSpecialty from './Patient/Specialty/AllSpecialty';
+import AllClinic from './Patient/Clinic/AllClinic';
+import AllDoctor from './Patient/Doctor/AllDoctor';
+import AllHandbook from './Patient/Handbook/AllHandbook';
 
 class App extends Component {
 
@@ -58,10 +62,14 @@ class App extends Component {
                                     <Route path={'/doctor/'} component={userIsAuthenticated(Doctor)} />
                                     <Route path={path.HOMEPAGE} component={HomePage} />
                                     <Route path={path.DETAIL_DOCTOR} component={DetailDoctor} />
+                                    <Route path="/all-doctors" component={AllDoctor} />
                                     <Route path={path.VERIFY_EMAIL_BOOKING} component={VerifyEmail} />
                                     <Route path={path.DETAIL_SPECIALTY} component={DetailSpecialty} />
+                                    <Route path="/all-specialty" component={AllSpecialty} />
                                     <Route path={path.DETAIL_CLINIC} component={DetailClinic} />
+                                    <Route path="/all-clinic" component={AllClinic} />
                                     <Route path={path.DETAIL_HANDBOOK} component={DetailHandbook} />
+                                    <Route path="/all-handbook" component={AllHandbook} />
                                 </Switch>
                             </CustomScrollbars>
                         </div>

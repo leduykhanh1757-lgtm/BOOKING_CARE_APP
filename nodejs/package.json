@@ -4,6 +4,7 @@
   "description": "backend node js",
   "main": "server.js",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "accepts": "^2.0.0",
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.2",
@@ -15,6 +16,7 @@
     "cookie": "^0.7.2",
     "cookie-signature": "^1.2.2",
     "cors": "^2.8.5",
+    "cross-fetch": "^4.1.0",
     "debug": "^4.4.3",
     "depd": "^2.0.0",
     "dotenv": "^17.3.1",
