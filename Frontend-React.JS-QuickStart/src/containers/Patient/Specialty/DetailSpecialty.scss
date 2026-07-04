@@ -1,38 +1,169 @@
 .detail-specialty-container {
-    background-color: #f6f6f6;
+    background-color: #f5f7f9;
+    /* Đổi nền xám nhẹ ánh xanh cho sang */
     min-height: 100vh;
+    padding-bottom: 60px;
+    /* Cách đáy một chút cho thoáng */
 
     .detail-specialty-body {
-        margin: 0 120px;
-        padding-top: 20px;
+        width: 1100px;
+        /* 🛠️ Ép khung giữa màn hình thay vì dùng margin hai bên */
+        margin: 0 auto;
+        padding-top: 25px;
 
-        // Khối chứa từng bác sĩ
-        .each-doctor {
-            display: flex;
-            /* 🛠️ Lệnh này ép 2 cột nằm ngang */
-            background-color: white;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        /* =========================================
+           1. KHỐI BÀI VIẾT GIỚI THIỆU CHUYÊN KHOA
+        ========================================= */
+        .description-specialty {
+            background: linear-gradient(to bottom, #ebf8f9, #ffffff);
+            /* Gradient xanh nhạt xuống trắng */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #45c3d2;
+            /* 🛠️ Vạch viền xanh BookingCare */
+            margin-bottom: 30px;
+            line-height: 1.7;
+            color: #333;
+            font-size: 15px;
 
-            // Cột bên Trái (Profile)
-            .dt-content-left {
-                width: 50%;
-                border-right: 1px solid #eee;
-                /* Kẻ đường chỉ mờ ngăn cách ở giữa */
-                padding-right: 15px;
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 25px 0;
+                background-color: white;
+                border-radius: 8px;
+                /* Bo tròn viền bảng */
+                overflow: hidden;
+                /* Ép góc bo tròn hoạt động */
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                /* Đổ bóng sang trọng */
+
+                th {
+                    background-color: #45c3d2;
+                    /* 🛠️ Đổi màu Header sang Cyan chuẩn BookingCare */
+                    color: white;
+                    font-size: 16px;
+                    font-weight: 600;
+                    text-align: left;
+                    padding: 16px;
+                    border: 1px solid #3eb0bd;
+                }
+
+                td {
+                    padding: 14px 16px;
+                    border: 1px solid #eee;
+                    color: #444;
+                    line-height: 1.6;
+                    vertical-align: top;
+                }
+
+                /* Tạo hiệu ứng sọc ngựa vằn màu xanh siêu nhạt cho dễ nhìn */
+                tr:nth-child(even) {
+                    background-color: #f9fbfc;
+                }
+
+                /* Hiệu ứng hover nảy nền xanh khi rê chuột vào từng dòng */
+                tr:hover {
+                    background-color: #ebf8f9;
+                    transition: background-color 0.2s ease;
+                }
             }
 
-            // Cột bên Phải (Lịch khám, Giá khám)
+            /* 🛠️ Style thêm cho khối Blockquote (Lưu ý) để nó xịn hơn */
+            blockquote {
+                border-left: 5px solid #ff4d4f;
+                background-color: #fff2f0;
+                padding: 15px 20px;
+                margin: 20px 0;
+                border-radius: 0 8px 8px 0;
+                color: #d4380d;
+                font-style: italic;
+                font-weight: 500;
+            }
+
+            /* Tút tát lại mấy cái thẻ heading bên trong bài viết cho chuẩn màu */
+            h1,
+            h2,
+            h3,
+            h4 {
+                color: #2248bd;
+                /* Xanh dương đậm */
+                margin-top: 0;
+                margin-bottom: 15px;
+            }
+
+            ul {
+                padding-left: 20px;
+
+                li {
+                    margin-bottom: 8px;
+                }
+            }
+
+        }
+
+        /* =========================================
+           2. Ô DROP-DOWN CHỌN TỈNH THÀNH
+        ========================================= */
+        .search-sp-doctor {
+            width: 250px;
+            /* 🛠️ Bóp nhỏ lại, không cho nó nằm dài thượt ra nữa */
+            margin-bottom: 25px;
+
+            /* Tùy chỉnh nhẹ CSS của thư viện react-select để nó ăn nhập với tông xanh */
+            .css-control {
+                border-color: #ddd;
+                border-radius: 8px;
+                cursor: pointer;
+
+                &:hover {
+                    border-color: #45c3d2;
+                }
+            }
+        }
+
+        /* =========================================
+           3. KHỐI CHỨA THÔNG TIN TỪNG BÁC SĨ
+        ========================================= */
+        .each-doctor {
+            display: flex;
+            background-color: white;
+            padding: 25px;
+            /* Tăng khoảng trống bên trong cho dễ thở */
+            margin-bottom: 25px;
+            border-radius: 12px;
+            /* Bo góc mượt hơn */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+            /* Thêm hiệu ứng mượt mà */
+
+            /* 🛠️ Hiệu ứng Nổi bật khi di chuột vào */
+            &:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(69, 195, 210, 0.15);
+                /* Bóng xanh cyan */
+                border-color: #d7f1f4;
+            }
+
+            /* Cột bên Trái (Profile) */
+            .dt-content-left {
+                width: 50%;
+                border-right: 1px dashed #dbe1e6;
+                /* 🛠️ Đổi sang nét đứt nhìn tinh tế hơn nét liền */
+                padding-right: 25px;
+            }
+
+            /* Cột bên Phải (Lịch khám, Giá khám) */
             .dt-content-right {
                 width: 50%;
-                padding-left: 15px;
+                padding-left: 25px;
 
-                // CSS thêm một chút cho phần nội dung bên phải nó tách bạch ra
                 .doctor-schedule {
                     margin-bottom: 15px;
-                    border-bottom: 1px solid #eee;
+                    border-bottom: 1px dashed #dbe1e6;
+                    /* Vách ngăn nét đứt */
                     padding-bottom: 15px;
                 }
             }

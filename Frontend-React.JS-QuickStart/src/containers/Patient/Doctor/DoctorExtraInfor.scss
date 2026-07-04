@@ -1,59 +1,79 @@
 .doctor-extra-infor-container {
-    padding-left: 15px;
+    padding-left: 10px;
 
     .content-up {
-        margin-bottom: 15px;
+        margin-bottom: 20px;
 
         .title-address {
             font-weight: 600;
             text-transform: uppercase;
             font-size: 14px;
             color: #333;
+            margin-bottom: 8px;
         }
 
         .name-clinic {
             font-weight: 600;
-            padding-top: 5px;
+            font-size: 15px;
+            color: #2248bd;
+            /* Tên phòng khám màu xanh đậm uy tín */
+            margin-bottom: 5px;
         }
 
         .detail-address {
-            font-size: 13px;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
         }
     }
 
     .content-down {
         .short-infor {
+            font-size: 15px;
+            color: #555;
+
             span {
                 font-weight: 600;
+                color: #333;
             }
 
             .currency {
                 font-weight: 600;
+                color: #333;
+                margin-left: 5px;
             }
 
             .detail {
                 cursor: pointer;
                 color: #45c3d2;
+                /* 🛠️ Nút "Xem chi tiết" màu xanh */
                 margin-left: 10px;
-                font-weight: 400;
+                font-weight: 500;
+                transition: color 0.2s;
 
                 &:hover {
+                    color: #2248bd;
                     text-decoration: underline;
                 }
             }
         }
 
         .detail-infor {
-            border: 1px solid #ddd;
-            background: #f8f9f9;
-            padding: 10px;
-            border-radius: 4px;
+            border: 1px solid #e1e8ed;
+            background: #fcfdfe;
+            /* 🛠️ Nền xám ánh xanh cực sang */
+            padding: 15px;
+            border-radius: 8px;
+            /* Bo góc 8px */
+            margin-top: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 
             .price-info {
                 display: flex;
                 justify-content: space-between;
-                border-bottom: 1px solid #eee;
-                padding-bottom: 10px;
+                border-bottom: 1px dashed #dbe1e6;
+                /* 🛠️ Vách ngăn nét đứt */
+                padding-bottom: 12px;
 
                 .left {
                     display: flex;
@@ -61,36 +81,48 @@
 
                     .title {
                         font-weight: 600;
+                        color: #333;
+                        font-size: 15px;
                     }
 
                     .note {
-                        font-size: 12px;
-                        color: #666;
+                        font-size: 13px;
+                        color: #777;
                         margin-top: 5px;
+                        font-style: italic;
                     }
                 }
 
                 .right {
                     .currency {
                         font-weight: 600;
+                        font-size: 15px;
+                        color: #ff4d4f;
+                        /* Làm nổi bật giá tiền lên chút */
                     }
                 }
             }
 
             .payment-info {
-                padding-top: 10px;
-                font-size: 13px;
+                padding-top: 12px;
+                font-size: 14px;
                 color: #555;
+                line-height: 1.5;
             }
 
             .hide-price {
-                margin-top: 10px;
+                margin-top: 15px;
+                text-align: right;
+                /* Đẩy chữ "Thu gọn" sang góc phải cho gọn */
 
                 span {
                     cursor: pointer;
                     color: #45c3d2;
+                    font-weight: 500;
+                    font-size: 14px;
 
                     &:hover {
+                        color: #2248bd;
                         text-decoration: underline;
                     }
                 }

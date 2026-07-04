@@ -1,45 +1,103 @@
 .detail-clinic-container {
-    background-color: #f4f6f8; // Nền xám nhạt cho toàn trang
+    background-color: #f5f7f9;
+    /* Đổi nền xám nhạt sang xám ánh dương */
     min-height: 100vh;
+    padding-bottom: 60px;
 
     .detail-clinic-body {
-        margin: 0 100px; // Căn lề hai bên cho gọn
-        padding-top: 20px;
+        width: 1100px;
+        /* 🛠️ Ép khung 1100px ra giữa màn hình y như trang Chuyên khoa */
+        margin: 0 auto;
+        padding-top: 25px;
 
+        /* =========================================
+           1. KHỐI GIỚI THIỆU CƠ SỞ Y TẾ
+        ========================================= */
         .description-clinic {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            border: 1px solid #d9d9d9;
+            background: linear-gradient(to bottom, #ebf8f9, #ffffff);
+            /* Gradient xanh nhạt */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #45c3d2;
+            /* Vạch viền xanh đặc trưng */
+            margin-bottom: 30px;
+            line-height: 1.7;
+            color: #333;
+            font-size: 15px;
 
+            /* Tên Bệnh viện/Phòng khám nổi bật */
             .clinic-name {
-                font-size: 20px;
-                font-weight: 600;
+                font-size: 24px;
+                font-weight: 700;
                 margin-bottom: 15px;
                 text-transform: uppercase;
-                color: #333;
+                color: #2248bd;
+                /* Xanh dương đậm uy tín */
+                border-bottom: 2px solid #eee;
+                padding-bottom: 10px;
+            }
+
+            /* Đồng bộ màu các thẻ tiêu đề trong bài viết HTML */
+            h1,
+            h2,
+            h3,
+            h4 {
+                color: #2248bd;
+                margin-top: 0;
+                margin-bottom: 15px;
+            }
+
+            ul {
+                padding-left: 20px;
+
+                li {
+                    margin-bottom: 8px;
+                }
             }
         }
 
+        /* =========================================
+           2. KHỐI CHỨA THÔNG TIN TỪNG BÁC SĨ
+        ========================================= */
         .detail-clinic-doctors {
             .each-doctor {
-                background: white;
-                margin-bottom: 20px;
-                padding: 15px;
-                border-radius: 5px;
-                border: 1px solid #d9d9d9;
                 display: flex;
+                background-color: white;
+                padding: 25px;
+                margin-bottom: 25px;
+                border-radius: 12px;
+                /* Bo góc mượt */
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+                border: 1px solid #f0f0f0;
+                transition: all 0.3s ease;
 
-                .dt-content-left {
-                    width: 50%;
-                    border-right: 1px solid #eee;
-                    padding-right: 15px;
+                /* 🛠️ Hiệu ứng hover nảy lên và tỏa bóng xanh */
+                &:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 8px 25px rgba(69, 195, 210, 0.15);
+                    border-color: #d7f1f4;
                 }
 
+                /* Cột bên Trái (Profile) */
+                .dt-content-left {
+                    width: 50%;
+                    border-right: 1px dashed #dbe1e6;
+                    /* Vách ngăn nét đứt */
+                    padding-right: 25px;
+                }
+
+                /* Cột bên Phải (Lịch khám, Giá khám) */
                 .dt-content-right {
                     width: 50%;
-                    padding-left: 15px;
+                    padding-left: 25px;
+
+                    /* Đường kẻ đứt ngăn cách Lịch khám và Giá khám */
+                    .doctor-schedule {
+                        margin-bottom: 15px;
+                        border-bottom: 1px dashed #dbe1e6;
+                        padding-bottom: 15px;
+                    }
                 }
             }
         }

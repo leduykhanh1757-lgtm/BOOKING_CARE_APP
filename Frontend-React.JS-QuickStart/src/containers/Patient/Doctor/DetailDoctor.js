@@ -32,9 +32,6 @@ class DetailDoctor extends Component {
         }
     }
 
-    componentDidUpdate() {
-    }
-
     render() {
         let { detailDoctor } = this.state;
         let { language } = this.props;
@@ -45,8 +42,6 @@ class DetailDoctor extends Component {
             nameEn = `${detailDoctor.positionData.valueEn}, ${detailDoctor.firstName} ${detailDoctor.lastName}`;
         }
 
-        // Khai báo link cho Facebook
-        // Nếu chạy localhost thì dùng 1 cái link ảo, nếu chạy thật trên mạng thì lấy link website thật
         let currentURL = process.env.REACT_APP_IS_LOCALHOST === "1" ?
             "https://bookingcare.vn/" : window.location.href;
 
@@ -55,62 +50,60 @@ class DetailDoctor extends Component {
                 <HomeHeader isShowBanner={false} />
 
                 <div className="doctor-detail-container">
-                    <div className="intro-doctor">
-                        {/* Hiển thị Ảnh */}
-                        <div className='content-left'>
-                            <div className="doctor-image"
-                                style={{ backgroundImage: `url(${detailDoctor && detailDoctor.image ? detailDoctor.image : ''})` }}
-                            ></div>
-                        </div>
+                    {/*  BỔ SUNG THẺ NÀY ĐỂ ÉP KHUNG 1100PX VÀO GIỮA */}
+                    <div className="doctor-detail-body">
 
-                        {/* Hiển thị Tên và Mô tả ngắn */}
-                        <div className='content-right'>
-                            <div className='up'>
-                                {language === 'vi' ? nameVi : nameEn}
+                        {/* KHỐI 1: GIỚI THIỆU BÁC SĨ */}
+                        <div className="intro-doctor">
+                            <div className='content-left'>
+                                <div className="doctor-image"
+                                    style={{ backgroundImage: `url(${detailDoctor && detailDoctor.image ? detailDoctor.image : ''})` }}
+                                ></div>
                             </div>
-                            <div className='down'>
-                                {detailDoctor && detailDoctor.markdownData && detailDoctor.markdownData.description
-                                    && <span>{detailDoctor.markdownData.description}</span>
-                                }
-
-                                {/* CHÈN NÚT LIKE & SHARE VÀO DƯỚI ĐOẠN GIỚI THIỆU */}
-                                <div className="like-share-plugin" style={{ marginTop: '10px' }}>
-                                    <LikeAndShare
-                                        doctorIdFromParent={this.state.currentDoctorId}
-                                        dataHref={currentURL}
-                                    />
+                            <div className='content-right'>
+                                <div className='up'>
+                                    {language === 'vi' ? nameVi : nameEn}
                                 </div>
-
+                                <div className='down'>
+                                    {detailDoctor && detailDoctor.markdownData && detailDoctor.markdownData.description
+                                        && <span>{detailDoctor.markdownData.description}</span>
+                                    }
+                                    <div className="like-share-plugin" style={{ marginTop: '15px' }}>
+                                        <LikeAndShare
+                                            doctorIdFromParent={this.state.currentDoctorId}
+                                            dataHref={currentURL}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="schedule-doctor">
-                        <div className="content-left">
-                            <DoctorSchedule
+
+                        {/* KHỐI 2: LỊCH KHÁM & GIÁ KHÁM */}
+                        <div className="schedule-doctor">
+                            <div className="content-left">
+                                <DoctorSchedule doctorIdFromParent={this.state.currentDoctorId} />
+                            </div>
+                            <div className="content-right">
+                                <DoctorExtraInfor doctorIdFromParent={this.state.currentDoctorId} />
+                            </div>
+                        </div>
+
+                        {/* KHỐI 3: BÀI VIẾT CHI TIẾT */}
+                        <div className="detail-infor-doctor">
+                            {detailDoctor && detailDoctor.markdownData && detailDoctor.markdownData.contentHTML &&
+                                <div dangerouslySetInnerHTML={{ __html: detailDoctor.markdownData.contentHTML }}></div>
+                            }
+                        </div>
+
+                        {/* KHỐI 4: COMMENT FACEBOOK */}
+                        <div className="comment-doctor">
+                            <Comment
+                                dataHref={currentURL}
+                                width={"100%"}
                                 doctorIdFromParent={this.state.currentDoctorId}
                             />
                         </div>
-                        <div className="content-right">
-                            <DoctorExtraInfor
-                                doctorIdFromParent={this.state.currentDoctorId}
-                            />
-                        </div>
-                    </div>
 
-                    <div className="detail-infor-doctor">
-                        {detailDoctor && detailDoctor.markdownData && detailDoctor.markdownData.contentHTML &&
-                            <div dangerouslySetInnerHTML={{ __html: detailDoctor.markdownData.contentHTML }}>
-                            </div>
-                        }
-                    </div>
-
-                    {/*  CHÈN KHUNG COMMENT VÀO PHẦN ĐUÔI CÙNG */}
-                    <div className="comment-doctor">
-                        <Comment
-                            dataHref={currentURL}
-                            width={"100%"}
-                            doctorIdFromParent={this.state.currentDoctorId}
-                        />
                     </div>
                 </div>
             </React.Fragment>
@@ -118,15 +111,6 @@ class DetailDoctor extends Component {
     }
 }
 
-
-const mapStateToProps = state => {
-    return {
-        language: state.app.language
-    };
-};
-
-const mapDispatchToProps = dispatch => {
-    return {};
-};
-
+const mapStateToProps = state => { return { language: state.app.language }; };
+const mapDispatchToProps = dispatch => { return {}; };
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(DetailDoctor));

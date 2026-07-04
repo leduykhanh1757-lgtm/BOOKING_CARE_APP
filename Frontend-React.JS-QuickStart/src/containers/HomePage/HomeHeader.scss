@@ -14,8 +14,9 @@
         height: 100%;
         display: flex;
 
+        /* 🛠️ Thu nhỏ cột trái 1 chút */
         .left-content {
-            width: 25%;
+            width: 20%;
             display: flex;
             align-items: center;
             padding-left: 20px;
@@ -36,8 +37,9 @@
             }
         }
 
+        /* 🛠️ Cột giữa chiếm 45% */
         .center-content {
-            width: 50%;
+            width: 45%;
             display: flex;
             align-items: center;
             justify-content: space-around;
@@ -62,12 +64,15 @@
             }
         }
 
+        /* 🛠️ Mở rộng cột phải lên 35% để nhét vừa khối Tài khoản */
         .right-content {
-            width: 25%;
+            width: 35%;
             display: flex;
             align-items: center;
             justify-content: flex-end;
             padding-right: 20px;
+            gap: 15px;
+            /* Tạo khoảng trống đều giữa các nút */
 
             .support {
                 cursor: pointer;
@@ -90,7 +95,6 @@
 
             .language-vi,
             .language-en {
-                margin-left: 15px;
                 cursor: pointer;
 
                 span {
@@ -107,10 +111,74 @@
                     }
                 }
             }
+
+            /* 🛠️ CSS CHO KHU VỰC TÀI KHOẢN/ĐĂNG NHẬP */
+            .user-login-section {
+                padding-left: 15px;
+                border-left: 1px solid #ddd;
+                /* Nét đứt phân cách với khối ngôn ngữ */
+
+                .login-btn {
+                    background-color: #45c3d2;
+                    color: white;
+                    padding: 8px 18px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    white-space: nowrap;
+                    /* Ép không cho rớt dòng */
+
+                    &:hover {
+                        background-color: #2248bd;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+                    }
+                }
+
+                .user-profile {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+
+                    .avatar {
+                        width: 30px;
+                        height: 30px;
+                        background-color: #eee;
+                        border-radius: 50%;
+                        background-image: url('../../assets/images/user.svg');
+                        /* Avatar tạm */
+                        background-position: center;
+                        background-size: cover;
+                    }
+
+                    .welcome-text {
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: #333;
+                        white-space: nowrap;
+                    }
+
+                    .logout-btn {
+                        cursor: pointer;
+                        color: #ff4d4f;
+                        font-size: 18px;
+                        transition: 0.2s;
+                        margin-left: 5px;
+
+                        &:hover {
+                            color: #c4132c;
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
+/* ============================
+   BANNER TRANG CHỦ
+============================ */
 .home-header-banner {
     width: 100%;
     height: 550px;
@@ -144,7 +212,6 @@
             margin-bottom: 30px;
         }
 
-        /* 🛠️ TOÀN BỘ LOGIC THANH TÌM KIẾM NẰM Ở ĐÂY */
         .search {
             padding: 12px 20px;
             border-radius: 25px;

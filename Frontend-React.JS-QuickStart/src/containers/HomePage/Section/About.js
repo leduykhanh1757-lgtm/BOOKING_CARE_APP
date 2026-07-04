@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { FormattedMessage } from 'react-intl';
+import './About.scss';
 
 class About extends Component {
     render() {
@@ -8,16 +8,16 @@ class About extends Component {
             <div className="section-share section-about">
                 <div className="section-container">
                     <div className="section-about-header">
-                        Truyền thông nói về Lê Duy Khánh
+                        Truyền thông nói về nền tảng y tế BookingCare
                     </div>
                     <div className="section-about-content">
 
-                        {/* NỬA BÊN TRÁI: CHỨA VIDEO YOUTUBE */}
+                        {/* NỬA BÊN TRÁI: VIDEO */}
                         <div className="content-left">
                             <iframe
                                 width="100%"
-                                height="400px"
-                                src="https://youtu.be/SQHhnoYzqCU?si=fW92wWWmcE4OdD48" /* Lát mình thay Link của bạn vào đây */
+                                height="350px"
+                                src="https://www.youtube.com/embed/FyDQljKtWnI"
                                 title="YouTube video player"
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -25,13 +25,22 @@ class About extends Component {
                             </iframe>
                         </div>
 
-                        {/* NỬA BÊN PHẢI: CHỨA CHỮ GIỚI THIỆU */}
+                        {/* NỬA BÊN PHẢI: TRÍCH DẪN & NHÃN CSS (KHÔNG DÙNG ẢNH) */}
                         <div className="content-right">
-                            <p>
-                                Xin chào! Mình là Lê Duy Khánh. Đây là trang web đặt lịch khám bệnh trực tuyến được xây dựng dựa trên bản sao của BookingCare.
-                                <br /> <br />
-                                Dự án này giúp bệnh nhân dễ dàng tìm kiếm bác sĩ, cơ sở y tế và đặt lịch hẹn một cách nhanh chóng, tiện lợi.
-                            </p>
+                            <div className="media-quotes">
+                                <i className="fas fa-quote-left quote-icon"></i>
+                                <p className="quote-text">
+                                    "Hệ thống đặt khám trực tuyến thông minh, giúp người bệnh tiết kiệm hàng giờ đồng hồ chờ đợi tại bệnh viện. Một bước tiến lớn cho nền y tế số."
+                                </p>
+
+                                <div className="css-logos">
+                                    <span className="logo-badge vtv">VTV1</span>
+                                    <span className="logo-badge vnexpress">VnExpress</span>
+                                    <span className="logo-badge dantri">Dân Trí</span>
+                                    <span className="logo-badge tuoitre">Tuổi Trẻ</span>
+                                    <span className="logo-badge thanhnien">Thanh Niên</span>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
@@ -39,19 +48,6 @@ class About extends Component {
             </div>
         );
     }
-
 }
 
-const mapStateToProps = state => {
-    return {
-        isLoggedIn: state.user.isLoggedIn,
-        language: state.app.language,
-    };
-};
-
-const mapDispatchToProps = dispatch => {
-    return {
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(About);
+export default connect()(About);

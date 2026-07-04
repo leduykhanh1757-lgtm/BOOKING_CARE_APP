@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from "connected-react-router";
 import * as actions from "../../store/actions";
-import './login.scss';
+import './UserLogin.scss';
 import { FormattedMessage } from 'react-intl';
 import { handleLoginApi } from '../../services/userService';
 import { divide } from 'lodash';
 
 
-class Login extends Component {
+class UserLogin extends Component {
     constructor(props) {
         super(props);
         // Khởi tạo State (bộ nhớ)
@@ -48,6 +48,7 @@ class Login extends Component {
 
             if (realData && realData.errCode === 0) {
                 this.props.userLoginSuccess(realData.user);
+                this.props.navigate('/home');
             }
 
         } catch (error) {
@@ -154,4 +155,4 @@ const mapDispatchToProps = dispatch => {
         //userLoginFail: () => dispatch(actions.userLoginFail()),
     };
 };
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(mapStateToProps, mapDispatchToProps)(UserLogin);

@@ -1,18 +1,28 @@
 .doctor-schedule-container {
     .all-schedule {
         select {
-            margin: 10px 0;
-            padding: 5px;
+            margin: 0 0 15px 0;
+            padding: 8px 0;
             border: none;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 2px solid #ebebeb;
             outline: none;
-            color: #337ab7;
+            color: #333;
+            /* 🛠️ SỬA 1: Đổi về màu xám đen cho dễ đọc */
+            font-size: 15px;
             font-weight: 600;
             text-transform: capitalize;
             cursor: pointer;
+            background-color: transparent;
+            transition: all 0.3s ease;
 
-            &:hover {
-                border-bottom: 1px solid #337ab7;
+            &:hover,
+            &:focus {
+                border-bottom-color: #45c3d2;
+            }
+
+            /* 🛠️ SỬA 2: Ép các dòng sổ xuống phải là chữ đen */
+            option {
+                color: #333;
             }
         }
     }
@@ -21,19 +31,22 @@
         .text-calendar {
             text-transform: uppercase;
             font-weight: 600;
-            margin-bottom: 10px;
-            padding: 5px 0;
+            margin-bottom: 15px;
+            font-size: 15px;
+            color: #333;
 
             i {
-                margin-right: 5px;
-                color: #333;
+                margin-right: 8px;
+                color: #45c3d2;
+                /* 🛠️ Icon lịch xanh Cyan */
+                font-size: 16px;
             }
         }
 
         .time-content {
             .time-content-btns {
                 display: flex;
-                gap: 15px;
+                gap: 12px;
                 flex-wrap: wrap;
 
                 .btn-vie,
@@ -41,29 +54,39 @@
                     padding: 10px 15px;
                     border: none;
                     outline: none;
-                    background-color: #fff0b3; // Màu vàng nhạt giống Bookingcare
+                    background-color: #fff2c5;
+                    /* 🛠️ Vàng pastel dịu mắt */
                     color: #333;
                     font-weight: 600;
-                    border-radius: 3px;
-                    min-width: 120px;
+                    border-radius: 5px;
+                    /* Bo góc mượt */
+                    min-width: 110px;
                     cursor: pointer;
-                    transition: all 0.3s ease;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
                     &:hover {
-                        background-color: #f7d549; // Hover đậm hơn
+                        background-color: #f7d549;
+                        /* Vàng đậm lên khi hover */
+                        transform: translateY(-2px);
+                        box-shadow: 0 3px 8px rgba(247, 213, 73, 0.3);
                     }
                 }
             }
 
             .book-free {
                 margin-top: 15px;
+                padding-top: 10px;
 
                 span {
                     font-size: 14px;
-                    color: #333;
+                    color: #555;
 
                     i {
                         margin: 0 5px;
+                        color: #2248bd;
+                        /* Icon bàn tay chỉ màu xanh đậm */
+                        font-size: 16px;
                     }
                 }
             }
@@ -72,6 +95,7 @@
                 font-style: italic;
                 color: #ff4d4f;
                 padding-top: 10px;
+                font-weight: 500;
             }
         }
     }

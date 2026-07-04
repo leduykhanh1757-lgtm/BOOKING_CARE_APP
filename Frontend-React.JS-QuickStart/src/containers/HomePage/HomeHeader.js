@@ -4,27 +4,25 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import './HomeHeader.scss';
 import { languages } from '../../utils';
 import { changeLanguageApp } from '../../store/actions/appActions';
+import * as actions from '../../store/actions';
 import { withRouter } from 'react-router';
-import { getAllSpecialty } from '../../services/userService'; //  Import API lấy chuyên khoa
-
+import { getAllSpecialty } from '../../services/userService';
 
 class HomeHeader extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            listSpecialty: [],     // Chứa toàn bộ dữ liệu chuyên khoa lấy từ DB
-            searchQuery: '',       // Từ khóa người dùng gõ
-            searchResults: [],     // Mảng kết quả sau khi lọc
-            isShowResult: false    // Trạng thái ẩn/hiện bảng kết quả
+            listSpecialty: [],
+            searchQuery: '',
+            searchResults: [],
+            isShowResult: false
         };
-        this.searchRef = React.createRef(); // 🛠️ Ref để bắt sự kiện click ra ngoài
+        this.searchRef = React.createRef();
     }
 
     async componentDidMount() {
-        // Lắng nghe sự kiện click ra ngoài
         document.addEventListener("mousedown", this.handleClickOutside);
 
-        // Gọi API lấy toàn bộ danh sách chuyên khoa 1 lần duy nhất
         let res = await getAllSpecialty();
         if (res && res.errCode === 0) {
             this.setState({
@@ -34,11 +32,9 @@ class HomeHeader extends Component {
     }
 
     componentWillUnmount() {
-        // Dọn dẹp sự kiện
         document.removeEventListener("mousedown", this.handleClickOutside);
     }
 
-    // 🛠️ Hàm đóng menu kết quả khi bấm ra ngoài vùng tìm kiếm
     handleClickOutside = (event) => {
         if (this.searchRef && this.searchRef.current && !this.searchRef.current.contains(event.target)) {
             this.setState({ isShowResult: false });
@@ -55,13 +51,11 @@ class HomeHeader extends Component {
         }
     }
 
-    // 🛠️ HÀM XỬ LÝ LỌC KẾT QUẢ KHI GÕ PHÍM
     handleSearchChange = (event) => {
         let query = event.target.value;
         let { listSpecialty } = this.state;
 
         if (query) {
-            // Lọc các chuyên khoa có tên chứa từ khóa gõ vào (không phân biệt hoa thường)
             let filtered = listSpecialty.filter(item =>
                 item.name.toLowerCase().includes(query.toLowerCase())
             );
@@ -71,7 +65,6 @@ class HomeHeader extends Component {
                 isShowResult: true
             });
         } else {
-            // Nếu xóa trắng ô input thì ẩn bảng kết quả
             this.setState({
                 searchQuery: query,
                 searchResults: [],
@@ -80,17 +73,28 @@ class HomeHeader extends Component {
         }
     }
 
-    // 🛠️ HÀM CHUYỂN TRANG KHI CLICK VÀO KẾT QUẢ
     handleViewDetailSpecialty = (item) => {
         if (this.props.history) {
             this.props.history.push(`/detail-specialty/${item.id}`);
         }
     }
 
+    handleGoToSupport = () => {
+        if (this.props.history) {
+            this.props.history.push('/support');
+        }
+    }
+
+    // HÀM ĐĂNG XUẤT TÀI KHOẢN
+    handleLogout = () => {
+        this.props.processLogout();
+    }
+
     render() {
-        let language = this.props.language;
+        // Lấy thêm isLoggedIn và userInfo từ Redux
+        let { language, isLoggedIn, userInfo, intl } = this.props;
         let { searchQuery, searchResults, isShowResult } = this.state;
-        let { intl } = this.props;
+
         return (
             <React.Fragment>
                 <div className='home-header-container'>
@@ -121,9 +125,9 @@ class HomeHeader extends Component {
                             </div>
                         </div>
 
-                        {/* Phần 3: Bên right */}
+                        {/* Phần 3: Bên phải */}
                         <div className='right-content'>
-                            <div className="support">
+                            <div className="support" onClick={() => this.handleGoToSupport()}>
                                 <i className="fas fa-question-circle"></i>
                                 <span><FormattedMessage id="home-header.support" /></span>
                             </div>
@@ -139,17 +143,35 @@ class HomeHeader extends Component {
                                     onClick={() => this.changeLanguage(languages.EN)}
                                 >EN</span>
                             </div>
+
+                            {/* KHU VỰC HIỂN THỊ TÀI KHOẢN KHÁCH HÀNG */}
+                            <div className="user-login-section">
+                                {isLoggedIn ? (
+                                    <div className="user-profile">
+                                        <div className="avatar"></div>
+                                        <span className="welcome-text">Xin chào, {userInfo ? userInfo.firstName : ''}!</span>
+                                        <span className="logout-btn" onClick={this.handleLogout} title="Đăng xuất">
+                                            <i className="fas fa-sign-out-alt"></i>
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div className="login-btn" onClick={() => this.props.history.push('/user-login')}>
+                                        Đăng nhập
+                                    </div>
+                                )}
+                            </div>
+
                         </div>
                     </div>
                 </div>
 
+                {/* Phần Banner bên dưới giữ nguyên */}
                 {this.props.isShowBanner === true && (
                     <div className='home-header-banner'>
                         <div className="content-up">
                             <div className="title1"><FormattedMessage id="banner.title1" /></div>
                             <div className="title2"><FormattedMessage id="banner.title2" /></div>
 
-                            {/* 🛠️ GẮN REF VÀ LOGIC TÌM KIẾM VÀO ĐÂY */}
                             <div className="search" ref={this.searchRef}>
                                 <i className="fas fa-search"></i>
                                 <input
@@ -157,11 +179,9 @@ class HomeHeader extends Component {
                                     placeholder={intl.formatMessage({ id: 'banner.search' })}
                                     value={searchQuery}
                                     onChange={(event) => this.handleSearchChange(event)}
-                                    // Khi bấm vào ô input nếu có text thì mở lại popup
                                     onFocus={() => { if (searchQuery) this.setState({ isShowResult: true }) }}
                                 />
 
-                                {/* KẾT QUẢ TÌM KIẾM DROPDOWN */}
                                 {isShowResult && searchResults.length > 0 &&
                                     <div className="search-results">
                                         {searchResults.map((item, index) => {
@@ -181,7 +201,6 @@ class HomeHeader extends Component {
                         </div>
 
                         <div className="content-down">
-                            {/* ... (Các options bên dưới giữ nguyên) ... */}
                             <div className="options">
                                 <div className="option-child">
                                     <div className="icon-child"><i className="fas fa-hospital"></i></div>
@@ -219,14 +238,15 @@ class HomeHeader extends Component {
 const mapStateToProps = state => {
     return {
         isLoggedIn: state.user.isLoggedIn,
-        userInfo: state.user.userInfo,
+        userInfo: state.user.userInfo, // Lấy thông tin user từ Redux
         language: state.app.language,
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        changeLanguageAppRedux: (language) => dispatch(changeLanguageApp(language))
+        changeLanguageAppRedux: (language) => dispatch(changeLanguageApp(language)),
+        processLogout: () => dispatch(actions.processLogout()) // Map hàm đăng xuất vào props
     };
 };
 

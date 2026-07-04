@@ -93,53 +93,6 @@
 /* ========================================================
    CÁC SECTION TĨNH (Footer, About) GIỮ NGUYÊN
 ======================================================== */
-.section-about {
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-    background-color: white;
-    padding-bottom: 40px;
-
-    .section-about-header {
-        font-size: 22px;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 30px;
-        text-align: center;
-        text-transform: uppercase;
-        width: 100%;
-        padding-top: 30px;
-    }
-
-    .section-about-content {
-        display: flex;
-        width: 1200px;
-        margin: 0 auto;
-        gap: 40px;
-
-        .content-left {
-            width: 60%;
-
-            iframe {
-                border-radius: 10px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-                width: 100%;
-            }
-        }
-
-        .content-right {
-            width: 40%;
-
-            p {
-                font-size: 16px;
-                color: #555;
-                line-height: 1.6;
-                text-align: justify;
-                margin-top: 0;
-            }
-        }
-    }
-}
-
 .home-footer {
     text-align: center;
     padding: 20px 0;

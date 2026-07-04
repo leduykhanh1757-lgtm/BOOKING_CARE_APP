@@ -1,62 +1,99 @@
 .detail-handbook-container {
-    background-color: #fcfcfc;
-    min-height: 100vh; // Ép chiều cao tối thiểu bằng màn hình
+    background-color: #f5f7f9;
+    /* Đồng bộ nền xám ánh dương với toàn hệ thống */
+    min-height: 100vh;
+    padding-bottom: 60px;
+    /* Cách đáy cho thoáng */
 
     .handbook-body {
-        width: 1200px; // Ép chiều rộng chuẩn
-        max-width: 100%; // Responsive cho màn hình nhỏ
-        margin: 0 auto; // Đẩy ra giữa màn hình
-        padding: 40px 15px 100px 15px; // Lề trên 40px, lề dưới 100px cho thoáng
+        width: 1100px;
+        /* 🛠️ Ép khung 1100px chuẩn y như trang Clinic và Specialty */
+        max-width: 100%;
+        margin: 0 auto;
+        padding-top: 30px;
 
+        /* =========================================
+           1. TIÊU ĐỀ BÀI VIẾT (CẨM NANG)
+        ========================================= */
         .handbook-title {
-            font-size: 32px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 30px;
-            line-height: 1.4;
+            font-size: 28px;
+            font-weight: 700;
+            color: #2248bd;
+            /* Xanh dương đậm uy tín */
+            margin-bottom: 25px;
+            line-height: 1.5;
+            text-align: center;
+            /* Đưa tiêu đề ra giữa cho sang */
+            text-transform: uppercase;
+            padding: 0 20px;
         }
 
+        /* =========================================
+           2. NỘI DUNG BÀI VIẾT
+        ========================================= */
         .handbook-content {
             background-color: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 40px;
+            border-radius: 12px;
+            /* Bo góc mượt mà */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #45c3d2;
+            /* 🛠️ Vạch viền xanh đặc trưng BookingCare */
 
-            /* 🛠️ CSS can thiệp vào bên trong cục HTML được sinh ra từ Markdown */
+            /* 🛠️ CSS can thiệp vào bên trong cục HTML sinh ra từ Markdown */
             p {
                 font-size: 16px;
-                line-height: 1.6;
-                color: #555;
+                line-height: 1.8;
+                /* Tăng khoảng cách dòng cho dễ đọc */
+                color: #333;
                 text-align: justify;
                 margin-bottom: 15px;
             }
 
+            /* Xử lý hình ảnh trong bài viết */
             img {
-                max-width: 100%; // Không cho ảnh tràn viền
+                max-width: 100%;
                 height: auto;
-                border-radius: 5px;
+                border-radius: 8px;
+                /* Bo nhẹ góc ảnh */
                 display: block;
-                margin: 20px auto; // Đưa ảnh ra giữa
+                margin: 30px auto;
+                /* Đưa ảnh ra giữa, cách lề rộng ra */
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                /* Cho ảnh nổi nhẹ lên bề mặt */
             }
 
+            /* Đồng bộ màu các thẻ Heading trong bài */
+            h1,
             h2,
             h3,
             h4 {
-                color: #333;
+                color: #2248bd;
+                /* Xanh dương đồng bộ */
                 font-weight: 600;
-                margin-top: 25px;
+                margin-top: 30px;
                 margin-bottom: 15px;
             }
 
-            ul {
+            /* Làm đẹp danh sách */
+            ul,
+            ol {
                 font-size: 16px;
-                color: #555;
-                line-height: 1.6;
+                color: #333;
+                line-height: 1.8;
                 margin-bottom: 20px;
+                padding-left: 25px;
 
                 li {
-                    margin-bottom: 8px;
+                    margin-bottom: 10px;
                 }
+            }
+
+            /* Nhấn mạnh các chữ in đậm */
+            strong,
+            b {
+                color: #1a1a1a;
+                font-weight: 600;
             }
         }
     }

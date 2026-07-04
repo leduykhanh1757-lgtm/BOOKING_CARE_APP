@@ -1,154 +1,132 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from "connected-react-router";
-
 import * as actions from "../store/actions";
-import { KeyCodeUtils, LanguageUtils } from "../utils";
-
-import userIcon from '../../src/assets/images/user.svg';
-import passIcon from '../../src/assets/images/pass.svg';
-import './Login.scss';
-import { FormattedMessage } from 'react-intl';
-
-import adminService from '../services/adminService';
+import './Login.scss'; // Import CSS mới
+import { handleLoginApi } from '../services/userService';
 
 class Login extends Component {
     constructor(props) {
         super(props);
-        this.btnLogin = React.createRef();
+        this.state = {
+            username: '',
+            password: '',
+            isShowPassword: false, // 🛠️ Bổ sung thêm tính năng Ẩn/Hiện mật khẩu
+            loginError: ''
+        }
     }
 
-    initialState = {
-        username: '',
-        password: '',
-        loginError: ''
+    // Hàm dùng chung để lấy dữ liệu khi gõ phím
+    handleOnChangeInput = (event, id) => {
+        let copyState = { ...this.state };
+        copyState[id] = event.target.value;
+        this.setState({ ...copyState });
     }
 
-    state = {
-        ...this.initialState
-    };
-
-    refresh = () => {
+    // Bật tắt con mắt mật khẩu
+    handleShowHidePassword = () => {
         this.setState({
-            ...this.initialState
+            isShowPassword: !this.state.isShowPassword
         })
     }
 
-    onUsernameChange = (e) => {
-        this.setState({ username: e.target.value })
-    }
-
-    onPasswordChange = (e) => {
-        this.setState({ password: e.target.value })
-    }
-
-    redirectToSystemPage = () => {
-        const { navigate } = this.props;
-        const redirectPath = '/system/user-manage';
-        navigate(`${redirectPath}`);
-    }
-
-    processLogin = () => {
+    // 🛠️ HÀM XỬ LÝ ĐĂNG NHẬP CHÍNH
+    processLogin = async () => {
         const { username, password } = this.state;
+        const { userLoginSuccess } = this.props;
 
-        const { adminLoginSuccess, adminLoginFail } = this.props;
-        let loginBody = {
-            username: 'admin',
-            password: '123456'
-        }
-        //sucess
-        let adminInfo = {
-            "tlid": "0",
-            "tlfullname": "Administrator",
-            "custype": "A",
-            "accessToken": "eyJhbGciOiJIU"
-        }
+        this.setState({ loginError: '' });
 
-        adminLoginSuccess(adminInfo);
-        this.refresh();
-        this.redirectToSystemPage();
-        try {
-            adminService.login(loginBody)
-        } catch (e) {
-            console.log('error login : ', e)
-        }
-
-    }
-
-    handlerKeyDown = (event) => {
-        const keyCode = event.which || event.keyCode;
-        if (keyCode === KeyCodeUtils.ENTER) {
-            event.preventDefault();
-            if (!this.btnLogin.current || this.btnLogin.current.disabled) return;
-            this.btnLogin.current.click();
-        }
-    };
-
-    componentDidMount() {
-        document.addEventListener('keydown', this.handlerKeyDown);
-    }
-
-    componentWillUnmount() {
-        document.removeEventListener('keydown', this.handlerKeyDown);
-        // fix Warning: Can't perform a React state update on an unmounted component
-        this.setState = (state, callback) => {
+        // Validate cơ bản
+        if (!username || !password) {
+            this.setState({ loginError: "Vui lòng nhập đầy đủ Tài khoản và Mật khẩu!" });
             return;
-        };
+        }
+
+        try {
+            // 🛠️ Gọi thẳng xuống Node.js kiểm tra tài khoản
+            let data = await handleLoginApi(username, password);
+            let realData = data && data.data ? data.data : data;
+
+            // Nếu sai tài khoản / mật khẩu
+            if (realData && realData.errCode !== 0) {
+                this.setState({ loginError: realData.message });
+            }
+
+            // Nếu thành công 100%
+            if (realData && realData.errCode === 0) {
+                // Giao toàn bộ data thật (có chứa firstName, lastName) cho Redux giữ
+                userLoginSuccess(realData.user);
+
+                // Chuyển trang vào hệ thống
+                this.props.navigate('/system/user-manage');
+            }
+        } catch (error) {
+            // Bắt lỗi Server sập hoặc mất mạng
+            if (error.response && error.response.data) {
+                this.setState({ loginError: error.response.data.message });
+            } else {
+                this.setState({ loginError: "Lỗi kết nối đến Server!" });
+            }
+        }
+    }
+
+    // Hỗ trợ bấm phím Enter để đăng nhập nhanh
+    handleKeyDown = (event) => {
+        if (event.key === 'Enter' || event.keyCode === 13) {
+            this.processLogin();
+        }
     }
 
     render() {
-        const { username, password, loginError } = this.state;
-        const { lang } = this.props;
-
         return (
-            <div className="login-wrapper">
-                <div className="login-container">
-                    <div className="form_login">
-                        <h2 className="title">
-                            <FormattedMessage id="login.login" />
-                        </h2>
-                        <div className="form-group icon-true">
-                            <img className="icon" src={userIcon} alt="this" />
+            <div className="admin-login-background">
+                <div className="admin-login-container">
+                    <div className="login-content">
+                        {/* Tiêu đề */}
+                        <div className="text-center login-title">Đăng nhập Quản trị</div>
+
+                        {/* Nhập Tài khoản */}
+                        <div className="form-group login-input">
+                            <label>Tài khoản Hệ thống</label>
                             <input
-                                placeholder={LanguageUtils.getMessageByKey("login.username", lang)}
-                                id="username"
-                                name="username"
                                 type="text"
                                 className="form-control"
-                                value={username}
-                                onChange={this.onUsernameChange}
+                                placeholder="Nhập tên đăng nhập..."
+                                value={this.state.username}
+                                onChange={(event) => this.handleOnChangeInput(event, 'username')}
                             />
                         </div>
 
-                        <div id="phone-input-container" className="form-group icon-true">
-                            <img className="icon" src={passIcon} alt="this" />
-                            <input
-                                placeholder={LanguageUtils.getMessageByKey("login.password", lang)}
-                                id="password"
-                                name="password"
-                                type="password"
-                                className="form-control"
-                                value={password}
-                                onChange={this.onPasswordChange}
-                            />
-                        </div>
-
-                        {loginError !== '' && (
-                            <div className='login-error'>
-                                <span className='login-error-message'>{loginError}</span>
+                        {/* Nhập Mật khẩu */}
+                        <div className="form-group login-input">
+                            <label>Mật khẩu</label>
+                            <div className="custom-input-password">
+                                <input
+                                    type={this.state.isShowPassword ? "text" : "password"}
+                                    className="form-control"
+                                    placeholder="Nhập mật khẩu..."
+                                    value={this.state.password}
+                                    onChange={(event) => this.handleOnChangeInput(event, 'password')}
+                                    onKeyDown={(event) => this.handleKeyDown(event)}
+                                />
+                                <span onClick={() => this.handleShowHidePassword()}>
+                                    <i className={this.state.isShowPassword ? "fas fa-eye" : "fas fa-eye-slash"}></i>
+                                </span>
                             </div>
-                        )}
-
-                        <div className="form-group login">
-                            <input
-                                ref={this.btnLogin}
-                                id="btnLogin"
-                                type="submit"
-                                className="btn"
-                                value={LanguageUtils.getMessageByKey("login.login", lang)}
-                                onClick={this.processLogin}
-                            />
                         </div>
+
+                        {/* Hiển thị Lỗi (nếu có) */}
+                        {this.state.loginError &&
+                            <div className="login-error-msg">
+                                {this.state.loginError}
+                            </div>
+                        }
+
+                        {/* Nút Đăng nhập */}
+                        <button className="btn-login" onClick={() => this.processLogin()}>
+                            Đăng nhập
+                        </button>
                     </div>
                 </div>
             </div>
@@ -158,15 +136,15 @@ class Login extends Component {
 
 const mapStateToProps = state => {
     return {
-        lang: state.app.language
+        language: state.app.language
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         navigate: (path) => dispatch(push(path)),
-        adminLoginSuccess: (adminInfo) => dispatch(actions.adminLoginSuccess(adminInfo)),
-        adminLoginFail: () => dispatch(actions.adminLoginFail()),
+        userLoginSuccess: (userInfo) => dispatch(actions.userLoginSuccess(userInfo)),
+        // userLoginFail: () => dispatch(actions.userLoginFail()), 
     };
 };
 

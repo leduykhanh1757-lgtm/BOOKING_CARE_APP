@@ -2,42 +2,82 @@
     .intro-doctor {
         display: flex;
 
+        /* Cột trái: Chứa Ảnh và Nút Xem Thêm */
         .content-left {
             width: 20%;
+            display: flex;
+            flex-direction: column;
+            /* Ép link rớt xuống dưới ảnh */
+            align-items: center;
+            /* Căn giữa ảnh và link */
+            padding-right: 15px;
 
             .doctor-image {
-                width: 80px;
-                height: 80px;
+                width: 90px;
+                /* To hơn bản cũ 10px cho rõ mặt */
+                height: 90px;
                 border-radius: 50%;
                 background-position: center;
                 background-size: cover;
                 background-repeat: no-repeat;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                /* Bóng nhẹ */
+                border: 2px solid #f0f0f0;
+                /* Viền mỏng */
+                margin-bottom: 10px;
+                /* Cách chữ Xem thêm ra */
+            }
+
+            /* CSS cho cái link Xem thêm */
+            .view-detail-doctor {
+                a {
+                    font-size: 14px;
+                    color: #45c3d2;
+                    text-decoration: none;
+                    font-weight: 500;
+                    transition: color 0.2s;
+
+                    &:hover {
+                        color: #2248bd;
+                        text-decoration: underline;
+                    }
+                }
             }
         }
 
+        /* Cột phải: Chứa Tên, Ghi chú và Giá khám */
         .content-right {
             width: 80%;
             display: flex;
             flex-direction: column;
             padding-left: 10px;
+            justify-content: center;
 
             .up {
                 font-size: 20px;
                 font-weight: 600;
-                margin-bottom: 5px;
-                color: #45c3d2;
+                margin-bottom: 8px;
+                color: #2248bd;
+                /* Đổi về màu Xanh dương đậm uy tín */
             }
 
             .down {
                 font-size: 14px;
+                color: #555;
+                line-height: 1.6;
+                text-align: justify;
             }
 
             .price {
                 margin-top: 10px;
                 font-size: 15px;
+                color: #333;
 
                 .currency {
-                    font-weight: 600; // In đậm giá tiền lên
+                    font-weight: 600;
+                    color: #ff4d4f;
+                    /* Làm nổi bật giá tiền lên giống khối Extra Infor */
+                    margin-left: 5px;
                 }
             }
         }

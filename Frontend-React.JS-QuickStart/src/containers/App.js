@@ -9,7 +9,7 @@ import DetailDoctor from './Patient/Doctor/DetailDoctor.js';
 import { userIsAuthenticated, userIsNotAuthenticated } from '../hoc/authentication';
 import { path } from '../utils'
 import Home from '../routes/Home';
-import login from './Auth/login';
+import Login from '../routes/Login';
 import System from '../routes/System';
 import CustomScrollbars from '../components/CustomScrollbars.js';
 import { CustomToastCloseButton } from '../components/CustomToast';
@@ -24,7 +24,8 @@ import AllSpecialty from './Patient/Specialty/AllSpecialty';
 import AllClinic from './Patient/Clinic/AllClinic';
 import AllDoctor from './Patient/Doctor/AllDoctor';
 import AllHandbook from './Patient/Handbook/AllHandbook';
-
+import SupportPage from './Patient/Support/SupportPage';
+import UserLogin from './Auth/UserLogin';
 class App extends Component {
 
     handlePersistorState = () => {
@@ -57,9 +58,15 @@ class App extends Component {
                             <CustomScrollbars style={{ height: '100vh', width: '100%' }}>
                                 <Switch>
                                     <Route path={path.HOME} exact component={(Home)} />
-                                    <Route path={path.LOGIN} component={userIsNotAuthenticated(login)} />
+
+                                    {/* ROUTE CHO ADMIN (Đăng nhập quản trị) */}
+                                    <Route path={path.LOGIN} component={userIsNotAuthenticated(Login)} />
                                     <Route path={path.SYSTEM} component={userIsAuthenticated(System)} />
+
+                                    {/* ROUTE DÀNH CHO BÁC SĨ */}
                                     <Route path={'/doctor/'} component={userIsAuthenticated(Doctor)} />
+
+                                    {/* CÁC ROUTE PUBLIC DÀNH CHO BỆNH NHÂN (Không cần đăng nhập vẫn xem được) */}
                                     <Route path={path.HOMEPAGE} component={HomePage} />
                                     <Route path={path.DETAIL_DOCTOR} component={DetailDoctor} />
                                     <Route path="/all-doctors" component={AllDoctor} />
@@ -70,6 +77,11 @@ class App extends Component {
                                     <Route path="/all-clinic" component={AllClinic} />
                                     <Route path={path.DETAIL_HANDBOOK} component={DetailHandbook} />
                                     <Route path="/all-handbook" component={AllHandbook} />
+                                    <Route path="/support" component={SupportPage} />
+
+                                    {/* 🛠️ THÊM ROUTE CHO BỆNH NHÂN ĐĂNG NHẬP Ở ĐÂY NÀY */}
+                                    <Route path="/user-login" component={UserLogin} />
+
                                 </Switch>
                             </CustomScrollbars>
                         </div>
