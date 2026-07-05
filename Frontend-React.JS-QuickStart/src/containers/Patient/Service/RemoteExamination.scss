@@ -1,0 +1,170 @@
+.remote-exam-container {
+    background-color: #f5f7f9;
+    min-height: 100vh;
+    padding-bottom: 60px;
+
+    /* ==============================
+       KHỐI 1: BANNER
+    ============================== */
+    .remote-banner {
+        height: 300px;
+        background-image: url('https://bookingcare.vn/wp-content/uploads/2020/06/102602-goi-kham-tong-quat.jpg'); // Ảnh tạm, bác có thể thay
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        position: relative;
+
+        .banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(34, 72, 189, 0.9), rgba(69, 195, 210, 0.7));
+            /* Dải màu gradient xanh rất sang */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .banner-content {
+                text-align: center;
+                color: white;
+                max-width: 800px;
+                padding: 0 20px;
+
+                h2 {
+                    font-size: 36px;
+                    font-weight: 700;
+                    margin-bottom: 15px;
+                    text-transform: uppercase;
+                }
+
+                p {
+                    font-size: 18px;
+                    line-height: 1.6;
+                    opacity: 0.9;
+                }
+            }
+        }
+    }
+
+    .remote-body {
+        width: 1100px;
+        margin: -40px auto 0 auto;
+        /* Đẩy khối body ngầm lên trên banner một chút để tạo độ sâu */
+        position: relative;
+        z-index: 10;
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* ==============================
+           KHỐI 2: QUY TRÌNH HƯỚNG DẪN
+        ============================== */
+        .how-it-works-section {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+
+            .steps-container {
+                display: flex;
+                justify-content: space-between;
+                text-align: center;
+
+                .step-item {
+                    width: 22%;
+
+                    .step-icon {
+                        width: 70px;
+                        height: 70px;
+                        margin: 0 auto 15px auto;
+                        background-color: #ebf8f9;
+                        /* Nền xanh nhạt */
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+
+                        i {
+                            font-size: 30px;
+                            color: #45c3d2;
+                            /* Icon màu Cyan */
+                        }
+                    }
+
+                    h4 {
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #2248bd;
+                        margin-bottom: 10px;
+                    }
+
+                    p {
+                        font-size: 14px;
+                        color: #555;
+                        line-height: 1.5;
+                    }
+                }
+            }
+        }
+
+        /* ==============================
+           KHỐI 3: LƯỚI CHUYÊN KHOA
+        ============================== */
+        .specialty-section {
+            .specialty-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                /* Chia 3 cột đều nhau */
+                gap: 25px;
+
+                .specialty-card {
+                    background-color: white;
+                    border-radius: 10px;
+                    overflow: hidden;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                    cursor: pointer;
+                    transition: all 0.3s;
+
+                    &:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+
+                        .card-name span {
+                            color: #45c3d2;
+                            /* Hover chữ đổi màu xanh */
+                        }
+                    }
+
+                    .card-image {
+                        height: 180px;
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        border-bottom: 3px solid #45c3d2;
+                        /* Viền ngăn cách ảnh và chữ */
+                    }
+
+                    .card-name {
+                        padding: 20px 15px;
+                        text-align: center;
+
+                        span {
+                            font-size: 16px;
+                            font-weight: 600;
+                            color: #333;
+                            transition: color 0.2s;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

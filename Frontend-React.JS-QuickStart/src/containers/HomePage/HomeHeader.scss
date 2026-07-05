@@ -1,173 +1,300 @@
+/* ============================
+   THANH HEADER CHÍNH
+============================ */
 .home-header-container {
-    height: 60px;
+    min-height: 60px;
     width: 100%;
     background-color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    display: flex;
-    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
     position: sticky;
     top: 0;
     z-index: 10000;
 
     .home-header-content {
         width: 100%;
-        height: 100%;
+        min-height: 60px;
+        padding: 8px 20px;
+        /* 🛠️ Sát rạt 2 mép màn hình */
+        box-sizing: border-box;
         display: flex;
+        justify-content: space-between;
+        align-items: center;
 
-        /* 🛠️ Thu nhỏ cột trái 1 chút */
+        /* 1. TRÁI: ÉP TÍT SANG LỀ TRÁI */
         .left-content {
-            width: 20%;
+            flex: 1;
+            /* 🛠️ Lấy 1 phần không gian đẩy mạnh sang trái */
             display: flex;
             align-items: center;
-            padding-left: 20px;
+            justify-content: flex-start;
 
-            i {
-                font-size: 24px;
-                color: #949494;
+            i.fa-bars {
+                font-size: 22px;
+                color: #888;
                 cursor: pointer;
-                margin-right: 20px;
+                margin-right: 15px;
+                transition: color 0.2s;
+
+                &:hover {
+                    color: #45c3d2;
+                }
             }
 
             .header-logo {
-                height: 45px;
-                width: 160px;
-                background: url('../../assets/images/bookingcare-2020.svg') center center no-repeat;
+                height: 40px;
+                width: 150px;
+                background: url('../../assets/images/bookingcare-2020.svg') left center no-repeat;
                 background-size: contain;
                 cursor: pointer;
             }
         }
 
-        /* 🛠️ Cột giữa chiếm 45% */
+        /* 2. GIỮA: KHOẢNG CÁCH HỢP LÝ, KHÔNG BỊ XÚM */
         .center-content {
-            width: 45%;
             display: flex;
+            justify-content: center;
+            gap: 40px;
+            /* 🛠️ Khoảng cách chuẩn, không sát quá cũng không xa quá */
             align-items: center;
-            justify-content: space-around;
 
             .child-content {
                 cursor: pointer;
-                text-align: left;
-                padding: 0 10px;
+                padding: 6px 8px;
+                border-radius: 6px;
+                text-align: center;
+                min-height: 45px;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                transition: all 0.2s ease;
 
-                div:first-child {
-                    font-size: 15px;
-                    color: #222;
-                    font-weight: 600;
-                    margin-bottom: 3px;
+                &:hover {
+                    background-color: #f5f7f9;
+                    transform: translateY(-2px);
+                }
+
+                .main-title {
+                    font-size: 14px;
+                    color: #333;
+                    font-weight: 700;
+                    margin-bottom: 2px;
+                    white-space: nowrap;
                 }
 
                 .subs-title {
                     font-size: 11px;
-                    color: #999;
-                    font-weight: 400;
+                    color: #777;
+                    font-weight: 500;
+                    line-height: 1.3;
+                    max-width: 140px;
                 }
             }
         }
 
-        /* 🛠️ Mở rộng cột phải lên 35% để nhét vừa khối Tài khoản */
+        /* 3. PHẢI: ÉP TÍT SANG LỀ PHẢI */
         .right-content {
-            width: 35%;
+            flex: 1;
+            /* 🛠️ Lấy 1 phần không gian đẩy mạnh sang phải */
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            padding-right: 20px;
-            gap: 15px;
-            /* Tạo khoảng trống đều giữa các nút */
+            gap: 18px;
 
             .support {
                 cursor: pointer;
                 display: flex;
                 align-items: center;
-                font-size: 14px;
-                color: #999;
-                font-weight: 500;
+                color: #666;
+                transition: color 0.2s;
+                white-space: nowrap;
 
                 i {
                     color: #45c3d2;
-                    font-size: 20px;
-                    margin-right: 8px;
+                    font-size: 18px;
+                    margin-right: 6px;
                 }
 
                 span {
-                    margin-bottom: 2px;
+                    font-size: 13px;
+                    font-weight: 600;
+                }
+
+                &:hover {
+                    color: #45c3d2;
                 }
             }
 
-            .language-vi,
-            .language-en {
-                cursor: pointer;
+            .lang-group {
+                font-size: 13px;
+                font-weight: 700;
+                color: #ccc;
+                white-space: nowrap;
 
                 span {
-                    font-size: 14px;
-                    font-weight: 600;
-                    color: #999;
-
-                    &:hover {
-                        color: #45c3d2;
-                    }
+                    cursor: pointer;
+                    transition: 0.2s;
 
                     &.active {
                         color: #2248bd;
                     }
+
+                    &:not(.separator):hover {
+                        color: #45c3d2;
+                    }
+                }
+
+                .separator {
+                    margin: 0 6px;
+                    cursor: default;
                 }
             }
 
-            /* 🛠️ CSS CHO KHU VỰC TÀI KHOẢN/ĐĂNG NHẬP */
             .user-login-section {
-                padding-left: 15px;
-                border-left: 1px solid #ddd;
-                /* Nét đứt phân cách với khối ngôn ngữ */
+                padding-left: 18px;
+                border-left: 1px solid #eaeaea;
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                min-width: 100px;
 
                 .login-btn {
-                    background-color: #45c3d2;
-                    color: white;
-                    padding: 8px 18px;
+                    background-color: #ebf8f9;
+                    color: #45c3d2;
+                    border: none;
+                    padding: 8px 20px;
                     border-radius: 20px;
-                    font-size: 14px;
-                    font-weight: 600;
+                    font-size: 13px;
+                    font-weight: 700;
                     cursor: pointer;
-                    transition: all 0.3s;
+                    transition: all 0.2s;
                     white-space: nowrap;
-                    /* Ép không cho rớt dòng */
 
                     &:hover {
-                        background-color: #2248bd;
-                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+                        background-color: #45c3d2;
+                        color: white;
                     }
                 }
 
                 .user-profile {
                     display: flex;
                     align-items: center;
-                    gap: 10px;
+                    justify-content: flex-end;
+                    width: 100%;
 
                     .avatar {
-                        width: 30px;
-                        height: 30px;
-                        background-color: #eee;
+                        width: 36px;
+                        height: 36px;
                         border-radius: 50%;
-                        background-image: url('../../assets/images/user.svg');
-                        /* Avatar tạm */
-                        background-position: center;
-                        background-size: cover;
-                    }
-
-                    .welcome-text {
-                        font-size: 14px;
-                        font-weight: 600;
-                        color: #333;
-                        white-space: nowrap;
-                    }
-
-                    .logout-btn {
+                        background: #eee url('../../assets/images/user.svg') center/cover;
                         cursor: pointer;
-                        color: #ff4d4f;
-                        font-size: 18px;
-                        transition: 0.2s;
-                        margin-left: 5px;
+                        border: 2px solid #ddd;
+                        transition: all 0.2s;
+                        flex-shrink: 0;
 
                         &:hover {
-                            color: #c4132c;
+                            border-color: #45c3d2;
+                            transform: scale(1.05);
+                        }
+                    }
+
+                    .profile-info-popup {
+                        position: absolute;
+                        top: 55px;
+                        right: 0px;
+                        width: 260px;
+                        background: white;
+                        border-radius: 12px;
+                        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+                        padding: 20px;
+                        cursor: default;
+
+                        &::before {
+                            content: '';
+                            position: absolute;
+                            top: -6px;
+                            right: 12px;
+                            border-left: 6px solid transparent;
+                            border-right: 6px solid transparent;
+                            border-bottom: 6px solid white;
+                        }
+
+                        .popup-header {
+                            display: flex;
+                            align-items: center;
+                            border-bottom: 1px solid #f1f1f1;
+                            padding-bottom: 15px;
+                            margin-bottom: 15px;
+
+                            .popup-avatar {
+                                width: 45px;
+                                height: 45px;
+                                border-radius: 50%;
+                                background: #f5f5f5 url('../../assets/images/user.svg') center/cover;
+                                margin-right: 12px;
+                                flex-shrink: 0;
+                            }
+
+                            .popup-details {
+                                width: calc(100% - 57px);
+                                min-width: 0;
+
+                                .p-name {
+                                    font-size: 15px;
+                                    font-weight: 700;
+                                    color: #222;
+                                    margin-bottom: 2px;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    white-space: nowrap;
+                                }
+
+                                .p-email {
+                                    font-size: 12px;
+                                    color: #888;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    white-space: nowrap;
+                                }
+                            }
+                        }
+
+                        .popup-actions button {
+                            width: 100%;
+                            padding: 10px;
+                            border: none;
+                            border-radius: 8px;
+                            font-size: 13px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transition: 0.2s;
+                            margin-bottom: 8px;
+
+                            i {
+                                margin-right: 8px;
+                            }
+
+                            &.btn-manage {
+                                background: #f0f4ff;
+                                color: #2248bd;
+
+                                &:hover {
+                                    background: #d6e4ff;
+                                }
+                            }
+
+                            &.btn-logout {
+                                background: #fff1f0;
+                                color: #ff4d4f;
+                                margin-bottom: 0;
+
+                                &:hover {
+                                    background: #ffccc7;
+                                }
+                            }
                         }
                     }
                 }
@@ -177,54 +304,57 @@
 }
 
 /* ============================
-   BANNER TRANG CHỦ
+   BANNER TÌM KIẾM & BONG BÓNG
 ============================ */
 .home-header-banner {
     width: 100%;
-    height: 550px;
-    background: url('../../assets/images/unnamed.webp') center 20% no-repeat;
-    background-size: cover;
+    min-height: 520px;
+    background: url('../../assets/images/unnamed.webp') center 20% / cover no-repeat;
     display: flex;
     flex-direction: column;
 
     .content-up {
-        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0));
-        width: 100%;
-        padding-top: 100px;
-        padding-bottom: 30px;
+        background: linear-gradient(rgba(0, 0, 0, 0.4), transparent);
+        flex: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
+        padding: 40px 20px 0;
+        text-align: center;
 
-        .title1 {
+        h1.title1 {
             color: white;
-            font-size: 30px;
-            font-weight: 300;
+            font-size: 28px;
+            font-weight: 400;
             text-shadow: 1px 1px 2px #333;
-            margin-bottom: 10px;
+            margin: 0 0 10px 0;
         }
 
-        .title2 {
+        h2.title2 {
             color: white;
-            font-size: 30px;
-            font-weight: 600;
+            font-size: 32px;
+            font-weight: 700;
             text-shadow: 1px 1px 2px #333;
-            margin-bottom: 30px;
+            margin: 0 0 35px 0;
         }
 
         .search {
-            padding: 12px 20px;
-            border-radius: 25px;
+            padding: 12px 25px;
+            border-radius: 30px;
             background-color: #f4c21a;
             display: flex;
             align-items: center;
-            width: 450px;
+            width: 100%;
+            max-width: 480px;
             position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 
             i {
                 color: #333;
                 font-size: 18px;
                 margin-right: 15px;
+                flex-shrink: 0;
             }
 
             input {
@@ -236,48 +366,49 @@
                 color: #222;
 
                 &::placeholder {
-                    color: #444;
+                    color: #555;
                 }
             }
 
             .search-results {
                 position: absolute;
-                top: 110%;
+                top: 115%;
                 left: 0;
                 width: 100%;
-                background-color: white;
-                border-radius: 10px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-                max-height: 250px;
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+                max-height: 300px;
                 overflow-y: auto;
                 z-index: 100;
                 padding: 10px 0;
+                text-align: left;
 
                 &::-webkit-scrollbar {
-                    width: 6px;
+                    width: 5px;
                 }
 
                 &::-webkit-scrollbar-thumb {
-                    background: #ccc;
+                    background: #d1d1d1;
                     border-radius: 10px;
                 }
 
                 .result-item {
-                    padding: 10px 20px;
-                    font-size: 15px;
+                    padding: 12px 20px;
+                    font-size: 14px;
                     color: #333;
                     cursor: pointer;
-                    text-align: left;
-                    border-bottom: 1px solid #f9f9f9;
-                    transition: background-color 0.2s;
+                    border-bottom: 1px solid #f5f5f5;
+                    transition: 0.2s;
+
+                    &:hover {
+                        background-color: #f4faff;
+                        color: #45c3d2;
+                        padding-left: 25px;
+                    }
 
                     &:last-child {
                         border-bottom: none;
-                    }
-
-                    &:hover {
-                        background-color: #f0f2f5;
-                        color: #45c3d2;
                     }
                 }
             }
@@ -285,56 +416,135 @@
     }
 
     .content-down {
-        margin-top: auto;
-        width: 100%;
-        background-image: linear-gradient(to bottom,
-                rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 1));
-        padding-top: 40px;
-        padding-bottom: 20px;
-        display: flex;
-        justify-content: center;
+        background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.9), white);
+        padding: 40px 0 30px 0;
 
         .options {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
-            align-items: flex-start;
+            gap: 40px;
+            padding: 0 24px;
+            box-sizing: border-box;
 
             .option-child {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                width: 120px;
+                width: 130px;
                 cursor: pointer;
-                margin: 0 15px;
+                transition: transform 0.3s ease;
+
+                &:hover {
+                    transform: translateY(-8px);
+
+                    .text-child {
+                        color: #45c3d2;
+                    }
+
+                    .icon-child {
+                        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+                    }
+                }
 
                 .icon-child {
-                    width: 50px;
-                    height: 50px;
-                    background-color: white;
+                    width: 55px;
+                    height: 55px;
+                    background: white;
                     border-radius: 50%;
                     display: flex;
-                    justify-content: center;
                     align-items: center;
-                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-                    margin-bottom: 10px;
+                    justify-content: center;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                    margin-bottom: 12px;
+                    transition: 0.3s;
 
                     i {
-                        font-size: 22px;
+                        font-size: 24px;
                         color: #45c3d2;
                     }
                 }
 
                 .text-child {
                     text-align: center;
-                    font-size: 18px;
-                    font-weight: 500;
-                    color: #333;
-                }
-
-                &:hover .text-child {
-                    color: #45c3d2;
+                    font-size: 15px;
+                    font-weight: 600;
+                    color: #222;
+                    transition: color 0.2s;
                 }
             }
+        }
+    }
+}
+
+/* ============================
+   SIDE DRAWER MENU
+============================ */
+.menu-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100000;
+}
+
+.side-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    z-index: 100001;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+
+    &.show {
+        transform: translateX(0);
+    }
+
+    &::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 10px;
+    }
+
+    .menu-list {
+        padding-top: 10px;
+
+        .menu-item {
+            padding: 15px 25px;
+            font-size: 14px;
+            color: #45c3d2;
+            border-bottom: 1px solid #f1f1f1;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+
+            &:hover {
+                background: #f4faff;
+                color: #2248bd;
+                padding-left: 30px;
+            }
+        }
+
+        .menu-group-title {
+            padding: 25px 25px 10px;
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            background: #f9f9f9;
+            font-weight: 700;
         }
     }
 }

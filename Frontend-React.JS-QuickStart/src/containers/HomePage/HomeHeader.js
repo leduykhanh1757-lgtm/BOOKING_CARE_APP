@@ -15,19 +15,19 @@ class HomeHeader extends Component {
             listSpecialty: [],
             searchQuery: '',
             searchResults: [],
-            isShowResult: false
+            isShowResult: false,
+            isOpenDrawer: false,
+            isShowProfileInfo: false
         };
         this.searchRef = React.createRef();
+        this.profileRef = React.createRef();
     }
 
     async componentDidMount() {
         document.addEventListener("mousedown", this.handleClickOutside);
-
         let res = await getAllSpecialty();
         if (res && res.errCode === 0) {
-            this.setState({
-                listSpecialty: res.data ? res.data : []
-            });
+            this.setState({ listSpecialty: res.data || [] });
         }
     }
 
@@ -36,196 +36,206 @@ class HomeHeader extends Component {
     }
 
     handleClickOutside = (event) => {
-        if (this.searchRef && this.searchRef.current && !this.searchRef.current.contains(event.target)) {
+        if (this.searchRef.current && !this.searchRef.current.contains(event.target)) {
             this.setState({ isShowResult: false });
         }
-    }
-
-    changeLanguage = (language) => {
-        this.props.changeLanguageAppRedux(language);
-    }
-
-    returnToHome = () => {
-        if (this.props.history) {
-            this.props.history.push('/home');
+        if (this.profileRef.current && !this.profileRef.current.contains(event.target)) {
+            this.setState({ isShowProfileInfo: false });
         }
+    }
+
+    handleAvatarClick = () => {
+        if (!this.state.isShowProfileInfo) {
+            this.setState({ isShowProfileInfo: true });
+        } else {
+            this.setState({ isShowProfileInfo: false });
+            if (this.props.history) {
+                this.props.history.push('/user/profile');
+            }
+        }
+    }
+
+    toggleDrawer = () => this.setState({ isOpenDrawer: !this.state.isOpenDrawer });
+    handleMenuClick = (path) => {
+        this.toggleDrawer();
+        if (path && this.props.history) this.props.history.push(path);
     }
 
     handleSearchChange = (event) => {
         let query = event.target.value;
-        let { listSpecialty } = this.state;
-
-        if (query) {
-            let filtered = listSpecialty.filter(item =>
-                item.name.toLowerCase().includes(query.toLowerCase())
-            );
-            this.setState({
-                searchQuery: query,
-                searchResults: filtered,
-                isShowResult: true
-            });
-        } else {
-            this.setState({
-                searchQuery: query,
-                searchResults: [],
-                isShowResult: false
-            });
-        }
+        let filtered = query ? this.state.listSpecialty.filter(item => item.name.toLowerCase().includes(query.toLowerCase())) : [];
+        this.setState({ searchQuery: query, searchResults: filtered, isShowResult: !!query });
     }
 
-    handleViewDetailSpecialty = (item) => {
-        if (this.props.history) {
-            this.props.history.push(`/detail-specialty/${item.id}`);
-        }
-    }
+    // --- CÁC HÀM ĐIỀU HƯỚNG CHÍNH ---
+    returnToHome = () => this.props.history && this.props.history.push('/home');
+    handleViewDetailSpecialty = (item) => this.props.history && this.props.history.push(`/detail-specialty/${item.id}`);
+    handleGoToSupport = () => this.props.history && this.props.history.push('/support');
 
-    handleGoToSupport = () => {
-        if (this.props.history) {
-            this.props.history.push('/support');
-        }
-    }
-
-    // HÀM ĐĂNG XUẤT TÀI KHOẢN
-    handleLogout = () => {
-        this.props.processLogout();
-    }
+    handleViewAllSpecialty = () => this.props.history && this.props.history.push('/all-specialty');
+    handleViewAllClinic = () => this.props.history && this.props.history.push('/all-clinic');
+    handleViewAllDoctor = () => this.props.history && this.props.history.push('/all-doctors');
+    handleViewAllPackage = () => this.props.history && this.props.history.push('/all-package');
+    handleViewRemote = () => this.props.history && this.props.history.push('/remote-examination');
+    handleViewMedicalTest = () => this.props.history && this.props.history.push('/medical-test');
+    handleViewMentalHealth = () => this.props.history && this.props.history.push('/mental-health');
+    handleViewDental = () => this.props.history && this.props.history.push('/dental-examination');
 
     render() {
-        // Lấy thêm isLoggedIn và userInfo từ Redux
-        let { language, isLoggedIn, userInfo, intl } = this.props;
-        let { searchQuery, searchResults, isShowResult } = this.state;
+        let { language, isLoggedIn, userInfo, intl, changeLanguageAppRedux, processLogout, isShowBanner } = this.props;
+        let { searchQuery, searchResults, isShowResult, isOpenDrawer, isShowProfileInfo } = this.state;
+
+        // TỐI ƯU 1: Cấu hình mảng dữ liệu cho Header Menu
+        const headerMenus = [
+            { titleId: "home-header.speciality", subId: "home-header.searchdoctor", onClick: this.handleViewAllSpecialty },
+            { titleId: "home-header.health-facility", subId: "home-header.select-room", onClick: this.handleViewAllClinic },
+            { titleId: "home-header.doctor", subId: "home-header.select-doctor", onClick: this.handleViewAllDoctor },
+            { titleId: "home-header.fee", subId: "home-header.check-health", onClick: this.handleViewAllPackage },
+        ];
+
+        // TỐI ƯU 2: Cấu hình mảng dữ liệu cho 6 Bong bóng Banner
+        const bannerOptions = [
+            { id: "banner.child1", icon: "fas fa-hospital", onClick: this.handleViewAllSpecialty },
+            { id: "banner.child2", icon: "fas fa-mobile-alt", onClick: this.handleViewRemote },
+            { id: "banner.child3", icon: "fas fa-procedures", onClick: this.handleViewAllPackage },
+            { id: "banner.child4", icon: "fas fa-flask", onClick: this.handleViewMedicalTest },
+            { id: "banner.child5", icon: "fas fa-user-md", onClick: this.handleViewMentalHealth },
+            { id: "banner.child6", icon: "fas fa-briefcase-medical", onClick: this.handleViewDental },
+        ];
 
         return (
             <React.Fragment>
+                {/* --- MENU TRƯỢT --- */}
+                {isOpenDrawer && <div className="menu-backdrop" onClick={this.toggleDrawer}></div>}
+                <div className={isOpenDrawer ? "side-drawer show" : "side-drawer"}>
+                    <div className="menu-list">
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/home')}>Trang chủ</div>
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/all-handbook')}>Cẩm nang</div>
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/cooperation')}>Liên hệ hợp tác</div>
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/corporate-health')}>Sức khỏe doanh nghiệp</div>
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/digital-transformation')}>Chuyển đổi số Phòng khám</div>
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/recruitment')}>Tuyển dụng</div>
+                        <div className="menu-group-title">VỀ BOOKINGCARE</div>
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/for-patients')}>Dành cho bệnh nhân</div>
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/for-doctors')}>Dành cho bác sĩ</div>
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/role')}>Vai trò của BookingCare</div>
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/contact')}>Liên hệ</div>
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/support')}>Câu hỏi thường gặp</div>
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/terms')}>Điều khoản sử dụng</div>
+                        <div className="menu-item" onClick={() => this.handleMenuClick('/regulations')}>Quy chế hoạt động</div>
+                    </div>
+                </div>
+
+                {/* --- THANH HEADER --- */}
                 <div className='home-header-container'>
                     <div className='home-header-content'>
-                        {/* Phần 1: Bên trái */}
+                        {/* 1. Trái: Logo */}
                         <div className='left-content'>
-                            <i className="fas fa-bars"></i>
-                            <div className="header-logo" onClick={() => this.returnToHome()}></div>
+                            <i className="fas fa-bars" onClick={this.toggleDrawer}></i>
+                            <div className="header-logo" onClick={this.returnToHome}></div>
                         </div>
 
-                        {/* Phần 2: Ở giữa */}
+                        {/* 2. Giữa: Render từ mảng bằng map() */}
                         <div className='center-content'>
-                            <div className="child-content">
-                                <div><b><FormattedMessage id="home-header.speciality" /></b></div>
-                                <div className="subs-title"><FormattedMessage id="home-header.searchdoctor" /></div>
-                            </div>
-                            <div className="child-content">
-                                <div><b><FormattedMessage id="home-header.health-facility" /></b></div>
-                                <div className="subs-title"><FormattedMessage id="home-header.select-room" /></div>
-                            </div>
-                            <div className="child-content">
-                                <div><b><FormattedMessage id="home-header.doctor" /></b></div>
-                                <div className="subs-title"><FormattedMessage id="home-header.select-doctor" /></div>
-                            </div>
-                            <div className="child-content">
-                                <div><b><FormattedMessage id="home-header.fee" /></b></div>
-                                <div className="subs-title"><FormattedMessage id="home-header.check-health" /></div>
-                            </div>
+                            {headerMenus.map((menu, index) => (
+                                <div className="child-content" key={index} onClick={menu.onClick}>
+                                    <div className="main-title"><FormattedMessage id={menu.titleId} /></div>
+                                    <div className="subs-title"><FormattedMessage id={menu.subId} /></div>
+                                </div>
+                            ))}
                         </div>
 
-                        {/* Phần 3: Bên phải */}
+                        {/* 3. Phải: Tiện ích & Tài khoản */}
                         <div className='right-content'>
-                            <div className="support" onClick={() => this.handleGoToSupport()}>
+                            <div className="support" onClick={this.handleGoToSupport}>
                                 <i className="fas fa-question-circle"></i>
                                 <span><FormattedMessage id="home-header.support" /></span>
                             </div>
-                            <div className="language-vi">
-                                <span
-                                    className={language === languages.VI ? 'active' : ''}
-                                    onClick={() => this.changeLanguage(languages.VI)}
-                                >VN</span>
-                            </div>
-                            <div className="language-en">
-                                <span
-                                    className={language === languages.EN ? 'active' : ''}
-                                    onClick={() => this.changeLanguage(languages.EN)}
-                                >EN</span>
+                            <div className="lang-group">
+                                <span className={language === languages.VI ? 'active' : ''} onClick={() => changeLanguageAppRedux(languages.VI)}>VN</span>
+                                <span className="separator">/</span>
+                                <span className={language === languages.EN ? 'active' : ''} onClick={() => changeLanguageAppRedux(languages.EN)}>EN</span>
                             </div>
 
-                            {/* KHU VỰC HIỂN THỊ TÀI KHOẢN KHÁCH HÀNG */}
-                            <div className="user-login-section">
+                            <div className="user-login-section" ref={this.profileRef}>
                                 {isLoggedIn ? (
                                     <div className="user-profile">
-                                        <div className="avatar"></div>
-                                        <span className="welcome-text">Xin chào, {userInfo ? userInfo.firstName : ''}!</span>
-                                        <span className="logout-btn" onClick={this.handleLogout} title="Đăng xuất">
-                                            <i className="fas fa-sign-out-alt"></i>
-                                        </span>
+                                        <div
+                                            className="avatar"
+                                            onClick={this.handleAvatarClick}
+                                            title={language === languages.VI ? "Quản lý tài khoản" : "Manage Account"}
+                                        ></div>
+
+                                        {isShowProfileInfo && (
+                                            <div className="profile-info-popup">
+                                                <div className="popup-header">
+                                                    <div className="popup-avatar"></div>
+                                                    <div className="popup-details">
+                                                        <div className="p-name">
+                                                            {userInfo ? `${userInfo.firstName} ${userInfo.lastName || ''}` : (language === languages.VI ? 'Người dùng' : 'User')}
+                                                        </div>
+                                                        <div className="p-email">{userInfo?.email || ''}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="popup-actions">
+                                                    <button className="btn-manage" onClick={this.handleAvatarClick}>
+                                                        <i className="fas fa-tasks"></i>
+                                                        {language === languages.VI ? 'Quản lý hệ thống' : 'System Management'}
+                                                    </button>
+                                                    <button className="btn-logout" onClick={processLogout}>
+                                                        <i className="fas fa-sign-out-alt"></i>
+                                                        {language === languages.VI ? 'Đăng xuất' : 'Logout'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 ) : (
-                                    <div className="login-btn" onClick={() => this.props.history.push('/user-login')}>
-                                        Đăng nhập
-                                    </div>
+                                    <button className="login-btn" onClick={() => this.props.history.push('/user-login')}>
+                                        {language === languages.VI ? 'Đăng nhập' : 'Login'}
+                                    </button>
                                 )}
                             </div>
-
                         </div>
                     </div>
                 </div>
 
-                {/* Phần Banner bên dưới giữ nguyên */}
-                {this.props.isShowBanner === true && (
+                {/* --- BANNER TÌM KIẾM --- */}
+                {isShowBanner && (
                     <div className='home-header-banner'>
                         <div className="content-up">
-                            <div className="title1"><FormattedMessage id="banner.title1" /></div>
-                            <div className="title2"><FormattedMessage id="banner.title2" /></div>
-
+                            <h1 className="title1"><FormattedMessage id="banner.title1" /></h1>
+                            <h2 className="title2"><FormattedMessage id="banner.title2" /></h2>
                             <div className="search" ref={this.searchRef}>
                                 <i className="fas fa-search"></i>
                                 <input
                                     type="text"
                                     placeholder={intl.formatMessage({ id: 'banner.search' })}
                                     value={searchQuery}
-                                    onChange={(event) => this.handleSearchChange(event)}
+                                    onChange={this.handleSearchChange}
                                     onFocus={() => { if (searchQuery) this.setState({ isShowResult: true }) }}
                                 />
-
-                                {isShowResult && searchResults.length > 0 &&
+                                {isShowResult && searchResults.length > 0 && (
                                     <div className="search-results">
-                                        {searchResults.map((item, index) => {
-                                            return (
-                                                <div
-                                                    className="result-item"
-                                                    key={index}
-                                                    onClick={() => this.handleViewDetailSpecialty(item)}
-                                                >
-                                                    {item.name}
-                                                </div>
-                                            )
-                                        })}
+                                        {searchResults.map((item, index) => (
+                                            <div className="result-item" key={index} onClick={() => this.handleViewDetailSpecialty(item)}>
+                                                {item.name}
+                                            </div>
+                                        ))}
                                     </div>
-                                }
+                                )}
                             </div>
                         </div>
 
                         <div className="content-down">
                             <div className="options">
-                                <div className="option-child">
-                                    <div className="icon-child"><i className="fas fa-hospital"></i></div>
-                                    <div className="text-child"><FormattedMessage id="banner.child1" /></div>
-                                </div>
-                                <div className="option-child">
-                                    <div className="icon-child"><i className="fas fa-mobile-alt"></i></div>
-                                    <div className="text-child"><FormattedMessage id="banner.child2" /></div>
-                                </div>
-                                <div className="option-child">
-                                    <div className="icon-child"><i className="fas fa-procedures"></i></div>
-                                    <div className="text-child"><FormattedMessage id="banner.child3" /></div>
-                                </div>
-                                <div className="option-child">
-                                    <div className="icon-child"><i className="fas fa-flask"></i></div>
-                                    <div className="text-child"><FormattedMessage id="banner.child4" /></div>
-                                </div>
-                                <div className="option-child">
-                                    <div className="icon-child"><i className="fas fa-user-md"></i></div>
-                                    <div className="text-child"><FormattedMessage id="banner.child5" /></div>
-                                </div>
-                                <div className="option-child">
-                                    <div className="icon-child"><i className="fas fa-briefcase-medical"></i></div>
-                                    <div className="text-child"><FormattedMessage id="banner.child6" /></div>
-                                </div>
+                                {/* Render 6 bong bóng từ mảng bằng map() */}
+                                {bannerOptions.map((opt, index) => (
+                                    <div className="option-child" key={index} onClick={opt.onClick}>
+                                        <div className="icon-child"><i className={opt.icon}></i></div>
+                                        <div className="text-child"><FormattedMessage id={opt.id} /></div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -235,19 +245,15 @@ class HomeHeader extends Component {
     }
 }
 
-const mapStateToProps = state => {
-    return {
-        isLoggedIn: state.user.isLoggedIn,
-        userInfo: state.user.userInfo, // Lấy thông tin user từ Redux
-        language: state.app.language,
-    };
-};
+const mapStateToProps = state => ({
+    isLoggedIn: state.user.isLoggedIn,
+    userInfo: state.user.userInfo,
+    language: state.app.language,
+});
 
-const mapDispatchToProps = dispatch => {
-    return {
-        changeLanguageAppRedux: (language) => dispatch(changeLanguageApp(language)),
-        processLogout: () => dispatch(actions.processLogout()) // Map hàm đăng xuất vào props
-    };
-};
+const mapDispatchToProps = dispatch => ({
+    changeLanguageAppRedux: (language) => dispatch(changeLanguageApp(language)),
+    processLogout: () => dispatch(actions.processLogout())
+});
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(injectIntl(HomeHeader)));

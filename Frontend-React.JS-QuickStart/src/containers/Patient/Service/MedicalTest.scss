@@ -1,0 +1,238 @@
+.medical-test-container {
+    background-color: #f5f7f9;
+    min-height: 100vh;
+    padding-bottom: 60px;
+
+    /* ==============================
+       KHỐI 1: BANNER (Tông màu Xanh dương - Cyan đồng bộ)
+    ============================== */
+    .medical-banner {
+        height: 320px;
+        background-image: url('https://bookingcare.vn/wp-content/uploads/2020/06/102602-goi-kham-tong-quat.jpg');
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        position: relative;
+
+        .banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* 🛠️ ĐỔI LẠI GRADIENT XANH DƯƠNG GIỐNG TRANG TRƯỚC */
+            background: linear-gradient(to right, rgba(34, 72, 189, 0.9), rgba(69, 195, 210, 0.7));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .banner-content {
+                text-align: center;
+                color: white;
+                max-width: 800px;
+                padding: 0 20px;
+
+                h2 {
+                    font-size: 34px;
+                    font-weight: 700;
+                    margin-bottom: 15px;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+
+                p {
+                    font-size: 17px;
+                    line-height: 1.6;
+                    opacity: 0.95;
+                }
+            }
+        }
+    }
+
+    .medical-body {
+        width: 1100px;
+        margin: -50px auto 0 auto;
+        position: relative;
+        z-index: 10;
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 25px;
+            padding-left: 10px;
+            /* 🛠️ ĐỔI VẠCH KẺ THÀNH MÀU CYAN */
+            border-left: 5px solid #45c3d2;
+        }
+
+        /* ==============================
+           KHỐI 2: ƯU ĐIỂM DỊCH VỤ
+        ============================== */
+        .features-section {
+            display: flex;
+            justify-content: space-between;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+
+            .feature-item {
+                display: flex;
+                align-items: flex-start;
+                width: 32%;
+
+                .feature-icon {
+                    width: 55px;
+                    height: 55px;
+                    /* 🛠️ ĐỔI NỀN VÀ ICON VỀ TÔNG XANH CYAN */
+                    background-color: #ebf8f9;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                    margin-right: 15px;
+
+                    i {
+                        font-size: 26px;
+                        color: #45c3d2;
+                    }
+                }
+
+                .feature-text {
+                    h4 {
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #2248bd;
+                        /* 🛠️ Tiêu đề xanh đậm cho sang */
+                        margin: 0 0 8px 0;
+                    }
+
+                    p {
+                        font-size: 14px;
+                        color: #666;
+                        margin: 0;
+                        line-height: 1.5;
+                    }
+                }
+            }
+        }
+
+        /* ==============================
+           KHỐI 3: GRID GÓI XÉT NGHIỆM
+        ============================== */
+        .test-packages-section {
+            .packages-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 25px;
+
+                .package-card {
+                    background-color: white;
+                    border-radius: 10px;
+                    overflow: hidden;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    display: flex;
+                    flex-direction: column;
+
+                    &:hover {
+                        transform: translateY(-6px);
+                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+
+                        /* 🛠️ Hover vào tên gói đổi màu Cyan */
+                        .pkg-name {
+                            color: #45c3d2 !important;
+                            transition: 0.2s;
+                        }
+                    }
+
+                    .card-image {
+                        height: 190px;
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        position: relative;
+
+                        /* Tem Lấy mẫu tại nhà giữ nguyên cam cho nổi */
+                        .tag-home-service {
+                            position: absolute;
+                            top: 15px;
+                            left: 15px;
+                            background-color: #ff9800;
+                            color: white;
+                            font-size: 12px;
+                            font-weight: 600;
+                            padding: 5px 10px;
+                            border-radius: 20px;
+                            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                        }
+                    }
+
+                    .card-info {
+                        padding: 20px;
+                        display: flex;
+                        flex-direction: column;
+                        flex: 1;
+
+                        .pkg-name {
+                            font-size: 17px;
+                            font-weight: 600;
+                            color: #222;
+                            margin: 0 0 10px 0;
+                            line-height: 1.4;
+                            min-height: 48px;
+                        }
+
+                        .pkg-provider {
+                            font-size: 14px;
+                            color: #666;
+                            margin-bottom: 20px;
+
+                            /* 🛠️ Đổi màu icon bệnh viện */
+                            i {
+                                color: #45c3d2;
+                                margin-right: 5px;
+                            }
+                        }
+
+                        .pkg-bottom {
+                            margin-top: auto;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            border-top: 1px dashed #ddd;
+                            padding-top: 15px;
+
+                            .pkg-price {
+                                font-size: 18px;
+                                font-weight: 700;
+                                color: #d93025;
+                            }
+
+                            .btn-book {
+                                /* 🛠️ Đổi nút bấm về tông xanh đồng bộ */
+                                background-color: #ebf8f9;
+                                color: #2248bd;
+                                border: none;
+                                padding: 8px 18px;
+                                font-size: 14px;
+                                font-weight: 600;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                transition: 0.2s;
+
+                                &:hover {
+                                    background-color: #45c3d2;
+                                    color: white;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

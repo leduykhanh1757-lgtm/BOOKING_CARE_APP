@@ -1,0 +1,67 @@
+.info-template-container {
+    background-color: #f5f7f9;
+    min-height: 100vh;
+    padding-bottom: 60px;
+
+    .info-body {
+        width: 900px;
+        /* Thu hẹp lại một chút để chữ không bị dàn quá dài, gây mỏi mắt khi đọc */
+        margin: 40px auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 40px 50px;
+
+        .info-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2248bd;
+            /* Xanh dương đậm BookingCare */
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f1f1;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .info-main-content {
+            font-size: 15px;
+            line-height: 1.8;
+            /* Giãn dòng rộng ra cho dễ đọc */
+            color: #333;
+            text-align: justify;
+
+            /* Định dạng chung cho mọi thẻ HTML bác sẽ nhét vào bên trong */
+            p {
+                margin-bottom: 15px;
+            }
+
+            h3 {
+                font-size: 20px;
+                font-weight: 600;
+                color: #45c3d2;
+                /* Xanh Cyan */
+                margin: 25px 0 15px 0;
+            }
+
+            ul {
+                padding-left: 20px;
+                margin-bottom: 15px;
+
+                li {
+                    margin-bottom: 8px;
+                }
+            }
+
+            a {
+                color: #45c3d2;
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                    color: #2248bd;
+                }
+            }
+        }
+    }
+}
