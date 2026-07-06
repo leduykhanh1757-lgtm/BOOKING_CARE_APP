@@ -1,0 +1,80 @@
+.manage-handbook-container {
+    padding: 20px 30px;
+
+    .ms-title {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 30px;
+        color: #333;
+        letter-spacing: 1px;
+    }
+
+    .add-new-handbook {
+        .form-group {
+            label {
+                font-weight: 600;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+        }
+
+        /* KHUNG PREVIEW ẢNH */
+        .preview-img-container {
+            display: flex;
+            flex-direction: column;
+
+            .label-upload {
+                background-color: #f1f1f1;
+                padding: 6px 15px;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                cursor: pointer;
+                width: fit-content;
+                transition: 0.2s;
+                font-weight: 600;
+
+                &:hover {
+                    background-color: #e2e2e2;
+                }
+            }
+
+            .preview-image {
+                height: 120px;
+                width: 150px;
+                border: 1px dashed #ccc;
+                background-color: #fcfcfc;
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center;
+                border-radius: 4px;
+                margin-top: 10px;
+            }
+        }
+
+        /* NÚT LƯU THEO TRẠNG THÁI */
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            padding: 8px 25px;
+            font-weight: 600;
+
+            &:hover {
+                background-color: #0056b3;
+            }
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #333;
+            padding: 8px 25px;
+            font-weight: 600;
+
+            &:hover {
+                background-color: #e0a800;
+            }
+        }
+    }
+}

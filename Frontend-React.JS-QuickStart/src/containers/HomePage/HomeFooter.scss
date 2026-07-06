@@ -132,25 +132,27 @@
                 .partner-logo {
                     width: 60px;
                     height: 60px;
-                    background-color: white;
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
+                    border-radius: 10px;
+                    /* Bo góc to ra tí cho giống App Icon */
                     margin-right: 15px;
                     flex-shrink: 0;
                     background-position: center;
                     background-repeat: no-repeat;
-                    background-size: 80%;
+                    background-size: cover;
+
+                    /* Đánh thêm quả bóng nhẹ nhàng cho nó nổi khối lên nền xám */
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
                     &.hellodoctor {
-                        background-image: url('https://bookingcare.vn/assets/icon/hellodoctor.png');
+                        background-image: url('../../assets/images/hellodoctor.jpg');
                     }
 
                     &.bernard {
-                        background-image: url('https://bookingcare.vn/assets/icon/bernard.png');
+                        background-image: url('../../assets/images/bernard.jpg');
                     }
 
                     &.doctorcheck {
-                        background-image: url('https://bookingcare.vn/assets/icon/doctorcheck.png');
+                        background-image: url('../../assets/images/doctorcheck.png');
                     }
                 }
 

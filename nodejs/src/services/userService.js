@@ -6,26 +6,30 @@ let handleUserLogin = (email, password) => {
     return new Promise(async (resolve, reject) => {
         try {
             let userData = {};
-            // Gọi hàm checkUserEmail lúc nãy để xem email có tồn tại không
             let isExist = await checkUserEmail(email);
-
             if (isExist) {
-                // Nếu tồn tại -> Chui vào DB lấy user đó ra
                 let user = await db.User.findOne({
-                    // Đã thêm 'id' vào danh sách lấy dữ liệu
-                    attributes: ['id', 'email', 'roleId', 'password', 'firstName', 'lastName'],
                     where: { email: email },
+                    attributes: ['id', 'email', 'roleId', 'password', 'firstName', 'lastName', 'image'],
                     raw: true
                 });
 
                 if (user) {
-                    // Dùng bcrypt so sánh mật khẩu nhập vào và mật khẩu trong DB
                     let check = await bcrypt.compareSync(password, user.password);
                     if (check) {
                         userData.errCode = 0;
                         userData.errMessage = 'Ok';
 
-                        delete user.password; // Cực kỳ quan trọng: Xóa password đi trước khi gửi về React để bảo mật
+                        // ✅ Cột image trong DB là kiểu BLOB nên Sequelize trả về dạng Buffer.
+                        // Buffer này chứa chính xác chuỗi "data:image/...;base64,..." đã lưu,
+                        // chỉ cần chuyển Buffer -> string (utf8), KHÔNG decode base64 gì thêm.
+                        if (user.image) {
+                            if (Buffer.isBuffer(user.image)) {
+                                user.image = user.image.toString('utf8');
+                            }
+                        }
+
+                        delete user.password;
                         userData.user = user;
                     } else {
                         userData.errCode = 3;
@@ -33,14 +37,13 @@ let handleUserLogin = (email, password) => {
                     }
                 } else {
                     userData.errCode = 2;
-                    userData.errMessage = 'User not found';
+                    userData.errMessage = `User's not found`;
                 }
             } else {
-                // Nếu không tồn tại -> Trả về lỗi
                 userData.errCode = 1;
-                userData.errMessage = `Your's Email isn't exist in your system. Please try other email!`;
+                userData.errMessage = `Your's Email isn't exist in your system. Plz try other email!`;
             }
-            resolve(userData); // Trả cục kết quả ra cho Controller
+            resolve(userData);
         } catch (e) {
             reject(e);
         }

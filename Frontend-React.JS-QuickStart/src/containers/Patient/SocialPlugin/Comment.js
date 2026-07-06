@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'; // 🛠️ 1. Import connect từ react-redux
 import './SocialPlugin.scss';
-import { createNewCommentApi, getCommentsByIdApi } from '../../../services/userService'; // Import API
-import moment from 'moment'; // Dùng moment để format ngày tháng
+import { createNewCommentApi, getCommentsByIdApi } from '../../../services/userService';
+import moment from 'moment';
 
 class Comment extends Component {
     constructor(props) {
         super(props);
         this.state = {
             inputText: '',
-            comments: [] // Mảng trống, lát lấy từ DB về
+            comments: []
         }
     }
 
@@ -17,7 +18,6 @@ class Comment extends Component {
     }
 
     async componentDidUpdate(prevProps) {
-        // Khi chuyển sang trang bác sĩ khác, gọi lại API
         if (this.props.doctorIdFromParent !== prevProps.doctorIdFromParent) {
             this.fetchComments();
         }
@@ -39,20 +39,39 @@ class Comment extends Component {
 
     handleSendComment = async () => {
         let { inputText } = this.state;
-        let { doctorIdFromParent } = this.props;
+        let { doctorIdFromParent, isLoggedIn, userInfo } = this.props;
 
         if (!inputText.trim()) return;
+
+        // 🛠️ 2. XỬ LÝ ĐỊNH DANH NGƯỜI DÙNG
+        let authorName = "Khách viếng thăm";
+        let authorAvatar = ""; // Chuỗi Base64 ảnh đại diện
+
+        // Nếu đã đăng nhập, lấy Tên và Ảnh từ Redux ra
+        if (isLoggedIn && userInfo) {
+            let fullName = `${userInfo.firstName ? userInfo.firstName : ''} ${userInfo.lastName ? userInfo.lastName : ''}`.trim();
+            authorName = fullName ? fullName : "Người dùng BookingCare";
+
+            if (userInfo.image) {
+                if (typeof userInfo.image === 'string' && userInfo.image.startsWith('data:image')) {
+                    authorAvatar = userInfo.image;
+                } else {
+                    authorAvatar = new Buffer(userInfo.image, 'base64').toString('binary');
+                }
+            }
+        }
 
         // Đẩy dữ liệu xuống DB
         let res = await createNewCommentApi({
             doctorId: doctorIdFromParent,
-            authorName: "Khách viếng thăm",
+            authorName: authorName,
+            authorAvatar: authorAvatar, // 🛠️ Truyền thêm Ảnh xuống Backend
             content: inputText
         });
 
         if (res && res.errCode === 0) {
-            this.setState({ inputText: '' }); // Xóa ô input
-            this.fetchComments(); // Gọi lại hàm load danh sách để cập nhật bình luận mới
+            this.setState({ inputText: '' });
+            this.fetchComments();
         }
     }
 
@@ -64,6 +83,23 @@ class Comment extends Component {
 
     render() {
         let { comments, inputText } = this.state;
+        let { isLoggedIn, userInfo } = this.props;
+        console.log('DEBUG userInfo.image:', userInfo && userInfo.image);
+
+        // 🛠️ 3. LẤY ẢNH NGƯỜI ĐANG ĐĂNG NHẬP ĐỂ HIỂN THỊ Ở Ô INPUT
+        let currentUserAvatar = '';
+        if (isLoggedIn && userInfo && userInfo.image) {
+            if (typeof userInfo.image === 'string' && userInfo.image.startsWith('data:image')) {
+                currentUserAvatar = userInfo.image;
+            } else if (userInfo.image.data) {
+                // Đề phòng trường hợp API trả về một object mảng nhị phân
+                currentUserAvatar = Buffer.from(userInfo.image.data, 'base64').toString('binary');
+            } else {
+                // Xử lý base64 chuẩn
+                currentUserAvatar = Buffer.from(userInfo.image, 'base64').toString('binary');
+            }
+        }
+
         return (
             <div className="custom-comment-section">
                 <div className="comment-header">
@@ -72,7 +108,11 @@ class Comment extends Component {
 
                 <div className="comment-input-area">
                     <div className="avatar-placeholder">
-                        <i className="fas fa-user-circle"></i>
+                        {/* Hiện ảnh nếu có, không có thì hiện icon mặc định */}
+                        {currentUserAvatar ?
+                            <div className="avatar-img" style={{ backgroundImage: `url(${currentUserAvatar})` }}></div>
+                            : <i className="fas fa-user-circle"></i>
+                        }
                     </div>
                     <div className="input-group">
                         <input
@@ -91,12 +131,15 @@ class Comment extends Component {
                         return (
                             <div className="comment-item" key={index}>
                                 <div className="avatar-placeholder">
-                                    <i className="fas fa-user-circle"></i>
+                                    {/* Hiển thị ảnh của người comment (Nếu API trả về có ảnh) */}
+                                    {item.authorAvatar ?
+                                        <div className="avatar-img" style={{ backgroundImage: `url(${item.authorAvatar})` }}></div>
+                                        : <i className="fas fa-user-circle"></i>
+                                    }
                                 </div>
                                 <div className="comment-content">
                                     <div className="author-name">{item.authorName}</div>
                                     <div className="text">{item.content}</div>
-                                    {/* Format lại giờ giấc nhìn cho chuyên nghiệp */}
                                     <div className="time">{moment(item.createdAt).format('HH:mm - DD/MM/YYYY')}</div>
                                 </div>
                             </div>
@@ -108,4 +151,12 @@ class Comment extends Component {
     }
 }
 
-export default Comment;
+// 🛠️ 4. MAP REDUX VÀO COMPONENT
+const mapStateToProps = state => {
+    return {
+        isLoggedIn: state.user.isLoggedIn,
+        userInfo: state.user.userInfo
+    };
+};
+
+export default connect(mapStateToProps)(Comment);

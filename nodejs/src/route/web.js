@@ -6,6 +6,7 @@ import patientController from '../controller/patientController';
 import specialtyController from '../controller/specialtyController';
 import clinicController from "../controller/clinicController";
 import handbookController from '../controller/handbookController';
+import packageController from "../controller/packageController";
 let router = express.Router();
 
 let initWebRoute = (app) => {
@@ -60,6 +61,13 @@ let initWebRoute = (app) => {
     router.get('/api/get-likes-by-doctor-id', doctorController.getLikesByDoctorId);
 
     router.post('/api/ask-chatbot', userController.handleAskBot);
+
+    router.post('/api/create-new-package', packageController.createNewPackage);
+    router.get('/api/get-all-packages', packageController.getAllPackages);
+    router.put('/api/edit-package', packageController.editPackage);
+    router.get('/api/get-detail-package-by-id', packageController.getDetailPackageById);
+    router.post('/api/book-package', packageController.postBookPackage);
+
 
     return app.use('/', router);
 }

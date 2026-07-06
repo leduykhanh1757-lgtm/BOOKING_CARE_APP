@@ -51,6 +51,15 @@ export const adminMenu = [
             },
         ]
     },
+    { // Quản lý Gói khám
+        name: 'menu.admin.package',
+        menus: [
+            {
+                name: 'menu.admin.manage-package',
+                link: '/system/manage-package'
+            }
+        ]
+    },
 ];
 
 export const doctorMenu = [

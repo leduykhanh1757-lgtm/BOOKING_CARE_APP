@@ -44,8 +44,26 @@ class UserProfile extends Component {
                 let user = res.users;
                 let imageBase64 = '';
 
+                // 🛠️ FIX ĐÚNG BẢN CHẤT: user.image thực ra là byte ASCII của MỘT CHUỖI
+                // BASE64 (đã có sẵn tiền tố data:image/...) bị lưu nhầm dạng BLOB —
+                // không phải byte ảnh nhị phân gốc. Chỉ cần đổi byte -> text
+                // (String.fromCharCode), KHÔNG được btoa() thêm lần nữa.
                 if (user.image) {
-                    imageBase64 = new Buffer(user.image, 'base64').toString('binary');
+                    if (typeof user.image === 'string') {
+                        imageBase64 = user.image.startsWith('data:image') ? user.image : `data:image/jpeg;base64,${user.image}`;
+                    } else if (user.image.data && user.image.data.length) {
+                        try {
+                            let str = '';
+                            const chunkSize = 0x8000;
+                            const byteArray = user.image.data;
+                            for (let i = 0; i < byteArray.length; i += chunkSize) {
+                                str += String.fromCharCode.apply(null, byteArray.slice(i, i + chunkSize));
+                            }
+                            imageBase64 = str.startsWith('data:image') ? str : `data:image/jpeg;base64,${str}`;
+                        } catch (e) {
+                            console.error('[PROFILE] Lỗi đọc dữ liệu ảnh:', e);
+                        }
+                    }
                 }
 
                 this.setState({

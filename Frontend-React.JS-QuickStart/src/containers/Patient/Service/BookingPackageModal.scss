@@ -1,0 +1,105 @@
+.booking-modal-container {
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .booking-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 25px;
+        border-bottom: 2px solid #f1f1f1;
+        background-color: #f8f9fa;
+        border-radius: 12px 12px 0 0;
+
+        .left {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2248bd;
+            text-transform: uppercase;
+        }
+
+        .right {
+            cursor: pointer;
+            font-size: 22px;
+            color: #999;
+            transition: 0.2s;
+
+            &:hover {
+                color: #ff4d4f;
+                transform: scale(1.1);
+            }
+        }
+    }
+
+    .booking-modal-body {
+        padding: 25px;
+
+        .form-group {
+            label {
+                font-size: 14px;
+                font-weight: 600;
+                color: #444;
+                margin-bottom: 6px;
+            }
+
+            .form-control {
+                border-radius: 6px;
+                padding: 10px 15px;
+                font-size: 14px;
+                border: 1px solid #ccc;
+                transition: 0.2s;
+
+                &:focus {
+                    outline: none;
+                    border-color: #45c3d2;
+                    box-shadow: 0 0 5px rgba(69, 195, 210, 0.3);
+                }
+            }
+        }
+    }
+
+    .booking-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        padding: 15px 25px;
+        border-top: 1px solid #f1f1f1;
+        background-color: #f8f9fa;
+        border-radius: 0 0 12px 12px;
+
+        .btn-booking-confirm {
+            background-color: #f4c21a;
+            color: #222;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+
+            &:hover {
+                background-color: #e3b516;
+                color: white;
+                transform: translateY(-2px);
+            }
+        }
+
+        .btn-booking-cancel {
+            background-color: #e4e6eb;
+            color: #333;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+
+            &:hover {
+                background-color: #d8dadf;
+            }
+        }
+    }
+}

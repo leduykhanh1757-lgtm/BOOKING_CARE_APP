@@ -4,33 +4,46 @@ import { Route, Switch } from 'react-router-dom';
 import { ConnectedRouter as Router } from 'connected-react-router';
 import { history } from '../redux'
 import { ToastContainer } from 'react-toastify';
-import HomePage from './HomePage/HomePage.js';
-import DetailDoctor from './Patient/Doctor/DetailDoctor.js';
+
 import { userIsAuthenticated, userIsNotAuthenticated } from '../hoc/authentication';
 import { path } from '../utils'
+
 import Home from '../routes/Home';
 import Login from '../routes/Login';
 import System from '../routes/System';
-import CustomScrollbars from '../components/CustomScrollbars.js';
-import { CustomToastCloseButton } from '../components/CustomToast';
-import ConfirmModal from '../components/ConfirmModal';
 import Doctor from '../routes/Doctor';
+
+import CustomScrollbars from '../components/CustomScrollbars.js';
+import ConfirmModal from '../components/ConfirmModal';
 import 'react-toastify/dist/ReactToastify.css';
-import VerifyEmail from './Patient/VerifyEmail/VerifyEmail';
-import DetailSpecialty from './Patient/Specialty/DetailSpecialty';
-import DetailClinic from './Patient/Clinic/DetailClinic';
-import DetailHandbook from './Patient/Handbook/DetailHandbook';
-import AllSpecialty from './Patient/Specialty/AllSpecialty';
-import AllClinic from './Patient/Clinic/AllClinic';
-import AllDoctor from './Patient/Doctor/AllDoctor';
-import AllHandbook from './Patient/Handbook/AllHandbook';
-import SupportPage from './Patient/Support/SupportPage';
+
+// --- IMPORT CÁC TRANG DÀNH CHO BỆNH NHÂN ---
+import HomePage from './HomePage/HomePage.js';
 import UserLogin from './Auth/UserLogin';
+import UserProfile from './Patient/Profile/UserProfile';
+import VerifyEmail from './Patient/VerifyEmail/VerifyEmail';
+
+import DetailDoctor from './Patient/Doctor/DetailDoctor.js';
+import AllDoctor from './Patient/Doctor/AllDoctor';
+
+import DetailSpecialty from './Patient/Specialty/DetailSpecialty';
+import AllSpecialty from './Patient/Specialty/AllSpecialty';
+
+import DetailClinic from './Patient/Clinic/DetailClinic';
+import AllClinic from './Patient/Clinic/AllClinic';
+
+import DetailHandbook from './Patient/Handbook/DetailHandbook';
+import AllHandbook from './Patient/Handbook/AllHandbook';
+
 import AllPackage from './Patient/Package/AllPackage';
-import RemoteExamination from './Patient/Service/RemoteExamination';
-import DentalExamination from './Patient/Service/DentalExamination';
-import MentalHealth from './Patient/Service/MentalHealth';
-import MedicalTest from './Patient/Service/MedicalTest';
+import DetailService from './Patient/Service/DetailService'; // Dùng cho Chi tiết Gói khám
+
+// IMPORT TEMPLATE CHUNG CHO CÁC DỊCH VỤ CÒN LẠI
+import ServiceTemplate from './Patient/Service/ServiceTemplate';
+
+import SupportPage from './Patient/Support/SupportPage';
+
+// --- IMPORT CÁC TRANG THÔNG TIN (INFORMATION) ---
 import Cooperation from './Patient/Information/Cooperation';
 import CorporateHealth from './Patient/Information/CorporateHealth';
 import Contact from './Patient/Information/Contact';
@@ -42,7 +55,7 @@ import ForPatients from './Patient/Information/ForPatients';
 import ForDoctors from './Patient/Information/ForDoctors';
 import Role from './Patient/Information/Role';
 import PrivacyPolicy from './Patient/Information/PrivacyPolicy';
-import UserProfile from './Patient/Profile/UserProfile';
+
 
 class App extends Component {
 
@@ -71,7 +84,6 @@ class App extends Component {
                     <div className="main-container">
                         <ConfirmModal />
 
-
                         <div className="content-container">
                             <CustomScrollbars style={{ height: '100vh', width: '100%' }}>
                                 <Switch>
@@ -84,29 +96,36 @@ class App extends Component {
                                     {/* ROUTE DÀNH CHO BÁC SĨ */}
                                     <Route path={'/doctor/'} component={userIsAuthenticated(Doctor)} />
 
-                                    {/* CÁC ROUTE PUBLIC DÀNH CHO BỆNH NHÂN (Không cần đăng nhập vẫn xem được) */}
+                                    {/* CÁC ROUTE PUBLIC DÀNH CHO BỆNH NHÂN (Không cần đăng nhập) */}
                                     <Route path={path.HOMEPAGE} component={HomePage} />
+
                                     <Route path={path.DETAIL_DOCTOR} component={DetailDoctor} />
                                     <Route path="/all-doctors" component={AllDoctor} />
+
                                     <Route path={path.VERIFY_EMAIL_BOOKING} component={VerifyEmail} />
+
                                     <Route path={path.DETAIL_SPECIALTY} component={DetailSpecialty} />
                                     <Route path="/all-specialty" component={AllSpecialty} />
+
                                     <Route path={path.DETAIL_CLINIC} component={DetailClinic} />
                                     <Route path="/all-clinic" component={AllClinic} />
+
                                     <Route path={path.DETAIL_HANDBOOK} component={DetailHandbook} />
                                     <Route path="/all-handbook" component={AllHandbook} />
-                                    <Route path="/support" component={SupportPage} />
+
                                     <Route path="/all-package" component={AllPackage} />
+                                    <Route path="/detail-service/:id" component={DetailService} />
 
-                                    {/* 🛠️ THÊM ROUTE CHO BỆNH NHÂN ĐĂNG NHẬP Ở ĐÂY NÀY */}
+                                    {/* ROUTE ĐỘNG CHO CÁC DỊCH VỤ (Thay thế cho 6 Route cũ) */}
+                                    <Route path="/service/:type" component={ServiceTemplate} />
+
+                                    <Route path="/support" component={SupportPage} />
+
+                                    {/* ROUTE CHO BỆNH NHÂN ĐĂNG NHẬP VÀ QUẢN LÝ */}
                                     <Route path="/user-login" component={UserLogin} />
+                                    <Route path="/user/profile" component={UserProfile} />
 
-                                    <Route path="/remote-examination" component={RemoteExamination} />
-                                    <Route path="/medical-test" component={MedicalTest} />
-                                    <Route path="/mental-health" component={MentalHealth} />
-                                    <Route path="/dental-examination" component={DentalExamination} />
-
-                                    {/* NHÓM CÁC TRANG THÔNG TIN (INFORMATION) */}
+                                    {/* NHÓM CÁC TRANG THÔNG TIN BÊN LỀ */}
                                     <Route path="/cooperation" component={Cooperation} />
                                     <Route path="/corporate-health" component={CorporateHealth} />
                                     <Route path="/contact" component={Contact} />
@@ -118,9 +137,6 @@ class App extends Component {
                                     <Route path="/for-doctors" component={ForDoctors} />
                                     <Route path="/role" component={Role} />
                                     <Route path="/privacy-policy" component={PrivacyPolicy} />
-
-                                    {/* ROUTE CHO TRANG THÔNG TIN CỦA NGƯỜI DÙNG */}
-                                    <Route path="/user/profile" component={UserProfile} />
                                 </Switch>
                             </CustomScrollbars>
                         </div>
@@ -144,7 +160,6 @@ class App extends Component {
     }
 }
 
-
 const mapStateToProps = state => {
     return {
         started: state.app.started,
@@ -153,8 +168,7 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => {
-    return {
-    };
+    return {};
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

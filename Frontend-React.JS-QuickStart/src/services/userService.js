@@ -119,6 +119,21 @@ const getLikesDoctorApi = (doctorId, patientId) => {
 const askChatbotApi = (message) => {
     return axios.post('/api/ask-chatbot', { message });
 }
+const createNewPackageApi = (data) => {
+    return axios.post('/api/create-new-package', data);
+}
+const getAllPackagesApi = () => {
+    return axios.get('/api/get-all-packages');
+}
+const editPackageService = (data) => {
+    return axios.put('/api/edit-package', data);
+}
+const getDetailPackageById = (id) => {
+    return axios.get(`/api/get-detail-package-by-id?id=${id}`);
+}
+const postBookPackage = (data) => {
+    return axios.post('/api/book-package', data);
+}
 export {
     handleLoginApi, getAllUsers,
     createNewUserService, deleteUserService,
@@ -136,5 +151,6 @@ export {
     createNewHandbook, getAllHandbook, editHandbookService, getDetailHandbookById,
     createNewCommentApi, getCommentsByIdApi,
     toggleLikeDoctorApi, getLikesDoctorApi,
-    askChatbotApi
+    askChatbotApi,
+    createNewPackageApi, getAllPackagesApi, editPackageService, getDetailPackageById, postBookPackage
 };

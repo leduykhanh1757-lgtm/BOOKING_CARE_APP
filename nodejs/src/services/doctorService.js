@@ -430,6 +430,7 @@ let createNewComment = (data) => {
                 await db.Comment.create({
                     doctorId: data.doctorId,
                     authorName: data.authorName || 'Khách viếng thăm',
+                    authorAvatar: data.authorAvatar,
                     content: data.content
                 });
                 resolve({ errCode: 0, errMessage: 'Create comment succeed!' });
@@ -442,15 +443,29 @@ let getCommentsByDoctorId = (doctorId) => {
     return new Promise(async (resolve, reject) => {
         try {
             if (!doctorId) {
-                resolve({ errCode: 1, errMessage: 'Missing parameter' });
+                resolve({ errCode: 1, errMessage: 'Missing parameters!' });
             } else {
-                let data = await db.Comment.findAll({
+                let comments = await db.Comment.findAll({
                     where: { doctorId: doctorId },
-                    order: [['createdAt', 'DESC']] // Lấy bình luận mới nhất đẩy lên đầu
+                    order: [['createdAt', 'DESC']], // Sắp xếp bình luận mới nhất lên đầu
+                    raw: true
                 });
-                resolve({ errCode: 0, errMessage: 'Ok', data });
+                if (comments && comments.length > 0) {
+                    comments = comments.map(item => {
+                        // ✅ Cột authorAvatar là BLOB -> Sequelize trả về Buffer.
+                        // Chỉ cần chuyển Buffer -> string (utf8), không decode base64 thêm.
+                        if (item.authorAvatar && Buffer.isBuffer(item.authorAvatar)) {
+                            item.authorAvatar = item.authorAvatar.toString('utf8');
+                        }
+                        return item;
+                    });
+                }
+
+                resolve({ errCode: 0, data: comments });
             }
-        } catch (e) { reject(e); }
+        } catch (e) {
+            reject(e);
+        }
     });
 }
 let toggleLikeDoctor = (data) => {

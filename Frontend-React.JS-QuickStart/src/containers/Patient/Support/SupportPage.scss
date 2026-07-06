@@ -5,28 +5,31 @@
     padding-bottom: 60px;
 
     .support-banner {
-        background: linear-gradient(135deg, #45c3d2, #3094a0);
+        /* Đổi màu Gradient Xanh biếc đồng bộ với các trang Dịch vụ */
+        background: linear-gradient(to right, rgba(34, 72, 189, 0.9), rgba(69, 195, 210, 0.7));
         color: white;
         text-align: center;
-        padding: 50px 20px;
+        /* Kéo giãn banner ra cho to đẹp, giống trang Gói khám */
+        padding: 80px 20px 100px 20px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 
         h1 {
-            font-size: 32px;
+            font-size: 34px;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         p {
-            font-size: 16px;
-            opacity: 0.9;
+            font-size: 17px;
+            opacity: 0.95;
         }
     }
 
     .support-body {
         width: 1000px;
-        margin: -30px auto 0;
-        /* Kéo khung nội dung chìm nhẹ lên banner */
+        margin: -60px auto 0;
 
         /* CSS cho 3 thẻ Liên hệ */
         .contact-methods {

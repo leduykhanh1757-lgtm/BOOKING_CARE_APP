@@ -34,7 +34,9 @@
             "specialty": "Chuyên khoa",
             "manage-specialty": "Quản lý chuyên khoa",
             "handbook": "Cẩm nang",
-            "manage-handbook": "Quản lý cẩm nang"
+            "manage-handbook": "Quản lý cẩm nang",
+            "package": "Gói khám",
+            "manage-package": "Quản lý gói khám"
         },
         "doctor": {
             "manage-schedule": "Quản lý lịch khám",

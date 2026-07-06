@@ -34,7 +34,9 @@
             "specialty": "Specialties",
             "manage-specialty": "Manage specialties",
             "handbook": "Handbooks",
-            "manage-handbook": "Manage handbooks"
+            "manage-handbook": "Manage handbooks",
+            "package": "Checkup packages",
+            "manage-package": "Manage packages"
         },
         "doctor": {
             "manage-schedule": "Manage schedule",

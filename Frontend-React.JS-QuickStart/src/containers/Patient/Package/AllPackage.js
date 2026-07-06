@@ -2,25 +2,28 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import HomeHeader from '../../HomePage/HomeHeader';
 import './AllPackage.scss';
-
+import { getAllPackagesApi } from '../../../services/userService';
 class AllPackage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // Mock data các gói khám tổng quát
-            listPackages: [
-                { id: 1, name: "Gói khám Sức khỏe Tổng quát Cơ bản", clinic: "Bệnh viện Đa khoa Quốc tế Thu Cúc", price: "2.000.000đ", image: "https://bookingcare.vn/wp-content/uploads/2020/06/102602-goi-kham-tong-quat.jpg" },
-                { id: 2, name: "Gói khám Tầm soát Ung thư Toàn diện Nam", clinic: "Hệ thống Y tế MEDLATEC", price: "3.500.000đ", image: "https://bookingcare.vn/wp-content/uploads/2020/06/102602-goi-kham-tong-quat.jpg" },
-                { id: 3, name: "Gói khám Tầm soát Ung thư Toàn diện Nữ", clinic: "Hệ thống Y tế MEDLATEC", price: "4.200.000đ", image: "https://bookingcare.vn/wp-content/uploads/2020/06/102602-goi-kham-tong-quat.jpg" },
-                { id: 4, name: "Gói Khám Sức khỏe Tiền hôn nhân", clinic: "Phòng khám Đa khoa Vietlife", price: "1.850.000đ", image: "https://bookingcare.vn/wp-content/uploads/2020/06/102602-goi-kham-tong-quat.jpg" },
-                { id: 5, name: "Gói Tầm soát Bệnh lý Tim mạch", clinic: "Bệnh viện Đa khoa Tâm Anh", price: "2.800.000đ", image: "https://bookingcare.vn/wp-content/uploads/2020/06/102602-goi-kham-tong-quat.jpg" },
-                { id: 6, name: "Gói Khám Tổng quát Nâng cao VIP", clinic: "Bệnh viện Quốc tế Vinmec", price: "8.500.000đ", image: "https://bookingcare.vn/wp-content/uploads/2020/06/102602-goi-kham-tong-quat.jpg" },
-            ]
+            listPackages: []
+        }
+    }
+
+    async componentDidMount() {
+        let res = await getAllPackagesApi();
+        if (res && res.errCode === 0) {
+            this.setState({
+                listPackages: res.data ? res.data : []
+            })
         }
     }
 
     handleViewDetail = (item) => {
-        alert(`Bác đang xem chi tiết gói: ${item.name}`);
+        if (this.props.history) {
+            this.props.history.push(`/detail-service/${item.id}`);
+        }
     }
 
     render() {

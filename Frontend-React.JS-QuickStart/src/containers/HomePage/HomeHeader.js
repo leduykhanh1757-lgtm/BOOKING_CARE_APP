@@ -6,7 +6,7 @@ import { languages } from '../../utils';
 import { changeLanguageApp } from '../../store/actions/appActions';
 import * as actions from '../../store/actions';
 import { withRouter } from 'react-router';
-import { getAllSpecialty } from '../../services/userService';
+import { getAllSpecialty, getAllUsers } from '../../services/userService';
 
 class HomeHeader extends Component {
     constructor(props) {
@@ -17,7 +17,8 @@ class HomeHeader extends Component {
             searchResults: [],
             isShowResult: false,
             isOpenDrawer: false,
-            isShowProfileInfo: false
+            isShowProfileInfo: false,
+            userImage: '' // 🛠️ Ảnh fetch trực tiếp từ DB, giống hệt cách UserProfile.js đang làm
         };
         this.searchRef = React.createRef();
         this.profileRef = React.createRef();
@@ -28,6 +29,29 @@ class HomeHeader extends Component {
         let res = await getAllSpecialty();
         if (res && res.errCode === 0) {
             this.setState({ listSpecialty: res.data || [] });
+        }
+        await this.fetchUserImageFromBackend();
+    }
+
+    async componentDidUpdate(prevProps) {
+        // 🛠️ Redux userInfo lúc đăng nhập thường KHÔNG có field image đầy đủ.
+        // Nên mỗi khi userInfo (id) thay đổi (đăng nhập/đăng xuất), tự fetch lại
+        // trực tiếp từ DB — giống hệt cách UserProfile.js đang làm — thay vì
+        // trông chờ vào Redux có sẵn ảnh.
+        if (prevProps.userInfo?.id !== this.props.userInfo?.id) {
+            await this.fetchUserImageFromBackend();
+        }
+    }
+
+    fetchUserImageFromBackend = async () => {
+        let { userInfo, isLoggedIn } = this.props;
+        if (isLoggedIn && userInfo && userInfo.id) {
+            let res = await getAllUsers(userInfo.id);
+            if (res && res.errCode === 0 && res.users) {
+                this.setState({ userImage: res.users.image || '' });
+            }
+        } else {
+            this.setState({ userImage: '' });
         }
     }
 
@@ -76,14 +100,46 @@ class HomeHeader extends Component {
     handleViewAllClinic = () => this.props.history && this.props.history.push('/all-clinic');
     handleViewAllDoctor = () => this.props.history && this.props.history.push('/all-doctors');
     handleViewAllPackage = () => this.props.history && this.props.history.push('/all-package');
-    handleViewRemote = () => this.props.history && this.props.history.push('/remote-examination');
-    handleViewMedicalTest = () => this.props.history && this.props.history.push('/medical-test');
-    handleViewMentalHealth = () => this.props.history && this.props.history.push('/mental-health');
-    handleViewDental = () => this.props.history && this.props.history.push('/dental-examination');
+    handleViewVaccination = () => { if (this.props.history) this.props.history.push('/service/vaccination'); }
+    handleViewRemote = () => { if (this.props.history) this.props.history.push('/service/remote-examination'); }
+    handleViewPhysiotherapy = () => { if (this.props.history) this.props.history.push('/service/physiotherapy'); }
+    handleViewMedicalTest = () => { if (this.props.history) this.props.history.push('/service/medical-test'); }
+    handleViewMentalHealth = () => { if (this.props.history) this.props.history.push('/service/mental-health'); }
+    handleViewDental = () => { if (this.props.history) this.props.history.push('/service/dental-examination'); }
 
     render() {
         let { language, isLoggedIn, userInfo, intl, changeLanguageAppRedux, processLogout, isShowBanner } = this.props;
-        let { searchQuery, searchResults, isShowResult, isOpenDrawer, isShowProfileInfo } = this.state;
+        let { searchQuery, searchResults, isShowResult, isOpenDrawer, isShowProfileInfo, userImage } = this.state;
+
+        // 🛠️ FIX ĐÚNG BẢN CHẤT: Buffer object { type:'Buffer', data:[...] } trong DB
+        // thực ra là byte ASCII của MỘT CHUỖI BASE64 (đã có sẵn tiền tố data:image/...)
+        // bị lưu nhầm dạng BLOB — KHÔNG phải byte ảnh nhị phân gốc.
+        // => Chỉ cần đổi byte -> lại thành text (String.fromCharCode), TUYỆT ĐỐI
+        // không được btoa() thêm lần nữa (sẽ ra base64-chồng-base64, ảnh hỏng).
+        const bufferDataToString = (byteArray) => {
+            try {
+                let str = '';
+                const chunkSize = 0x8000; // xử lý từng đoạn, tránh vỡ stack với ảnh lớn
+                for (let i = 0; i < byteArray.length; i += chunkSize) {
+                    str += String.fromCharCode.apply(null, byteArray.slice(i, i + chunkSize));
+                }
+                return str;
+            } catch (e) {
+                console.error('[HEADER] Lỗi đọc dữ liệu ảnh:', e);
+                return '';
+            }
+        };
+
+        let imageBase64 = '';
+        let rawImage = userImage || (userInfo && userInfo.image) || '';
+        if (rawImage) {
+            if (typeof rawImage === 'string') {
+                imageBase64 = rawImage.startsWith('data:image') ? rawImage : `data:image/jpeg;base64,${rawImage}`;
+            } else if (rawImage.data && rawImage.data.length) {
+                let decodedStr = bufferDataToString(rawImage.data);
+                imageBase64 = decodedStr.startsWith('data:image') ? decodedStr : `data:image/jpeg;base64,${decodedStr}`;
+            }
+        }
 
         // TỐI ƯU 1: Cấu hình mảng dữ liệu cho Header Menu
         const headerMenus = [
@@ -95,9 +151,9 @@ class HomeHeader extends Component {
 
         // TỐI ƯU 2: Cấu hình mảng dữ liệu cho 6 Bong bóng Banner
         const bannerOptions = [
-            { id: "banner.child1", icon: "fas fa-hospital", onClick: this.handleViewAllSpecialty },
+            { titleVi: "Tiêm chủng y tế", titleEn: "Vaccination", icon: "fas fa-syringe", onClick: this.handleViewVaccination },
             { id: "banner.child2", icon: "fas fa-mobile-alt", onClick: this.handleViewRemote },
-            { id: "banner.child3", icon: "fas fa-procedures", onClick: this.handleViewAllPackage },
+            { titleVi: "Vật lý trị liệu", titleEn: "Physiotherapy", icon: "fas fa-wheelchair", onClick: this.handleViewPhysiotherapy },
             { id: "banner.child4", icon: "fas fa-flask", onClick: this.handleViewMedicalTest },
             { id: "banner.child5", icon: "fas fa-user-md", onClick: this.handleViewMentalHealth },
             { id: "banner.child6", icon: "fas fa-briefcase-medical", onClick: this.handleViewDental },
@@ -164,12 +220,16 @@ class HomeHeader extends Component {
                                             className="avatar"
                                             onClick={this.handleAvatarClick}
                                             title={language === languages.VI ? "Quản lý tài khoản" : "Manage Account"}
+                                            style={{ backgroundImage: imageBase64 ? `url(${imageBase64})` : '' }}
                                         ></div>
 
                                         {isShowProfileInfo && (
                                             <div className="profile-info-popup">
                                                 <div className="popup-header">
-                                                    <div className="popup-avatar"></div>
+                                                    <div
+                                                        className="popup-avatar"
+                                                        style={{ backgroundImage: imageBase64 ? `url(${imageBase64})` : '' }}
+                                                    ></div>
                                                     <div className="popup-details">
                                                         <div className="p-name">
                                                             {userInfo ? `${userInfo.firstName} ${userInfo.lastName || ''}` : (language === languages.VI ? 'Người dùng' : 'User')}
@@ -233,7 +293,10 @@ class HomeHeader extends Component {
                                 {bannerOptions.map((opt, index) => (
                                     <div className="option-child" key={index} onClick={opt.onClick}>
                                         <div className="icon-child"><i className={opt.icon}></i></div>
-                                        <div className="text-child"><FormattedMessage id={opt.id} /></div>
+                                        <div className="text-child">
+                                            {/* Tự động nhận diện ngôn ngữ */}
+                                            {opt.id ? <FormattedMessage id={opt.id} /> : (language === languages.VI ? opt.titleVi : opt.titleEn)}
+                                        </div>
                                     </div>
                                 ))}
                             </div>

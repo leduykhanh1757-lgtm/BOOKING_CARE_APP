@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
   Comment.init({
     doctorId: DataTypes.INTEGER,
     authorName: DataTypes.STRING,
+    authorAvatar: DataTypes.BLOB('long'),
     content: DataTypes.TEXT
   }, {
     sequelize,
