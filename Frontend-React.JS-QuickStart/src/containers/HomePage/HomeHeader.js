@@ -18,7 +18,7 @@ class HomeHeader extends Component {
             isShowResult: false,
             isOpenDrawer: false,
             isShowProfileInfo: false,
-            userImage: '' // 🛠️ Ảnh fetch trực tiếp từ DB, giống hệt cách UserProfile.js đang làm
+            userImage: '' // Ảnh fetch trực tiếp từ DB, giống hệt cách UserProfile.js đang làm
         };
         this.searchRef = React.createRef();
         this.profileRef = React.createRef();
@@ -34,7 +34,7 @@ class HomeHeader extends Component {
     }
 
     async componentDidUpdate(prevProps) {
-        // 🛠️ Redux userInfo lúc đăng nhập thường KHÔNG có field image đầy đủ.
+        // Redux userInfo lúc đăng nhập thường KHÔNG có field image đầy đủ.
         // Nên mỗi khi userInfo (id) thay đổi (đăng nhập/đăng xuất), tự fetch lại
         // trực tiếp từ DB — giống hệt cách UserProfile.js đang làm — thay vì
         // trông chờ vào Redux có sẵn ảnh.
@@ -79,6 +79,22 @@ class HomeHeader extends Component {
         }
     }
 
+    changeLanguage = (language) => {
+        // 1. Gọi Redux để đổi các từ tĩnh
+        this.props.changeLanguageAppRedux(language);
+
+        // 2. Ép Google Translate dịch Dữ liệu động
+        if (language === 'en') {
+            document.cookie = "googtrans=/vi/en; path=/; domain=" + window.location.hostname;
+        } else {
+            document.cookie = "googtrans=/vi/vi; path=/; domain=" + window.location.hostname;
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+
+        // 3. Tải lại trang
+        window.location.reload();
+    }
+
     toggleDrawer = () => this.setState({ isOpenDrawer: !this.state.isOpenDrawer });
     handleMenuClick = (path) => {
         this.toggleDrawer();
@@ -111,7 +127,7 @@ class HomeHeader extends Component {
         let { language, isLoggedIn, userInfo, intl, changeLanguageAppRedux, processLogout, isShowBanner } = this.props;
         let { searchQuery, searchResults, isShowResult, isOpenDrawer, isShowProfileInfo, userImage } = this.state;
 
-        // 🛠️ FIX ĐÚNG BẢN CHẤT: Buffer object { type:'Buffer', data:[...] } trong DB
+        // FIX ĐÚNG BẢN CHẤT: Buffer object { type:'Buffer', data:[...] } trong DB
         // thực ra là byte ASCII của MỘT CHUỖI BASE64 (đã có sẵn tiền tố data:image/...)
         // bị lưu nhầm dạng BLOB — KHÔNG phải byte ảnh nhị phân gốc.
         // => Chỉ cần đổi byte -> lại thành text (String.fromCharCode), TUYỆT ĐỐI
@@ -194,7 +210,7 @@ class HomeHeader extends Component {
                         {/* 2. Giữa: Render từ mảng bằng map() */}
                         <div className='center-content'>
                             {headerMenus.map((menu, index) => (
-                                <div className="child-content" key={index} onClick={menu.onClick}>
+                                <div className="child-content notranslate" key={index} onClick={menu.onClick}>
                                     <div className="main-title"><FormattedMessage id={menu.titleId} /></div>
                                     <div className="subs-title"><FormattedMessage id={menu.subId} /></div>
                                 </div>
@@ -203,14 +219,14 @@ class HomeHeader extends Component {
 
                         {/* 3. Phải: Tiện ích & Tài khoản */}
                         <div className='right-content'>
-                            <div className="support" onClick={this.handleGoToSupport}>
+                            <div className="support notranslate" onClick={this.handleGoToSupport}>
                                 <i className="fas fa-question-circle"></i>
                                 <span><FormattedMessage id="home-header.support" /></span>
                             </div>
-                            <div className="lang-group">
-                                <span className={language === languages.VI ? 'active' : ''} onClick={() => changeLanguageAppRedux(languages.VI)}>VN</span>
+                            <div className="lang-group notranslate">
+                                <span className={language === languages.VI ? 'active' : ''} onClick={() => this.changeLanguage(languages.VI)}>VN</span>
                                 <span className="separator">/</span>
-                                <span className={language === languages.EN ? 'active' : ''} onClick={() => changeLanguageAppRedux(languages.EN)}>EN</span>
+                                <span className={language === languages.EN ? 'active' : ''} onClick={() => this.changeLanguage(languages.EN)}>EN</span>
                             </div>
 
                             <div className="user-login-section" ref={this.profileRef}>
@@ -264,8 +280,8 @@ class HomeHeader extends Component {
                 {isShowBanner && (
                     <div className='home-header-banner'>
                         <div className="content-up">
-                            <h1 className="title1"><FormattedMessage id="banner.title1" /></h1>
-                            <h2 className="title2"><FormattedMessage id="banner.title2" /></h2>
+                            <h1 className="title1 notranslate"><FormattedMessage id="banner.title1" /></h1>
+                            <h2 className="title2 notranslate"><FormattedMessage id="banner.title2" /></h2>
                             <div className="search" ref={this.searchRef}>
                                 <i className="fas fa-search"></i>
                                 <input
@@ -293,7 +309,7 @@ class HomeHeader extends Component {
                                 {bannerOptions.map((opt, index) => (
                                     <div className="option-child" key={index} onClick={opt.onClick}>
                                         <div className="icon-child"><i className={opt.icon}></i></div>
-                                        <div className="text-child">
+                                        <div className="text-child notranslate">
                                             {/* Tự động nhận diện ngôn ngữ */}
                                             {opt.id ? <FormattedMessage id={opt.id} /> : (language === languages.VI ? opt.titleVi : opt.titleEn)}
                                         </div>

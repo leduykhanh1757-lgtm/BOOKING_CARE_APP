@@ -42,9 +42,8 @@ class MedicalFacility extends Component {
         return (
             <div className="section-share section-medical-facility">
                 <div className="section-container">
-                    <div className="section-header">
+                    <div className="section-header notranslate">
                         <h3><FormattedMessage id="homepage.outstanding-medical-facility" /></h3>
-                        {/* GẮN SỰ KIỆN ONCLICK VÀO NÚT NÀY */}
                         <button onClick={() => this.handleViewMoreClinic()}>
                             <FormattedMessage id="homepage.more-info" />
                         </button>
@@ -64,7 +63,9 @@ class MedicalFacility extends Component {
                                                     className="bg-image"
                                                     style={{ backgroundImage: `url(${item.image})` }}
                                                 />
-                                                <h3>{item.name}</h3>
+                                                <h3>
+                                                    <span>{item.name}</span>
+                                                </h3>
                                             </div>
                                         </div>
                                     )

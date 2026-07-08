@@ -3,15 +3,11 @@ import { connect } from 'react-redux';
 import { push } from "connected-react-router";
 import * as actions from "../../store/actions";
 import './UserLogin.scss';
-import { FormattedMessage } from 'react-intl';
+// import { FormattedMessage } from 'react-intl'; // (Bác có thể mở comment nếu dùng file .json)
 import { handleLoginApi } from '../../services/userService';
-import { divide } from 'lodash';
-
-
 class UserLogin extends Component {
     constructor(props) {
         super(props);
-        // Khởi tạo State (bộ nhớ)
         this.state = {
             username: '',
             password: '',
@@ -19,16 +15,17 @@ class UserLogin extends Component {
             errMessage: ''
         }
     }
-    handleOnChangeUsername = (event) => {
-        this.setState({
-            username: event.target.value
-        })
-    }
 
-    handleOnChangePassword = (event) => {
+    // =====================================================================
+    // TỐI ƯU DRY (Don't Repeat Yourself):
+    // Gộp 2 hàm handleOnChangeUsername và handleOnChangePassword thành 1 hàm duy nhất.
+    // =====================================================================
+    handleOnChangeInput = (event, id) => {
+        let copyState = { ...this.state };
+        copyState[id] = event.target.value;
         this.setState({
-            password: event.target.value
-        })
+            ...copyState
+        });
     }
 
     handleLogin = async () => {
@@ -36,10 +33,8 @@ class UserLogin extends Component {
 
         try {
             let data = await handleLoginApi(this.state.username, this.state.password);
-            // 2. Nếu thư viện bọc thêm lớp data bên ngoài thì mình lột nó ra
             let realData = data && data.data ? data.data : data;
 
-            // 3. Xử lý như bình thường với cục dữ liệu đã lột vỏ
             if (realData && realData.errCode !== 0) {
                 this.setState({
                     errMessage: realData.message
@@ -59,6 +54,7 @@ class UserLogin extends Component {
             }
         }
     }
+
     handleShowHidePassword = () => {
         this.setState({
             isShowPassword: !this.state.isShowPassword
@@ -70,50 +66,55 @@ class UserLogin extends Component {
             this.handleLogin();
         }
     }
+
     render() {
+        // TỐI ƯU 2: Destructuring state giúp code bên dưới ngắn gọn, dễ đọc, 
+        // không cần phải viết this.state.username lặp đi lặp lại.
+        let { username, password, isShowPassword, errMessage } = this.state;
+
         return (
             <div className="login-background">
                 <div className="login-container">
-                    <div className="login-content row">
 
-                        {/* Tiêu đề */}
+                    {/* CHỐT HẠ ĐA NGÔN NGỮ (i18n): 
+                        Gắn class 'notranslate' vào thẻ bọc toàn bộ form. */}
+                    <div className="login-content row notranslate">
+
                         <div className="col-12 text-center login-title">
                             Login
                         </div>
 
-                        {/* Ô nhập Username */}
                         <div className="col-12 form-group login-input">
                             <label>Username</label>
                             <input
                                 type="text"
                                 className="form-control"
                                 placeholder="Enter your username"
-                                value={this.state.username}
-                                onChange={(event) => this.handleOnChangeUsername(event)}
+                                value={username}
+                                onChange={(event) => this.handleOnChangeInput(event, 'username')}
                             />
                         </div>
 
-                        {/* Ô nhập Password */}
                         <div className="col-12 form-group login-input">
                             <label>Password</label>
                             <div className='custom-input-password'>
                                 <input
-                                    type={this.state.isShowPassword ? "text" : "password"}
+                                    type={isShowPassword ? "text" : "password"}
                                     className="form-control"
                                     placeholder="Enter your password"
-                                    value={this.state.password}
-                                    onChange={(event) => this.handleOnChangePassword(event)}
+                                    value={password}
+                                    onChange={(event) => this.handleOnChangeInput(event, 'password')}
                                     onKeyDown={(event) => this.handleKeyDown(event)}
                                 />
                                 <span onClick={() => this.handleShowHidePassword()}>
-                                    <i className={this.state.isShowPassword ? "fas fa-eye" : "fas fa-eye-slash"}></i>
+                                    <i className={isShowPassword ? "fas fa-eye" : "fas fa-eye-slash"}></i>
                                 </span>
                             </div>
                         </div>
 
-                        {this.state.errMessage &&
+                        {errMessage &&
                             <div className="col-12" style={{ color: 'red', marginTop: '10px' }}>
-                                {this.state.errMessage}
+                                {errMessage}
                             </div>
                         }
                         <div className="col-12">
@@ -124,12 +125,10 @@ class UserLogin extends Component {
                             <span className="forgot-password">Forgot your password?</span>
                         </div>
 
-                        {/* Chữ chuyển hướng */}
                         <div className="col-12 text-center mt-3">
                             <span className="text-other-login">Or sign in with:</span>
                         </div>
 
-                        {/* Mạng xã hội (Dùng icon của FontAwesome) */}
                         <div className="col-12 social-login text-center mt-2">
                             <i className="fab fa-facebook-f"></i>
                             <i className="fab fa-twitter"></i>
@@ -152,7 +151,6 @@ const mapDispatchToProps = dispatch => {
     return {
         navigate: (path) => dispatch(push(path)),
         userLoginSuccess: (userInfo) => dispatch(actions.userLoginSuccess(userInfo)),
-        //userLoginFail: () => dispatch(actions.userLoginFail()),
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(UserLogin);

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import './BookingModal.scss';
 import { Modal } from 'reactstrap';
 import ProfileDoctor from '../ProfileDoctor';
@@ -13,18 +13,22 @@ import _ from 'lodash';
 import moment from 'moment';
 import LoadingOverlay from 'react-loading-overlay';
 
+const EMPTY_FORM = {
+    fullName: '',
+    phoneNumber: '',
+    email: '',
+    address: '',
+    reason: '',
+    birthday: '',
+    selectedGender: '',
+};
+
 class BookingModal extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            fullName: '',
-            phoneNumber: '',
-            email: '',
-            address: '',
-            reason: '',
-            birthday: '',
-            selectedGender: '',
+            ...EMPTY_FORM,
             genders: [],
             isShowLoading: false
         }
@@ -89,10 +93,30 @@ class BookingModal extends Component {
         return '';
     }
 
+    // Validate các trường bắt buộc trước khi gửi API.
+    // Trước đây không có bước này -> có thể submit form trắng lên server.
+    isFormValid = () => {
+        let { fullName, phoneNumber, email, birthday, selectedGender } = this.state;
+        let { intl } = this.props;
+
+        if (!fullName || !phoneNumber || !email || !birthday || !selectedGender) {
+            toast.error(intl.formatMessage({
+                id: 'patient.booking-modal.missing-fields',
+                defaultMessage: 'Vui lòng điền đầy đủ thông tin bắt buộc.'
+            }));
+            return false;
+        }
+        return true;
+    }
+
     handleConfirmBooking = async () => {
+        if (!this.isFormValid()) {
+            return;
+        }
+
         this.setState({ isShowLoading: true });
         let formattedBirthday = this.state.birthday ? new Date(this.state.birthday).getTime() : '';
-        let { dataTime } = this.props;
+        let { dataTime, intl } = this.props;
 
         let doctorId = dataTime && dataTime.doctorId ? dataTime.doctorId : '';
         let timeType = dataTime && dataTime.timeType ? dataTime.timeType : '';
@@ -119,21 +143,18 @@ class BookingModal extends Component {
 
         if (res && res.errCode === 0) {
             this.setState({ isShowLoading: false });
-            toast.success('Lưu thông tin đặt lịch thành công!');
+            toast.success(intl.formatMessage({
+                id: 'patient.booking-modal.success',
+                defaultMessage: 'Lưu thông tin đặt lịch thành công!'
+            }));
             this.props.closeBookingClose();
-            this.setState({
-                fullName: '',
-                phoneNumber: '',
-                email: '',
-                address: '',
-                reason: '',
-                birthday: '',
-                selectedGender: ''
-            });
+            this.setState({ ...EMPTY_FORM });
         } else {
             this.setState({ isShowLoading: false });
-            toast.error('Lỗi từ Server: ' + res.errMessage);
-            console.log("Check dữ liệu bị lỗi:", res);
+            toast.error(
+                intl.formatMessage({ id: 'patient.booking-modal.error-prefix', defaultMessage: 'Lỗi từ Server: ' })
+                + (res && res.errMessage ? res.errMessage : '')
+            );
         }
     }
 
@@ -171,11 +192,16 @@ class BookingModal extends Component {
             })
         }
 
-        // Đã cắt bỏ hoàn toàn đoạn code cập nhật doctorId và timeType rườm rà ở đây
+        // Reset form khi modal được MỞ LẠI (đóng -> mở) cho một lượt đặt lịch mới,
+        // tránh còn sót dữ liệu (họ tên, SĐT...) của lượt trước nếu user đóng
+        // modal giữa chừng mà chưa submit thành công.
+        if (this.props.isOpenModal && !prevProps.isOpenModal) {
+            this.setState({ ...EMPTY_FORM });
+        }
     }
 
     render() {
-        let { isOpenModal, closeBookingClose, dataTime, language } = this.props;
+        let { isOpenModal, closeBookingClose, dataTime, language, intl } = this.props;
 
         return (
             <Modal
@@ -187,7 +213,7 @@ class BookingModal extends Component {
                 <LoadingOverlay
                     active={this.state.isShowLoading}
                     spinner
-                    text='Đang xử lý dữ liệu...'
+                    text={intl.formatMessage({ id: 'patient.booking-modal.processing', defaultMessage: 'Đang xử lý dữ liệu...' })}
                 >
                     <div className="booking-modal-content">
                         <div className="booking-modal-header">
@@ -258,7 +284,7 @@ class BookingModal extends Component {
                                         value={this.state.selectedGender}
                                         onChange={this.handleChangeSelect}
                                         options={this.state.genders}
-                                        placeholder={language === 'vi' ? 'Vui lòng chọn giới tính' : 'Please choose gender'}
+                                        placeholder={intl.formatMessage({ id: 'patient.booking-modal.gender-placeholder', defaultMessage: 'Vui lòng chọn giới tính' })}
                                     />
                                 </div>
                             </div>
@@ -291,4 +317,4 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(BookingModal);
+export default connect(mapStateToProps, mapDispatchToProps)(injectIntl(BookingModal));

@@ -1,5 +1,15 @@
 // Lưu trữ toàn bộ Text, Banner, Icon của các dịch vụ để Template tự động gọi ra
 export const SERVICE_CONFIG = {
+    'general': {
+        title: "Khám Sức khỏe Tổng quát",
+        desc: "Dịch vụ khám và tầm soát sức khỏe toàn diện cho cá nhân và gia đình.",
+        bannerBg: "linear-gradient(to right, rgba(34, 72, 189, 0.9), rgba(69, 195, 210, 0.7))",
+        features: [
+            { icon: "fas fa-heartbeat", title: "Khám toàn diện", text: "Kiểm tra tổng quát các chỉ số sức khỏe cơ bản." },
+            { icon: "fas fa-user-md", title: "Bác sĩ giàu kinh nghiệm", text: "Được tư vấn bởi các chuyên gia y tế uy tín." },
+            { icon: "fas fa-check-circle", title: "Kết quả nhanh chóng", text: "Quy trình khép kín, nhận kết quả trong ngày." }
+        ]
+    },
     // 1. Tiêm chủng y tế
     'vaccination': {
         title: "Dịch vụ Tiêm chủng Y tế",

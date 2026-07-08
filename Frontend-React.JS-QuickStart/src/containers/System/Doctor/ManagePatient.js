@@ -29,7 +29,6 @@ class ManagePatient extends Component {
 
     getDataPatient = () => {
         let { user } = this.props;
-        console.log(">>> Full keys của user:", Object.keys(user));
         let { currentDate } = this.state;
 
         if (user && user.id) {
@@ -49,7 +48,7 @@ class ManagePatient extends Component {
             })
         }
 
-        // 2. 🛠️ ĐỢI KHI CÓ USER RỒI MỚI GỌI API
+        // 2. ĐỢI KHI CÓ USER RỒI MỚI GỌI API
         if (prevProps.user !== this.props.user && this.props.user && this.props.user.id) {
             this.getDataPatient();
         }
@@ -78,7 +77,7 @@ class ManagePatient extends Component {
         })
     }
 
-    // 🛠️ Thêm luôn hàm này để lát bấm nút "Hủy" thì Modal đóng lại
+    // Thêm luôn hàm này để lát bấm nút "Hủy" thì Modal đóng lại
     closeRemedyModal = () => {
         this.setState({
             isOpenRemedyModal: false,
@@ -152,10 +151,15 @@ class ManagePatient extends Component {
                                 <tbody>
                                     {dataPatient && dataPatient.length > 0 ?
                                         dataPatient.map((item, index) => {
-                                            let time = language === languages.VI ?
-                                                item.timeTypeDataPatient.valueVi : item.timeTypeDataPatient.valueEn;
-                                            let gender = language === languages.VI ?
-                                                item.patientData.genderData.valueVi : item.patientData.genderData.valueEn;
+                                            // Check an toàn cho Time
+                                            let time = (item && item.timeTypeDataPatient)
+                                                ? (language === languages.VI ? item.timeTypeDataPatient.valueVi : item.timeTypeDataPatient.valueEn)
+                                                : '';
+
+                                            // Check an toàn cho Gender
+                                            let gender = (item && item.patientData && item.patientData.genderData)
+                                                ? (language === languages.VI ? item.patientData.genderData.valueVi : item.patientData.genderData.valueEn)
+                                                : '';
 
                                             return (
                                                 <tr key={index}>
@@ -199,7 +203,6 @@ class ManagePatient extends Component {
 }
 
 const mapStateToProps = state => {
-    console.log(">>> Check toàn bộ state Redux:", state);
     return {
         language: state.app.language,
         user: state.user.userInfo,

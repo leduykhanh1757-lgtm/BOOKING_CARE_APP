@@ -29,10 +29,11 @@ class Doctor extends Component {
     }
 
     handleViewDetailDoctor = (doctor) => {
-        this.props.history.push(`/detail-doctor/${doctor.id}`);
+        if (this.props.history) {
+            this.props.history.push(`/detail-doctor/${doctor.id}`);
+        }
     }
 
-    // THÊM HÀM CHUYỂN TRANG TẤT CẢ BÁC SĨ
     handleViewMoreDoctor = () => {
         if (this.props.history) {
             this.props.history.push(`/all-doctors`);
@@ -46,9 +47,8 @@ class Doctor extends Component {
         return (
             <div className="section-share section-outstanding-doctor">
                 <div className="section-container">
-                    <div className="section-header">
+                    <div className="section-header notranslate">
                         <h3><FormattedMessage id="homepage.outstanding-doctor" /></h3>
-                        {/* GẮN SỰ KIỆN ONCLICK VÀO NÚT NÀY */}
                         <button onClick={() => this.handleViewMoreDoctor()}>
                             <FormattedMessage id="homepage.more-info" />
                         </button>
@@ -61,6 +61,12 @@ class Doctor extends Component {
                                     let nameVi = `${item.positionData.valueVi}, ${item.lastName} ${item.firstName}`;
                                     let nameEn = `${item.positionData.valueEn}, ${item.firstName} ${item.lastName}`;
 
+                                    // LOGIC LẤY TÊN CHUYÊN KHOA (Có check null an toàn)
+                                    let specialtyName = '';
+                                    if (item.Doctor_Infor && item.Doctor_Infor.specialtyData && item.Doctor_Infor.specialtyData.name) {
+                                        specialtyName = item.Doctor_Infor.specialtyData.name;
+                                    }
+
                                     return (
                                         <div key={index} className="doctor-wrapper" onClick={() => this.handleViewDetailDoctor(item)}>
                                             <div className="doctor-customize">
@@ -70,10 +76,14 @@ class Doctor extends Component {
                                                     style={{ backgroundImage: `url(${item.image})` }}
                                                 ></div>
 
-                                                <h4 className="doctor-name">
-                                                    {language === 'vi' ? nameVi : nameEn}
+                                                <h4 className="doctor-name notranslate">
+                                                    {language === languages.VI ? nameVi : nameEn}
                                                 </h4>
-                                                <h5 className="doctor-specialty">Cơ xương khớp</h5>
+                                                {/* Tuyệt đối KHÔNG gắn notranslate ở đây để Google dịch được tên Chuyên khoa */}
+                                                <h5 className="doctor-specialty">
+                                                    <span>{specialtyName}</span>
+                                                </h5>
+
                                             </div>
                                         </div>
                                     )

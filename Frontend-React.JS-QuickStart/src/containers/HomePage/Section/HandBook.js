@@ -40,7 +40,6 @@ class Handbook extends Component {
         }
     }
 
-    // THÊM HÀM CHUYỂN TRANG TẤT CẢ CẨM NANG
     handleViewMoreHandbook = () => {
         if (this.props.history) {
             this.props.history.push(`/all-handbook`);
@@ -53,13 +52,15 @@ class Handbook extends Component {
         return (
             <div className="section-share section-handbook">
                 <div className="section-container">
-                    <div className="section-header">
+
+                    {/* BỌC NOTRANSLATE CHO HEADER VÌ ĐÃ DÙNG FORMATTED_MESSAGE */}
+                    <div className="section-header notranslate">
                         <h3><FormattedMessage id="homepage.handbook" /></h3>
-                        {/* GẮN SỰ KIỆN ONCLICK VÀO NÚT NÀY */}
                         <button onClick={() => this.handleViewMoreHandbook()}>
                             <FormattedMessage id="homepage.all-articles" />
                         </button>
                     </div>
+
                     <div className="section-body">
                         {dataHandbooks && dataHandbooks.length > 0 &&
                             <Slider {...this.props.settings}>
@@ -75,11 +76,12 @@ class Handbook extends Component {
                                                     style={{ backgroundImage: `url(${item.image})` }}
                                                 ></div>
 
+                                                {/* UYỆT ĐỐI KHÔNG NOTRANSLATE Ở ĐÂY để bài viết từ DB được Google dịch */}
                                                 <h3
                                                     className="handbook-title"
                                                     title={item.name}
                                                 >
-                                                    {truncateText(item.name, 60)}
+                                                    <span>{truncateText(item.name, 60)}</span>
                                                 </h3>
                                             </div>
                                         </div>

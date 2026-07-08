@@ -12,7 +12,7 @@ class AllPackage extends Component {
     }
 
     async componentDidMount() {
-        let res = await getAllPackagesApi();
+        let res = await getAllPackagesApi('general');
         if (res && res.errCode === 0) {
             this.setState({
                 listPackages: res.data ? res.data : []

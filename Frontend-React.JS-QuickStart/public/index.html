@@ -21,6 +21,37 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
   <title>Booking care</title>
+  <style>
+    /* Ép tàng hình banner Google (Class bản cũ) */
+    .goog-te-banner-frame.skiptranslate,
+    .goog-te-banner-frame {
+      display: none !important;
+    }
+
+    /* 🛠️ Ép tàng hình banner Google (Class bản cập nhật mới nhất) */
+    iframe.skiptranslate,
+    .VIpgJd-ZVi9od-ORHb-OEVmcd {
+      display: none !important;
+      visibility: hidden !important;
+    }
+
+    /* Chống Google tự động đẩy thẻ body xuống 40px */
+    body {
+      top: 0px !important;
+      position: static !important;
+    }
+
+    /* Tắt viền xanh khó chịu khi hover vào chữ đã dịch */
+    .goog-text-highlight {
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+
+    /* Ẩn thẻ div công cụ mặc định */
+    #google_translate_element {
+      display: none !important;
+    }
+  </style>
 </head>
 
 <body>
@@ -36,6 +67,22 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+  <div id="google_translate_element" style="display: none;"></div>
+
+  <!-- Script cấu hình Google Translate -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'vi', // Ngôn ngữ gốc của web là Tiếng Việt
+        includedLanguages: 'en,vi', // Chỉ hỗ trợ dịch ra tiếng Anh hoặc Việt
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+  </script>
+
+  <!-- Nhúng thư viện của Google -->
+  <script type="text/javascript"
+    src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 
 </html>

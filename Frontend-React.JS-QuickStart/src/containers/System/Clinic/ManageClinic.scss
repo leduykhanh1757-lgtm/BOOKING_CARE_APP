@@ -70,23 +70,5 @@
             margin-top: 10px;
             margin-bottom: 20px;
         }
-
-        .btn-save-clinic {
-            padding: 8px 25px;
-            border-radius: 5px;
-            border: none;
-            outline: none;
-            background: #f0a322;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s;
-
-            &:hover {
-                background: #f1b34a;
-                transform: translateY(-1px);
-                /* Hiệu ứng nảy lên xíu khi trỏ chuột */
-            }
-        }
     }
 }

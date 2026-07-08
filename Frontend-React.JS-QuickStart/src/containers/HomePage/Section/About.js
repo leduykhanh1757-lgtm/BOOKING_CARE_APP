@@ -12,7 +12,6 @@ class About extends Component {
                     </div>
                     <div className="section-about-content">
 
-                        {/* NỬA BÊN TRÁI: VIDEO */}
                         <div className="content-left">
                             <iframe
                                 width="100%"
@@ -25,7 +24,6 @@ class About extends Component {
                             </iframe>
                         </div>
 
-                        {/* NỬA BÊN PHẢI: TRÍCH DẪN & NHÃN CSS (KHÔNG DÙNG ẢNH) */}
                         <div className="content-right">
                             <div className="media-quotes">
                                 <i className="fas fa-quote-left quote-icon"></i>
@@ -33,7 +31,8 @@ class About extends Component {
                                     "Hệ thống đặt khám trực tuyến thông minh, giúp người bệnh tiết kiệm hàng giờ đồng hồ chờ đợi tại bệnh viện. Một bước tiến lớn cho nền y tế số."
                                 </p>
 
-                                <div className="css-logos">
+                                {/* BỌC NOTRANSLATE để Google không dịch bậy tên thương hiệu của báo chí (VnExpress -> VnFast...) */}
+                                <div className="css-logos notranslate">
                                     <span className="logo-badge vtv">VTV1</span>
                                     <span className="logo-badge vnexpress">VnExpress</span>
                                     <span className="logo-badge dantri">Dân Trí</span>

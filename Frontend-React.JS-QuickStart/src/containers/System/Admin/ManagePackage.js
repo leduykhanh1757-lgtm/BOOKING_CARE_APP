@@ -8,8 +8,20 @@ import CommonUtils from '../../../utils/CommonUtils';
 import { createNewPackageApi, getAllClinic, getAllPackagesApi, editPackageService } from '../../../services/userService';
 import { toast } from 'react-toastify';
 import Select from 'react-select';
+// FIX: import chung SERVICE_CONFIG để build dropdown loại dịch vụ, tránh
+// liệt kê tay danh sách 7 loại dịch vụ ở 2 chỗ (dễ bị lệch khi thêm dịch vụ mới).
+// Đường dẫn dưới đây có thể cần chỉnh lại cho khớp vị trí thực tế của
+// ServiceConfig.js trong project của bạn (nó đang nằm cùng chỗ với ServiceTemplate.js).
+import { SERVICE_CONFIG } from '../../Patient/Service/ServiceConfig';
 
 const mdParser = new MarkdownIt();
+
+// Build sẵn danh sách option cho Select từ SERVICE_CONFIG,
+// mỗi khi thêm 1 dịch vụ mới vào ServiceConfig.js, dropdown này tự động có thêm option, không cần sửa gì ở đây.
+const SERVICE_TYPE_OPTIONS = Object.keys(SERVICE_CONFIG).map(key => ({
+    label: SERVICE_CONFIG[key].title,
+    value: key
+}));
 
 class ManagePackage extends Component {
     constructor(props) {
@@ -22,7 +34,9 @@ class ManagePackage extends Component {
             descriptionMarkdown: '',
 
             listClinics: [],
-            selectedClinic: '', // 🛠️ Thay vì lưu clinicId dạng chuỗi, giờ lưu thành Object {label, value}
+            selectedClinic: '',
+
+            selectedServiceType: '', // FIX: thêm state lưu loại dịch vụ đang chọn
 
             listPackages: [],
             selectedPackage: '',
@@ -32,9 +46,8 @@ class ManagePackage extends Component {
 
     async componentDidMount() {
         let resClinic = await getAllClinic();
-        let resPackage = await getAllPackagesApi();
+        let resPackage = await getAllPackagesApi('ALL'); // Admin cần thấy TẤT CẢ gói khám mọi loại để quản lý
 
-        // 🛠️ Chế biến data Phòng khám cho thư viện react-select
         if (resClinic && resClinic.errCode === 0) {
             let dataClinicSelect = resClinic.data.map(item => ({
                 label: item.name,
@@ -55,7 +68,9 @@ class ManagePackage extends Component {
     buildDataInputSelect = (inputData) => {
         let result = [];
         if (inputData && inputData.length > 0) {
-            inputData.map((item, index) => {
+            // Dùng forEach thay vì map vì chỉ cần side-effect (push),
+            // không cần mảng mới trả về từ map
+            inputData.forEach((item) => {
                 let object = {};
                 object.label = item.name;
                 object.value = item.id;
@@ -64,6 +79,7 @@ class ManagePackage extends Component {
                 object.descriptionHTML = item.descriptionHTML;
                 object.descriptionMarkdown = item.descriptionMarkdown;
                 object.image = item.image;
+                object.serviceType = item.serviceType; // 🛠️ FIX: giữ lại serviceType để khi chọn sửa gói, tự động điền đúng dropdown
                 result.push(object);
             })
         }
@@ -73,14 +89,16 @@ class ManagePackage extends Component {
     handleChangeSelect = (selectedOption) => {
         let { listClinics } = this.state;
 
-        // FIX 1: Dùng == (2 dấu bằng) thay vì === để nó tự động nhận dạng String và Integer
         let matchedClinic = listClinics.find(item => item.value == selectedOption.clinicId);
+        // FIX: tìm đúng option loại dịch vụ tương ứng với gói đang chọn để tự điền lại dropdown
+        let matchedServiceType = SERVICE_TYPE_OPTIONS.find(item => item.value === selectedOption.serviceType);
 
         this.setState({
             selectedPackage: selectedOption,
             name: selectedOption.label,
             price: selectedOption.price,
-            selectedClinic: matchedClinic || '', // Gán đúng Object Phòng khám
+            selectedClinic: matchedClinic || '',
+            selectedServiceType: matchedServiceType || '',
             descriptionHTML: selectedOption.descriptionHTML,
             descriptionMarkdown: selectedOption.descriptionMarkdown,
             imageBase64: selectedOption.image ? selectedOption.image : '',
@@ -88,16 +106,21 @@ class ManagePackage extends Component {
         });
     }
 
-    // 🛠️ Hàm riêng để xử lý khi người dùng chọn Dropdown Phòng khám
     handleChangeSelectClinic = (selectedOption) => {
         this.setState({ selectedClinic: selectedOption });
+    }
+
+    // FIX: hàm riêng để xử lý khi chọn Dropdown Loại dịch vụ
+    handleChangeSelectServiceType = (selectedOption) => {
+        this.setState({ selectedServiceType: selectedOption });
     }
 
     handleClearForm = () => {
         this.setState({
             selectedPackage: '', name: '', price: '', imageBase64: '',
             descriptionHTML: '', descriptionMarkdown: '', hasOldData: false,
-            selectedClinic: this.state.listClinics.length > 0 ? this.state.listClinics[0] : ''
+            selectedClinic: this.state.listClinics.length > 0 ? this.state.listClinics[0] : '',
+            selectedServiceType: '' // 🛠️ FIX: reset luôn loại dịch vụ khi làm mới form
         });
     }
 
@@ -121,9 +144,15 @@ class ManagePackage extends Component {
     }
 
     handleSavePackage = async () => {
-        let { hasOldData, selectedClinic, selectedPackage } = this.state;
+        let { hasOldData, selectedClinic, selectedPackage, selectedServiceType } = this.state;
 
-        // FIX 2: Bọc điều kiện an toàn, nếu selectedClinic tồn tại thì mới chọc vào .value
+        // FIX: validate bắt buộc chọn loại dịch vụ trước khi lưu,
+        // vì thiếu serviceType sẽ khiến gói khám không hiện ở trang nào cả
+        if (!selectedServiceType || !selectedServiceType.value) {
+            toast.error("Vui lòng chọn Loại dịch vụ cho gói khám!");
+            return;
+        }
+
         let clinicIdToSave = (selectedClinic && selectedClinic.value) ? selectedClinic.value : '';
 
         let dataToSave = {
@@ -133,10 +162,10 @@ class ManagePackage extends Component {
             imageBase64: this.state.imageBase64,
             descriptionHTML: this.state.descriptionHTML,
             descriptionMarkdown: this.state.descriptionMarkdown,
+            serviceType: selectedServiceType.value // 🛠️ FIX: gửi kèm loại dịch vụ lên server
         };
 
         if (hasOldData === false) {
-            // LƯU MỚI
             let res = await createNewPackageApi(dataToSave);
             if (res && res.errCode === 0) {
                 toast.success("Thêm gói khám thành công!");
@@ -146,7 +175,6 @@ class ManagePackage extends Component {
                 toast.error("Lỗi: " + res.errMessage);
             }
         } else {
-            // CẬP NHẬT
             let res = await editPackageService({
                 ...dataToSave,
                 id: selectedPackage.value
@@ -163,7 +191,7 @@ class ManagePackage extends Component {
     }
 
     render() {
-        let { hasOldData, listClinics, selectedClinic } = this.state;
+        let { hasOldData, listClinics, selectedClinic, selectedServiceType } = this.state;
 
         return (
             <div className="manage-handbook-container">
@@ -199,7 +227,6 @@ class ManagePackage extends Component {
                         <input className="form-control" type="text" value={this.state.name} onChange={(event) => this.handleOnChangeInput(event, 'name')} />
                     </div>
 
-                    {/* 🛠️ DROPDOWN PHÒNG KHÁM ĐÃ ĐƯỢC NÂNG CẤP LÊN REACT-SELECT */}
                     <div className="col-4 form-group mt-3">
                         <label>Phòng khám / Bệnh viện</label>
                         <Select
@@ -213,6 +240,17 @@ class ManagePackage extends Component {
                     <div className="col-4 form-group mt-3">
                         <label>Giá tiền</label>
                         <input className="form-control" type="text" value={this.state.price} onChange={(event) => this.handleOnChangeInput(event, 'price')} />
+                    </div>
+
+                    {/* FIX: DROPDOWN LOẠI DỊCH VỤ - ĐÂY LÀ PHẦN CÒN THIẾU GÂY RA BUG serviceType = null */}
+                    <div className="col-4 form-group mt-3">
+                        <label>Loại dịch vụ *</label>
+                        <Select
+                            value={selectedServiceType}
+                            onChange={this.handleChangeSelectServiceType}
+                            options={SERVICE_TYPE_OPTIONS}
+                            placeholder="Chọn loại dịch vụ..."
+                        />
                     </div>
 
                     <div className="col-12 md-editor mt-4">

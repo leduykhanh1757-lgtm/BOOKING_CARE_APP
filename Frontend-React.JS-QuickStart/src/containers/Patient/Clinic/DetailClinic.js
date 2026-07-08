@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from "react-redux";
 import './DetailClinic.scss';
 import HomeHeader from '../../HomePage/HomeHeader';
 import DoctorSchedule from '../Doctor/DoctorSchedule';
@@ -29,7 +28,9 @@ class DetailClinic extends Component {
                 if (data && !_.isEmpty(data)) {
                     let arr = data.doctorClinic;
                     if (arr && arr.length > 0) {
-                        arr.map(item => {
+                        // Dùng forEach thay vì map vì chỉ cần side-effect (push),
+                        // không cần mảng mới trả về từ map
+                        arr.forEach(item => {
                             arrDoctorId.push(item.doctorId);
                         })
                     }
@@ -53,8 +54,12 @@ class DetailClinic extends Component {
                     <div className="description-clinic">
                         {dataDetailClinic && !_.isEmpty(dataDetailClinic) &&
                             <>
+                                {/* Tên cơ sở + nội dung mô tả -> dữ liệu động từ DB,
+                                    để Google Translate tự dịch, không cần FormattedMessage */}
                                 <div className="clinic-name">{dataDetailClinic.name}</div>
-                                {/* Đổ nội dung bài viết HTML ra */}
+                                {/* Đổ nội dung bài viết HTML ra.
+                                    Lưu ý: nếu descriptionHTML do người dùng/admin nhập tự do,
+                                    cần đảm bảo backend đã sanitize để tránh XSS */}
                                 <div dangerouslySetInnerHTML={{ __html: dataDetailClinic.descriptionHTML }}></div>
                             </>
                         }
@@ -62,9 +67,9 @@ class DetailClinic extends Component {
 
                     <div className="detail-clinic-doctors">
                         {arrDoctorId && arrDoctorId.length > 0 &&
-                            arrDoctorId.map((item, index) => {
+                            arrDoctorId.map((item) => {
                                 return (
-                                    <div className="each-doctor" key={index}>
+                                    <div className="each-doctor" key={item}>
                                         <div className="dt-content-left">
                                             <ProfileDoctor
                                                 doctorId={item}
@@ -93,14 +98,4 @@ class DetailClinic extends Component {
     }
 }
 
-const mapStateToProps = state => {
-    return {
-        language: state.app.language,
-    };
-};
-
-const mapDispatchToProps = dispatch => {
-    return {};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(DetailClinic);
+export default DetailClinic;

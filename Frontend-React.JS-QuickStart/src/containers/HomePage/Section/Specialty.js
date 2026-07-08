@@ -43,11 +43,10 @@ class Specialty extends Component {
         return (
             <div className="section-share section-specialty">
                 <div className="section-container">
-                    <div className="section-header">
+                    <div className="section-header notranslate">
                         <span className="title-section">
                             <FormattedMessage id="homepage.specialty-popular" />
                         </span>
-                        {/* GẮN SỰ KIỆN ONCLICK VÀO NÚT NÀY */}
                         <button className="btn-section" onClick={() => this.handleViewMoreSpecialty()}>
                             <FormattedMessage id="homepage.more-infor" />
                         </button>
@@ -66,7 +65,9 @@ class Specialty extends Component {
                                                     className="bg-image"
                                                     style={{ backgroundImage: `url(${item.image})` }}
                                                 />
-                                                <h3>{item.name}</h3>
+                                                <h3>
+                                                    <span>{item.name}</span>
+                                                </h3>
                                             </div>
                                         </div>
                                     )

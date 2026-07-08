@@ -26,10 +26,9 @@ class ServiceTemplate extends Component {
                     configData: config
                 });
 
-                // 🛠️ 2. Gọi API lấy danh sách các gói để đổ ra giao diện
-                // LƯU Ý: Hiện tại mình đang gọi chung hàm getAllPackagesApi để lấy 6 gói khám demo. 
-                // Tương lai bác thêm cột 'type' vào Database thì viết API truyền type xuống để lọc nhé!
-                let res = await getAllPackagesApi();
+                // TRUYỀN TYPE VÀO ĐÂY ĐỂ GỌI API LỌC
+                let res = await getAllPackagesApi(type);
+
                 if (res && res.errCode === 0) {
                     this.setState({ listData: res.data ? res.data : [] });
                 }

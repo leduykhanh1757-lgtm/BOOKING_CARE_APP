@@ -15,7 +15,8 @@ let createNewPackage = async (req, res) => {
 
 let getAllPackages = async (req, res) => {
     try {
-        let info = await packageService.getAllPackages();
+        let info = await packageService.getAllPackages(req.query.type);
+
         return res.status(200).json(info);
     } catch (e) {
         console.log(e);

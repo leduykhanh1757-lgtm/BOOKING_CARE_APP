@@ -35,20 +35,7 @@ class ManageHandbook extends Component {
     }
 
     buildDataInputSelect = (inputData) => {
-        let result = [];
-        if (inputData && inputData.length > 0) {
-            inputData.map((item, index) => {
-                let object = {};
-                object.label = item.name;
-                object.value = item.id;
-                // Lưu tạm data vào đây để lúc chọn Dropdown thì lôi ra dùng
-                object.descriptionHTML = item.descriptionHTML;
-                object.descriptionMarkdown = item.descriptionMarkdown;
-                object.image = item.image;
-                result.push(object);
-            })
-        }
-        return result;
+        return inputData && inputData.length > 0 ? inputData.map(item => ({ label: item.name, value: item.id })) : [];
     }
 
     handleChangeSelect = async (selectedOption) => {
@@ -188,7 +175,7 @@ class ManageHandbook extends Component {
 
                     <div className="col-12">
                         <button
-                            className={hasOldData === true ? "btn btn-warning mt-3" : "btn btn-primary mt-3"}
+                            className={hasOldData === true ? "btn btn-warning mt-3 notranslate" : "btn btn-primary mt-3"}
                             onClick={() => this.handleSaveNewHandbook()}
                         >
                             {hasOldData === true ? "Lưu thay đổi" : "Tạo mới cẩm nang"}

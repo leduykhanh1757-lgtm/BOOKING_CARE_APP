@@ -19,7 +19,8 @@ module.exports = (sequelize, DataTypes) => {
     clinicId: DataTypes.INTEGER,
     image: DataTypes.BLOB('long'), // BẮT BUỘC PHẢI LÀ BLOB('long') để chứa ảnh Base64
     descriptionHTML: DataTypes.TEXT('long'), // Dùng TEXT('long') để chứa bài viết dài
-    descriptionMarkdown: DataTypes.TEXT('long')
+    descriptionMarkdown: DataTypes.TEXT('long'),
+    serviceType: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Package',

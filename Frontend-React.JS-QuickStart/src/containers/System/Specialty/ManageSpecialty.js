@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import './ManageSpecialty.scss';
 import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
+import 'react-markdown-editor-lite/lib/index.css'
 import { CommonUtils } from '../../../utils';
 import { createNewSpecialty, getAllSpecialty, getAllDetailSpecialtyById, editSpecialtyService } from '../../../services/userService';
 import { toast } from 'react-toastify';
@@ -35,16 +36,7 @@ class ManageSpecialty extends Component {
     }
 
     buildDataInputSelect = (inputData) => {
-        let result = [];
-        if (inputData && inputData.length > 0) {
-            inputData.map((item, index) => {
-                let object = {};
-                object.label = item.name;
-                object.value = item.id;
-                result.push(object);
-            })
-        }
-        return result;
+        return inputData && inputData.length > 0 ? inputData.map(item => ({ label: item.name, value: item.id })) : [];
     }
 
     handleChangeSelect = async (selectedOption) => {
@@ -180,7 +172,7 @@ class ManageSpecialty extends Component {
 
                     <div className="col-12">
                         <button
-                            className={hasOldData === true ? "btn btn-warning mt-3" : "btn btn-primary mt-3"}
+                            className={hasOldData === true ? "btn btn-warning mt-3 notranslate" : "btn btn-primary mt-3 notranslate"}
                             onClick={() => this.handleSaveNewSpecialty()}
                         >
                             {hasOldData === true ?

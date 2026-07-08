@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
+import { injectIntl } from 'react-intl';
 import './DetailSpecialty.scss';
 import HomeHeader from '../../HomePage/HomeHeader';
 import DoctorSchedule from '../Doctor/DoctorSchedule';
@@ -28,10 +29,17 @@ class DetailSpecialty extends Component {
             if (resProvince && resProvince.errCode === 0) {
                 let data = resProvince.data;
                 let result = [];
-                // Thêm option "Toàn quốc"
-                result.push({ label: 'Toàn quốc', value: 'ALL' });
+                // Thêm option "Toàn quốc" -> chữ tĩnh, dùng intl để đổi theo ngôn ngữ
+                // giống các option tỉnh thành khác (trước đây hardcode tiếng Việt,
+                // không đổi khi chuyển sang EN)
+                result.push({
+                    label: this.props.intl.formatMessage({ id: 'detail-specialty.nationwide', defaultMessage: 'Toàn quốc' }),
+                    value: 'ALL'
+                });
                 if (data && data.length > 0) {
-                    data.map(item => {
+                    // Dùng forEach thay vì map vì chỉ cần side-effect (push),
+                    // không cần mảng mới trả về từ map
+                    data.forEach(item => {
                         let object = {};
                         let labelVi = item.valueVi;
                         let labelEn = item.valueEn;
@@ -53,7 +61,7 @@ class DetailSpecialty extends Component {
             let data = res.data;
             let arrDoctorId = [];
             if (data && data.doctorSpecialty) {
-                data.doctorSpecialty.map(item => arrDoctorId.push(item.doctorId));
+                data.doctorSpecialty.forEach(item => arrDoctorId.push(item.doctorId));
             }
             this.setState({
                 dataDetailSpecialty: res.data,
@@ -70,12 +78,14 @@ class DetailSpecialty extends Component {
 
     render() {
         let { arrDoctorId, dataDetailSpecialty } = this.state;
+        let { intl } = this.props;
         return (
             <div className="detail-specialty-container">
                 <HomeHeader />
                 <div className="detail-specialty-body">
 
-                    {/* 1. HIỂN THỊ BÀI VIẾT GIỚI THIỆU CHUYÊN KHOA */}
+                    {/* 1. HIỂN THỊ BÀI VIẾT GIỚI THIỆU CHUYÊN KHOA
+                        -> Nội dung động từ DB, để Google Translate tự dịch */}
                     <div className="description-specialty">
                         {dataDetailSpecialty && !_.isEmpty(dataDetailSpecialty) &&
                             <div dangerouslySetInnerHTML={{ __html: dataDetailSpecialty.descriptionHTML }}></div>
@@ -88,12 +98,12 @@ class DetailSpecialty extends Component {
                             value={this.state.selectedProvince}
                             onChange={(event) => this.handleOnChangeSelect(event)}
                             options={this.state.listProvince}
-                            placeholder="Chọn tỉnh thành"
+                            placeholder={intl.formatMessage({ id: 'detail-specialty.select-province', defaultMessage: 'Chọn tỉnh thành' })}
                         />
                     </div>
 
                     {arrDoctorId && arrDoctorId.length > 0 &&
-                        arrDoctorId.map((item, index) => {
+                        arrDoctorId.map((item) => {
                             return (
                                 <div className="each-doctor" key={item}>
 
@@ -114,12 +124,12 @@ class DetailSpecialty extends Component {
                                     <div className="dt-content-right">
                                         <div className="doctor-schedule">
                                             <DoctorSchedule
-                                                doctorIdFromParent={item} // 🛠️ Truyền ID cho Lịch khám
+                                                doctorIdFromParent={item}
                                             />
                                         </div>
                                         <div className="doctor-extra-infor">
                                             <DoctorExtraInfor
-                                                doctorIdFromParent={item} // 🛠️ Truyền ID cho Giá khám
+                                                doctorIdFromParent={item}
                                             />
                                         </div>
                                     </div>
@@ -140,8 +150,4 @@ const mapStateToProps = state => {
     };
 };
 
-const mapDispatchToProps = dispatch => {
-    return {};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(DetailSpecialty);
+export default connect(mapStateToProps)(injectIntl(DetailSpecialty));

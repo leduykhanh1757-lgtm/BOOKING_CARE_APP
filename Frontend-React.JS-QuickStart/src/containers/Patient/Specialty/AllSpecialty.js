@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import HomeHeader from '../../HomePage/HomeHeader';
 import './AllSpecialty.scss';
 import { getAllSpecialty } from '../../../services/userService';
@@ -8,7 +9,8 @@ class AllSpecialty extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            dataSpecialty: []
+            dataSpecialty: [],
+            isLoading: true,
         }
     }
 
@@ -17,8 +19,11 @@ class AllSpecialty extends Component {
         let res = await getAllSpecialty();
         if (res && res.errCode === 0) {
             this.setState({
-                dataSpecialty: res.data ? res.data : []
+                dataSpecialty: res.data ? res.data : [],
+                isLoading: false,
             });
+        } else {
+            this.setState({ isLoading: false });
         }
     }
 
@@ -30,7 +35,7 @@ class AllSpecialty extends Component {
     }
 
     render() {
-        let { dataSpecialty } = this.state;
+        let { dataSpecialty, isLoading } = this.state;
 
         return (
             <div className="all-specialty-container">
@@ -39,21 +44,37 @@ class AllSpecialty extends Component {
 
                 <div className="all-specialty-body">
                     <div className="all-specialty-content">
-                        <div className="title-section">Khám chuyên khoa</div>
+                        {/* Chữ tĩnh -> FormattedMessage */}
+                        <div className="title-section">
+                            <FormattedMessage id="all-specialty.title" defaultMessage="Khám chuyên khoa" />
+                        </div>
 
                         <div className="list-specialty">
-                            {dataSpecialty && dataSpecialty.length > 0 &&
-                                dataSpecialty.map((item, index) => {
+                            {isLoading && (
+                                <div className="loading-text">
+                                    <FormattedMessage id="all-specialty.loading" defaultMessage="Đang tải dữ liệu..." />
+                                </div>
+                            )}
+
+                            {!isLoading && dataSpecialty.length === 0 && (
+                                <div className="empty-text">
+                                    <FormattedMessage id="all-specialty.empty" defaultMessage="Chưa có chuyên khoa nào." />
+                                </div>
+                            )}
+
+                            {!isLoading && dataSpecialty && dataSpecialty.length > 0 &&
+                                dataSpecialty.map((item) => {
                                     return (
                                         <div
                                             className="specialty-item"
-                                            key={index}
+                                            key={item.id}
                                             onClick={() => this.handleViewDetailSpecialty(item)}
                                         >
                                             <div
                                                 className="bg-image"
                                                 style={{ backgroundImage: `url(${item.image})` }}
                                             ></div>
+                                            {/* Tên chuyên khoa -> dữ liệu động từ DB, để Google Translate tự dịch */}
                                             <div className="specialty-name">{item.name}</div>
                                         </div>
                                     )
@@ -67,14 +88,4 @@ class AllSpecialty extends Component {
     }
 }
 
-const mapStateToProps = state => {
-    return {
-        language: state.app.language,
-    };
-};
-
-const mapDispatchToProps = dispatch => {
-    return {};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(AllSpecialty);
+export default connect()(AllSpecialty);

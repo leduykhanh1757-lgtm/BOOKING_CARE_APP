@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import './ManageClinic.scss';
 import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
+import 'react-markdown-editor-lite/lib/index.css';
 import { CommonUtils } from '../../../utils';
 import { createNewClinic, getAllClinic, getAllDetailClinicById, editClinicService } from '../../../services/userService';
 import { toast } from 'react-toastify';
@@ -38,18 +39,10 @@ class ManageClinic extends Component {
     }
 
     buildDataInputSelect = (inputData) => {
-        let result = [];
-        if (inputData && inputData.length > 0) {
-            inputData.map((item, index) => {
-                let object = {};
-                object.label = item.name;
-                object.value = item.id;
-                result.push(object);
-            })
-        }
-        return result;
+        return inputData && inputData.length > 0
+            ? inputData.map(item => ({ label: item.name, value: item.id }))
+            : [];
     }
-
     handleChangeSelect = async (selectedOption) => {
         this.setState({ selectedClinic: selectedOption });
 
@@ -71,7 +64,7 @@ class ManageClinic extends Component {
     // Nút Clear Form để tạo mới
     handleClearForm = () => {
         this.setState({
-            selectedClinic: '',
+            selectedClinic: null,
             name: '',
             address: '',
             imageBase64: '',
@@ -140,11 +133,11 @@ class ManageClinic extends Component {
         let { hasOldData } = this.state;
         return (
             <div className="manage-clinic-container">
-                <div className="ms-title"><FormattedMessage id="admin.manage-clinic.title" /></div>
+                <div className="ms-title notranslate"><FormattedMessage id="admin.manage-clinic.title" /></div>
 
                 <div className="add-new-clinic row">
                     <div className="col-6 form-group">
-                        <label><FormattedMessage id="admin.manage-clinic.select-clinic" /></label>
+                        <label className="notranslate"><FormattedMessage id="admin.manage-clinic.select-clinic" /></label>
                         <Select
                             value={this.state.selectedClinic}
                             onChange={this.handleChangeSelect}
@@ -157,7 +150,7 @@ class ManageClinic extends Component {
                     </div>
 
                     <div className="col-6 form-group">
-                        <label><FormattedMessage id="admin.manage-clinic.image" /></label>
+                        <label className="notranslate"><FormattedMessage id="admin.manage-clinic.image" /></label>
                         <div className="preview-img-container">
                             <input id="previewImgClinic" type="file" hidden
                                 onChange={(event) => this.handleOnChangeImage(event)}
@@ -172,13 +165,13 @@ class ManageClinic extends Component {
                     </div>
 
                     <div className="col-6 form-group mt-3">
-                        <label><FormattedMessage id="admin.manage-clinic.name" /></label>
+                        <label className="notranslate"><FormattedMessage id="admin.manage-clinic.name" /></label>
                         <input className="form-control" type="text" value={this.state.name}
                             onChange={(event) => this.handleOnChangeInput(event, 'name')}
                         />
                     </div>
                     <div className="col-6 form-group mt-3">
-                        <label><FormattedMessage id="admin.manage-clinic.address" /></label>
+                        <label className="notranslate"><FormattedMessage id="admin.manage-clinic.address" /></label>
                         <input className="form-control" type="text" value={this.state.address}
                             onChange={(event) => this.handleOnChangeInput(event, 'address')}
                         />

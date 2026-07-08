@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'; // 🛠️ 1. Import Redux để lấy thông tin User
 import './SocialPlugin.scss';
 import { toggleLikeDoctorApi, getLikesDoctorApi } from '../../../services/userService';
+import { toast } from 'react-toastify'; // 🛠️ Import thêm Toast để báo lỗi
 
 class LikeAndShare extends Component {
     constructor(props) {
@@ -9,31 +11,27 @@ class LikeAndShare extends Component {
             isLiked: false,
             likeCount: 0,
             shareCount: 15,
-            fakePatientId: 1,
             isShowShareMenu: false
         }
-        // TỐI ƯU 2: Tạo ref để quản lý việc click ra ngoài vùng menu
         this.shareMenuRef = React.createRef();
     }
 
     async componentDidMount() {
         this.fetchLikeData();
-        // Lắng nghe sự kiện click trên toàn bộ tài liệu
         document.addEventListener("mousedown", this.handleClickOutside);
     }
 
     componentWillUnmount() {
-        // Dọn dẹp sự kiện khi component bị hủy để tránh rò rỉ bộ nhớ
         document.removeEventListener("mousedown", this.handleClickOutside);
     }
 
     async componentDidUpdate(prevProps) {
-        if (this.props.doctorIdFromParent !== prevProps.doctorIdFromParent) {
+        // Cập nhật lại Like nếu chuyển Bác sĩ, hoặc khi User vừa đăng nhập/đăng xuất
+        if (this.props.doctorIdFromParent !== prevProps.doctorIdFromParent || this.props.isLoggedIn !== prevProps.isLoggedIn) {
             this.fetchLikeData();
         }
     }
 
-    // TỐI ƯU 2: Hàm tự động đóng Menu khi click ra ngoài
     handleClickOutside = (event) => {
         if (this.shareMenuRef && this.shareMenuRef.current && !this.shareMenuRef.current.contains(event.target)) {
             this.setState({ isShowShareMenu: false });
@@ -41,11 +39,13 @@ class LikeAndShare extends Component {
     }
 
     fetchLikeData = async () => {
-        let { doctorIdFromParent } = this.props;
-        let { fakePatientId } = this.state;
+        let { doctorIdFromParent, isLoggedIn, userInfo } = this.props;
+
+        // 🛠️ 2. LẤY ID CỦA NGƯỜI DÙNG THẬT
+        let currentPatientId = (isLoggedIn && userInfo) ? userInfo.id : null;
 
         if (doctorIdFromParent) {
-            let res = await getLikesDoctorApi(doctorIdFromParent, fakePatientId);
+            let res = await getLikesDoctorApi(doctorIdFromParent, currentPatientId);
             if (res && res.errCode === 0 && res.data) {
                 this.setState({
                     likeCount: res.data.totalLikes,
@@ -56,24 +56,31 @@ class LikeAndShare extends Component {
     }
 
     handleToggleLike = async () => {
-        let { doctorIdFromParent } = this.props;
-        let { fakePatientId, isLiked, likeCount } = this.state;
+        let { doctorIdFromParent, isLoggedIn, userInfo } = this.props;
+        let { isLiked, likeCount } = this.state;
 
         if (!doctorIdFromParent) return;
 
-        // TỐI ƯU 1: OPTIMISTIC UPDATE - Cập nhật UI ngay lập tức cho mượt
+        // 🛠️ 3. NẾU CHƯA ĐĂNG NHẬP THÌ CHẶN LẠI VÀ CẢNH BÁO
+        if (!isLoggedIn || !userInfo) {
+            toast.warn("Vui lòng đăng nhập để Thích bác sĩ này!");
+            return;
+        }
+
+        let currentPatientId = userInfo.id; // Lấy ID thật
+
+        // OPTIMISTIC UPDATE - Cập nhật UI ngay lập tức cho mượt
         this.setState({
             isLiked: !isLiked,
             likeCount: isLiked ? likeCount - 1 : likeCount + 1
         });
 
-        // Gọi API chạy ngầm phía sau
+        // Gọi API chạy ngầm phía sau với ID thật
         let res = await toggleLikeDoctorApi({
             doctorId: doctorIdFromParent,
-            patientId: fakePatientId
+            patientId: currentPatientId // 🛠️ Truyền ID thật xuống DB
         });
 
-        // Nếu lỡ xui API báo lỗi, tự động refetch lại data để đồng bộ với DB
         if (res && res.errCode !== 0) {
             this.fetchLikeData();
         }
@@ -83,7 +90,6 @@ class LikeAndShare extends Component {
         this.setState({ isShowShareMenu: !this.state.isShowShareMenu })
     }
 
-    // TỐI ƯU 3: Hàm tiện ích giúp ép Popup luôn nằm GIỮA màn hình
     openPopupCenter = (url, title, w, h) => {
         const left = (window.screen.width / 2) - (w / 2);
         const top = (window.screen.height / 2) - (h / 2);
@@ -104,7 +110,7 @@ class LikeAndShare extends Component {
 
     copyToClipboard = () => {
         navigator.clipboard.writeText(window.location.href);
-        alert("Đã copy đường dẫn Bác sĩ vào bộ nhớ tạm!");
+        toast.success("Đã copy đường dẫn Bác sĩ vào bộ nhớ tạm!"); // Đổi sang Toast cho đẹp
         this.setState({ isShowShareMenu: false, shareCount: this.state.shareCount + 1 });
     }
 
@@ -121,7 +127,6 @@ class LikeAndShare extends Component {
                     <span className="count">({likeCount})</span>
                 </button>
 
-                {/* Gắn Ref vào container này để theo dõi Click ra ngoài */}
                 <div className="share-container" ref={this.shareMenuRef}>
                     <button className="btn-share" onClick={() => this.toggleShareMenu()}>
                         <i className="fas fa-share-alt"></i>
@@ -148,4 +153,12 @@ class LikeAndShare extends Component {
     }
 }
 
-export default LikeAndShare;
+// 🛠️ 4. MAP REDUX VÀO COMPONENT ĐỂ LẤY INFO USER
+const mapStateToProps = state => {
+    return {
+        isLoggedIn: state.user.isLoggedIn,
+        userInfo: state.user.userInfo
+    };
+};
+
+export default connect(mapStateToProps)(LikeAndShare);

@@ -11,9 +11,9 @@ class Chatbot extends Component {
             messages: [
                 { sender: 'bot', text: 'Chào bạn! Mình là trợ lý ảo của BookingCare. Mình có thể giúp gì cho bạn hôm nay?' }
             ],
-            isLoading: false // Trạng thái chờ AI gõ phím
+            isLoading: false
         };
-        this.messagesEndRef = React.createRef(); // Ref để cuộn trang
+        this.messagesEndRef = React.createRef();
     }
 
     toggleChat = () => {
@@ -26,8 +26,15 @@ class Chatbot extends Component {
         }
     }
 
-    componentDidUpdate() {
-        this.scrollToBottom(); // Cứ có tin nhắn mới là tự cuộn xuống
+    // =====================================================================
+    // TỐI ƯU 1: FIX BUG HIỆU NĂNG RẤT NẶNG Ở HÀM UPDATE
+    // =====================================================================
+    componentDidUpdate(prevProps, prevState) {
+        // Chỉ tự động cuộn xuống ĐÁY khi Mảng tin nhắn có sự thay đổi 
+        // hoặc khi trạng thái AI đang gõ (isLoading) thay đổi.
+        if (prevState.messages.length !== this.state.messages.length || prevState.isLoading !== this.state.isLoading) {
+            this.scrollToBottom();
+        }
     }
 
     handleOnChangeInput = (event) => {
@@ -45,7 +52,6 @@ class Chatbot extends Component {
             isLoading: true
         });
 
-        // 🛠️ BỌC TRY...CATCH ĐỂ CHỐNG KẸT GIAO DIỆN
         try {
             let res = await askChatbotApi(inputText);
 
@@ -80,21 +86,21 @@ class Chatbot extends Component {
 
         return (
             <div className="chatbot-container">
-                {/* Nút bong bóng chat */}
                 {!isOpen && (
                     <div className="chat-bubble" onClick={this.toggleChat}>
                         <i className="fas fa-comments"></i>
                     </div>
                 )}
 
-                {/* Khung chat bật lên */}
                 {isOpen && (
                     <div className="chat-window">
-                        <div className="chat-header">
+                        {/* CHỐT HẠ ĐA NGÔN NGỮ: Gắn notranslate vào Header để giữ nguyên tên thương hiệu */}
+                        <div className="chat-header notranslate">
                             <span>Trợ lý BookingCare</span>
                             <i className="fas fa-times close-icon" onClick={this.toggleChat}></i>
                         </div>
 
+                        {/* LƯU Ý: Tuyệt đối KHÔNG gắn notranslate vào chat-body, để Google thoải mái dịch nội dung chat */}
                         <div className="chat-body">
                             {messages.map((msg, index) => (
                                 <div key={index} className={`message-row ${msg.sender}`}>
@@ -102,14 +108,15 @@ class Chatbot extends Component {
                                 </div>
                             ))}
                             {isLoading && (
-                                <div className="message-row bot">
+                                <div className="message-row bot notranslate">
                                     <div className="message-content typing">AI đang gõ...</div>
                                 </div>
                             )}
                             <div ref={this.messagesEndRef} />
                         </div>
 
-                        <div className="chat-footer">
+                        {/* Gắn notranslate vào footer để cái Placeholder nhập liệu khỏi bị dịch bậy */}
+                        <div className="chat-footer notranslate">
                             <input
                                 type="text"
                                 placeholder="Nhập câu hỏi..."

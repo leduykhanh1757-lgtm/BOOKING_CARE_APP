@@ -122,8 +122,8 @@ const askChatbotApi = (message) => {
 const createNewPackageApi = (data) => {
     return axios.post('/api/create-new-package', data);
 }
-const getAllPackagesApi = () => {
-    return axios.get('/api/get-all-packages');
+const getAllPackagesApi = (type) => {
+    return axios.get(`/api/get-all-packages?type=${type}`);
 }
 const editPackageService = (data) => {
     return axios.put('/api/edit-package', data);

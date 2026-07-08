@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import './ManageSchedule.scss';
 import { languages, dateFormat, CRUD_actions } from '../../../utils';
 import Select from 'react-select';
 import * as actions from "../../../store/actions";
@@ -9,9 +8,9 @@ import DatePicker from '../../../components/Input/DatePicker';
 import moment from 'moment';
 import FormattedDate from '../../../components/Formating/FormattedDate';
 import { range } from 'lodash';
+import _ from 'lodash';
 import './ManageSchedule.scss';
 import { toast } from 'react-toastify';
-import _ from 'lodash';
 import { saveBulkScheduleDoctor } from '../../../services/userService';
 
 class ManageSchedule extends Component {
@@ -44,7 +43,6 @@ class ManageSchedule extends Component {
             });
         }
         if (prevProps.allScheduleTime !== this.props.allScheduleTime) {
-            console.log(">>> CHECK ALL SCHEDULE TIME: ", this.props.allScheduleTime);
             let data = this.props.allScheduleTime;
             if (data && data.length > 0) {
                 data = data.map(item => ({ ...item, isSelected: false }));
@@ -139,7 +137,7 @@ class ManageSchedule extends Component {
         let { language } = this.props;
         return (
             <div className="manage-schedule-container">
-                <div className="m-s-title">
+                <div className="m-s-title notranslate">
 
                     <FormattedMessage id="manage-schedule.manage-schedule" />
                 </div>
@@ -148,7 +146,7 @@ class ManageSchedule extends Component {
                     <div className="row">
                         <div className="col-6 form-group">
 
-                            <label><FormattedMessage id="manage-schedule.choose-doctor" /></label>
+                            <label className="notranslate"><FormattedMessage id="manage-schedule.choose-doctor" /></label>
                             <Select
                                 value={this.state.selectedDoctor}
                                 onChange={this.handleChangeSelect}
@@ -158,7 +156,7 @@ class ManageSchedule extends Component {
 
                         <div className="col-6 form-group">
 
-                            <label><FormattedMessage id="manage-schedule.select-date" /></label>
+                            <label className="notranslate"><FormattedMessage id="manage-schedule.select-date" /></label>
                             <DatePicker
                                 onChange={this.handleOnChangeDatePicker}
                                 className="form-control"
@@ -183,7 +181,7 @@ class ManageSchedule extends Component {
                         </div>
 
                         <div className="col-12">
-                            <button className="btn btn-primary btn-save-schedule"
+                            <button className="btn btn-primary btn-save-schedule notranslate"
                                 onClick={() => this.handleSaveSchedule()}
                             >
 

@@ -14,11 +14,6 @@ import Chatbot from './Chatbot/Chatbot';
 
 class HomePage extends Component {
 
-    handleAfterChange = (index) => {
-        console.log('Current slide index:', index);
-    }
-
-
     render() {
         let settings = {
             dots: false,
@@ -26,14 +21,11 @@ class HomePage extends Component {
             speed: 500,
             slidesToShow: 4,
             slidesToScroll: 1,
-            afterChange: this.handleAfterChange // Thêm sự kiện sau khi chuyển slide
         };
         return (
             <div>
                 <HomeHeader isShowBanner={true} />
-                <Specialty
-                    settings={settings}
-                    history={this.props.history} />
+                <Specialty settings={settings} />
                 <MedicalFacility settings={settings} />
                 <Doctor settings={settings} />
                 <HandBook settings={settings} />
