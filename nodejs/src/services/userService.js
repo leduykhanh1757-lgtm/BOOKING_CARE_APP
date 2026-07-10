@@ -1,6 +1,18 @@
 import db from '../models/index';
 import bcrypt from 'bcryptjs';
-import CRUDservices from './CRUDservices';
+
+const salt = bcrypt.genSaltSync(10);
+
+let hashUserPassword = (password) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let hashPassword = await bcrypt.hashSync(password, salt);
+            resolve(hashPassword);
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
 
 let handleUserLogin = (email, password) => {
     return new Promise(async (resolve, reject) => {
@@ -109,7 +121,7 @@ let createNewUser = (data) => {
             }
             else {
                 // Nếu chưa tồn tại thì hash password và tạo mới user
-                let hashPasswordFromBcrypt = await CRUDservices.hashUserPassword(data.password);
+                let hashPasswordFromBcrypt = await hashUserPassword(data.password);
                 await db.User.create({
                     email: data.email,
                     password: hashPasswordFromBcrypt,

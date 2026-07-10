@@ -31,7 +31,6 @@ let getAllDoctors = async (req, res) => {
 
 let postInforDoctor = async (req, res) => {
     try {
-        console.log("=== CHECK DATA TỪ REACT GỬI LÊN (REQ.BODY) ===", req.body);
         let response = await doctorService.saveDetailInforDoctor(req.body);
         return res.status(200).json(response);
     }

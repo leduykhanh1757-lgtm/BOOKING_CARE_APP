@@ -73,15 +73,15 @@ class BookingPackageModal extends Component {
                 >
                     <div className="booking-modal-content">
                         <div className="booking-modal-header text-white" style={{ backgroundColor: '#45c3d2', padding: '15px' }}>
-                            <h5 className="modal-title m-0"><i className="fas fa-calendar-check"></i> ĐẶT LỊCH GÓI KHÁM</h5>
+                            <h5 className="left m-0"><i className="fas fa-calendar-check"></i> ĐẶT LỊCH GÓI KHÁM</h5>
                             <span className="right" onClick={closeBookingModal} style={{ cursor: 'pointer', fontSize: '20px' }}>
                                 <i className="fas fa-times"></i>
                             </span>
                         </div>
 
-                        <div className="booking-modal-body p-4">
+                        <div className="booking-modal-body p-3">
                             {/* THÔNG TIN GÓI KHÁM ĐƯỢC LÀM NỔI BẬT */}
-                            <div className="package-info-card p-3 mb-4" style={{ backgroundColor: '#f8f9fa', borderLeft: '4px solid #f0ad4e', borderRadius: '5px' }}>
+                            <div className="package-info-card p-3 mb-3" style={{ backgroundColor: '#f8f9fa', borderLeft: '4px solid #f0ad4e', borderRadius: '5px' }}>
                                 <h5 style={{ color: '#333', fontWeight: 'bold' }}>{packageData.name}</h5>
                                 <div className="text-danger font-weight-bold" style={{ fontSize: '18px' }}>
                                     Giá: {packageData.price}
@@ -139,8 +139,8 @@ class BookingPackageModal extends Component {
                         </div>
 
                         <div className="booking-modal-footer p-3 border-top text-right">
-                            <button className="btn btn-secondary mr-2" onClick={closeBookingModal}>Hủy bỏ</button>
-                            <button className="btn btn-primary font-weight-bold" onClick={() => this.handleConfirmBooking()}>Xác nhận đặt lịch</button>
+                            <button className="btn-booking-cancel" onClick={closeBookingModal}>Hủy bỏ</button>
+                            <button className="btn-booking-confirm" onClick={() => this.handleConfirmBooking()}>Xác nhận đặt lịch</button>
                         </div>
                     </div>
                 </LoadingOverlay>

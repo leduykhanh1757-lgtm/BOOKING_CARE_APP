@@ -1,8 +1,18 @@
 .booking-modal-container {
+    z-index: 2000;
+    // 🛠️ Đảm bảo modal luôn nổi trên header của site (header thường có z-index cao)
+
+    .modal-dialog {
+        max-width: 650px;
+        // 🛠️ Dùng vh thay vì px cố định để luôn vừa khít mọi kích thước màn hình,
+        // tránh bị dư chiều cao khiến khung ngoài tự cuộn (gây mất phần tiêu đề)
+    }
+
     .modal-content {
         border-radius: 12px;
         border: none;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        transform: translateY(20px);
     }
 
     .booking-modal-header {
@@ -35,19 +45,25 @@
     }
 
     .booking-modal-body {
-        padding: 25px;
+        padding: 20px 25px;
+        max-height: calc(89vh - 210px);
+        overflow-y: auto;
+        // 🛠️ 210px ≈ chiều cao cố định của header teal + thẻ thông tin gói khám + footer nút bấm
+        // Chỉ phần body này cuộn riêng khi nội dung dài, còn header/footer luôn cố định hiển thị
 
         .form-group {
+            margin-bottom: 12px;
+
             label {
                 font-size: 14px;
                 font-weight: 600;
                 color: #444;
-                margin-bottom: 6px;
+                margin-bottom: 4px;
             }
 
             .form-control {
                 border-radius: 6px;
-                padding: 10px 15px;
+                padding: 8px 12px;
                 font-size: 14px;
                 border: 1px solid #ccc;
                 transition: 0.2s;
