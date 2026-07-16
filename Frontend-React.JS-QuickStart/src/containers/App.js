@@ -22,6 +22,7 @@ import HomePage from './HomePage/HomePage.js';
 import UserLogin from './Auth/UserLogin';
 import UserProfile from './Patient/Profile/UserProfile';
 import VerifyEmail from './Patient/VerifyEmail/VerifyEmail';
+import UserRegister from './Auth/UserRegister';
 
 import DetailDoctor from './Patient/Doctor/DetailDoctor.js';
 import AllDoctor from './Patient/Doctor/AllDoctor';
@@ -123,6 +124,7 @@ class App extends Component {
 
                                     {/* ROUTE CHO BỆNH NHÂN ĐĂNG NHẬP VÀ QUẢN LÝ */}
                                     <Route path="/user-login" component={UserLogin} />
+                                    <Route path="/user-register" component={UserRegister} />
                                     <Route path="/user/profile" component={UserProfile} />
 
                                     {/* NHÓM CÁC TRANG THÔNG TIN BÊN LỀ */}

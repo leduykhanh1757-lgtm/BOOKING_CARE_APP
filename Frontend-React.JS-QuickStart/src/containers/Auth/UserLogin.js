@@ -126,6 +126,13 @@ class UserLogin extends Component {
                         </div>
 
                         <div className="col-12 text-center mt-3">
+                            <span className="text-other-login" style={{ cursor: 'pointer', color: '#2248bd', fontWeight: '600' }} 
+                                  onClick={() => this.props.navigate('/user-register')}>
+                                Don't have an account? Register now
+                            </span>
+                        </div>
+
+                        <div className="col-12 text-center mt-3">
                             <span className="text-other-login">Or sign in with:</span>
                         </div>
 
