@@ -258,7 +258,10 @@ class HomeHeader extends Component {
                                                         <i className="fas fa-tasks"></i>
                                                         {language === languages.VI ? 'Quản lý hệ thống' : 'System Management'}
                                                     </button>
-                                                    <button className="btn-logout" onClick={processLogout}>
+                                                    <button className="btn-logout" onClick={() => {
+                                                        processLogout();
+                                                        this.props.history.push('/home');
+                                                    }}>
                                                         <i className="fas fa-sign-out-alt"></i>
                                                         {language === languages.VI ? 'Đăng xuất' : 'Logout'}
                                                     </button>

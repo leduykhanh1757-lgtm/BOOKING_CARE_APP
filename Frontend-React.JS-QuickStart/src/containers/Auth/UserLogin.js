@@ -122,7 +122,10 @@ class UserLogin extends Component {
                         </div>
 
                         <div className="col-12 text-center mt-2">
-                            <span className="forgot-password">Forgot your password?</span>
+                            <span className="forgot-password" style={{ cursor: 'pointer', textDecoration: 'underline' }} 
+                                  onClick={() => this.props.navigate('/forgot-password')}>
+                                Forgot your password?
+                            </span>
                         </div>
 
                         <div className="col-12 text-center mt-3">

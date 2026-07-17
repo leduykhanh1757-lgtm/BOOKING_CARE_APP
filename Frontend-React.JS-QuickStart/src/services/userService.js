@@ -134,6 +134,12 @@ const getDetailPackageById = (id) => {
 const postBookPackage = (data) => {
     return axios.post('/api/book-package', data);
 }
+const forgotPasswordService = (email, language) => {
+    return axios.post('/api/forgot-password', { email, language });
+}
+const verifyForgotPasswordService = (data) => {
+    return axios.post('/api/verify-forgot-password', data);
+}
 export {
     handleLoginApi, getAllUsers,
     createNewUserService, deleteUserService,
@@ -152,5 +158,6 @@ export {
     createNewCommentApi, getCommentsByIdApi,
     toggleLikeDoctorApi, getLikesDoctorApi,
     askChatbotApi,
-    createNewPackageApi, getAllPackagesApi, editPackageService, getDetailPackageById, postBookPackage
+    createNewPackageApi, getAllPackagesApi, editPackageService, getDetailPackageById, postBookPackage,
+    forgotPasswordService, verifyForgotPasswordService
 };
