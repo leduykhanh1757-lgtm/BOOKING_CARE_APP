@@ -91,6 +91,26 @@ let handleAskBot = async (req, res) => {
     }
 }
 
+let handleForgotPassword = async (req, res) => {
+    try {
+        let info = await userService.handleForgotPassword(req.body.email, req.body.language);
+        return res.status(200).json(info);
+    } catch (e) {
+        console.log(e);
+        return res.status(200).json({ errCode: -1, errMessage: 'Error from server' });
+    }
+}
+
+let handleVerifyForgotPassword = async (req, res) => {
+    try {
+        let info = await userService.handleVerifyForgotPassword(req.body);
+        return res.status(200).json(info);
+    } catch (e) {
+        console.log(e);
+        return res.status(200).json({ errCode: -1, errMessage: 'Error from server' });
+    }
+}
+
 module.exports = {
     handleLogin: handleLogin,
     getAllUsers: getAllUsers,
@@ -98,5 +118,7 @@ module.exports = {
     editUser: editUser,
     deleteUser: deleteUser,
     getAllCode: getAllCode,
-    handleAskBot: handleAskBot
+    handleAskBot: handleAskBot,
+    handleForgotPassword: handleForgotPassword,
+    handleVerifyForgotPassword: handleVerifyForgotPassword
 }

@@ -1,5 +1,8 @@
 import db from '../models/index';
 import bcrypt from 'bcryptjs';
+import emailService from './emailService';
+
+const otpStore = new Map(); // Store OTPs in memory: email -> { otp, expiresAt }
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -244,6 +247,87 @@ let getAllCodeService = (typeInput) => {
     })
 }
 
+let handleForgotPassword = (email, language) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!email) {
+                resolve({ errCode: 1, errMessage: "Missing email parameter!" });
+                return;
+            }
+            let isExist = await checkUserEmail(email);
+            if (!isExist) {
+                resolve({ errCode: 2, errMessage: "Email does not exist in the system!" });
+                return;
+            }
+            
+            // Generate 6-digit OTP
+            let otp = Math.floor(100000 + Math.random() * 900000).toString();
+            let expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+            otpStore.set(email, { otp, expiresAt });
+
+            // Send Email
+            await emailService.sendForgotPasswordEmail({
+                email: email,
+                otp: otp,
+                language: language || 'vi'
+            });
+
+            resolve({
+                errCode: 0,
+                errMessage: "OTP has been sent to your email!"
+            });
+
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
+let handleVerifyForgotPassword = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let { email, otp, newPassword } = data;
+            if (!email || !otp || !newPassword) {
+                resolve({ errCode: 1, errMessage: "Missing required parameters!" });
+                return;
+            }
+
+            let record = otpStore.get(email);
+            if (!record) {
+                resolve({ errCode: 2, errMessage: "No OTP found or it has expired!" });
+                return;
+            }
+
+            if (Date.now() > record.expiresAt) {
+                otpStore.delete(email);
+                resolve({ errCode: 3, errMessage: "OTP has expired!" });
+                return;
+            }
+
+            if (record.otp !== otp) {
+                resolve({ errCode: 4, errMessage: "Invalid OTP!" });
+                return;
+            }
+
+            // OTP is valid, hash new password and update DB
+            let hashPassword = await hashUserPassword(newPassword);
+            let user = await db.User.findOne({ where: { email: email }, raw: false });
+            if (user) {
+                user.password = hashPassword;
+                await user.save();
+                otpStore.delete(email); // clear OTP
+                resolve({ errCode: 0, errMessage: "Password updated successfully!" });
+            } else {
+                resolve({ errCode: 5, errMessage: "User not found in DB!" });
+            }
+
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
 module.exports = {
     handleUserLogin: handleUserLogin,
     checkUserEmail: checkUserEmail,
@@ -251,5 +335,7 @@ module.exports = {
     createNewUser: createNewUser,
     editUser: editUser,
     deleteUser: deleteUser,
-    getAllCodeService: getAllCodeService
+    getAllCodeService: getAllCodeService,
+    handleForgotPassword: handleForgotPassword,
+    handleVerifyForgotPassword: handleVerifyForgotPassword
 }

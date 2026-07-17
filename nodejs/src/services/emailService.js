@@ -160,9 +160,45 @@ let sendPackageBookingEmail = async (dataSend) => {
     });
 }
 
+let sendForgotPasswordEmail = async (dataSend) => {
+    let transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        auth: {
+            user: process.env.EMAIL_APP,
+            pass: process.env.EMAIL_APP_PASSWORD,
+        },
+    });
+
+    let subjectTitle = dataSend.language === 'en'
+        ? "Reset Password Verification Code | BookingCare"
+        : "Mã xác nhận Đặt lại mật khẩu | BookingCare";
+
+    let bodyHtml = dataSend.language === 'en'
+        ? `<h3>Dear User,</h3>
+           <p>You requested a password reset on BookingCare. Your verification code is:</p>
+           <h2 style="color: #d93025; font-size: 24px; padding: 10px; border: 1px solid #ccc; display: inline-block;">${dataSend.otp}</h2>
+           <p>This code is valid for 5 minutes. If you did not request this, please ignore this email.</p>
+           <p>Best regards!</p>`
+        : `<h3>Xin chào,</h3>
+           <p>Bạn đã yêu cầu đặt lại mật khẩu trên BookingCare. Mã xác nhận của bạn là:</p>
+           <h2 style="color: #d93025; font-size: 24px; padding: 10px; border: 1px solid #ccc; display: inline-block;">${dataSend.otp}</h2>
+           <p>Mã này có hiệu lực trong 5 phút. Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
+           <p>Trân trọng!</p>`;
+
+    await transporter.sendMail({
+        from: '"BookingCare LDK" <latla17572005@gmail.com>',
+        to: dataSend.email,
+        subject: subjectTitle,
+        html: bodyHtml,
+    });
+}
+
 module.exports = {
     sendSimpleEmail: sendSimpleEmail,
     sendAttachment: sendAttachment,
     getPackageEmailBody: getPackageEmailBody,
-    sendPackageBookingEmail: sendPackageBookingEmail
+    sendPackageBookingEmail: sendPackageBookingEmail,
+    sendForgotPasswordEmail: sendForgotPasswordEmail
 }
