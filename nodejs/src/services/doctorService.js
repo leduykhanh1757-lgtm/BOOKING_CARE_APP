@@ -32,7 +32,11 @@ let getTopDoctorHome = (limitInput) => {
             if (users && users.length > 0) {
                 users = users.map(item => {
                     if (item.image) {
-                        item.image = Buffer.from(item.image, 'base64').toString('binary'); // 🛠️ Sửa chỗ này
+                        if (Buffer.isBuffer(item.image)) {
+                            item.image = item.image.toString('utf8');
+                        } else if (typeof item.image === 'string') {
+                            item.image = Buffer.from(item.image, 'base64').toString('binary');
+                        }
                     }
                     return item;
                 })
@@ -203,7 +207,11 @@ let getInforDoctorById = (inputId) => {
                 })
 
                 if (data && data.image) {
-                    data.image = Buffer.from(data.image, 'base64').toString('binary');
+                    if (Buffer.isBuffer(data.image)) {
+                        data.image = data.image.toString('utf8');
+                    } else if (typeof data.image === 'string') {
+                        data.image = Buffer.from(data.image, 'base64').toString('binary');
+                    }
                 }
 
                 if (!data) data = {};
@@ -375,7 +383,11 @@ let getProfileDoctorById = (inputId) => {
                 })
 
                 if (data && data.image) {
-                    data.image = Buffer.from(data.image, 'base64').toString('binary'); // 🛠️ Sửa chỗ này
+                    if (Buffer.isBuffer(data.image)) {
+                        data.image = data.image.toString('utf8');
+                    } else if (typeof data.image === 'string') {
+                        data.image = Buffer.from(data.image, 'base64').toString('binary');
+                    }
                 }
 
                 if (!data) data = {};

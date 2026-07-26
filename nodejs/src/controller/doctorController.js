@@ -7,10 +7,10 @@ let getTopDoctorHome = async (req, res) => {
         let response = await doctorService.getTopDoctorHome(+limit);
         return res.status(200).json(response);
     } catch (e) {
-        console.log(e);
+        console.log("Error getTopDoctorHome: ", e);
         return res.status(200).json({
             errCode: -1,
-            message: 'Error from server...'
+            message: 'Error from server: ' + (e.message || e)
         })
     }
 }
