@@ -11,12 +11,12 @@ const customizeConfig = {
   port: process.env.DB_PORT || 20774,
   dialect: 'mysql',
   logging: false,
-  dialectOptions: process.env.DB_SSL === 'true' ? {
+  dialectOptions: (process.env.DB_SSL === 'false') ? {} : {
     ssl: {
       require: true,
       rejectUnauthorized: false
     }
-  } : {}
+  }
 };
 
 const sequelize = new Sequelize(

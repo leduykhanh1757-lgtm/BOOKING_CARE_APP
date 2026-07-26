@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-// Khởi tạo kết nối Sequelize sử dụng biến môi trường từ .env
+// Khởi tạo kết nối Sequelize sử dụng biến môi trường từ .env hoặc Railway Variables
 const sequelize = new Sequelize(
     process.env.DB_NAME || 'bookingcare',
     process.env.DB_USER || 'avnadmin',
@@ -11,12 +11,12 @@ const sequelize = new Sequelize(
         port: process.env.DB_PORT || 20774,
         dialect: 'mysql',
         logging: false,
-        dialectOptions: process.env.DB_SSL === 'true' ? {
+        dialectOptions: (process.env.DB_SSL === 'false') ? {} : {
             ssl: {
                 require: true,
                 rejectUnauthorized: false
             }
-        } : {}
+        }
     }
 );
 

@@ -1,10 +1,15 @@
 import axios from 'axios';
 import _ from 'lodash';
 
+let backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8080';
+if (backendUrl && !backendUrl.startsWith('http://') && !backendUrl.startsWith('https://')) {
+    backendUrl = `https://${backendUrl}`;
+}
+
 const instance = axios.create({
-    baseURL: process.env.REACT_APP_BACKEND_URL,
+    baseURL: backendUrl,
 });
-console.log("Check baseURL:", process.env.REACT_APP_BACKEND_URL);
+console.log("Check baseURL:", backendUrl);
 instance.interceptors.response.use(
     (response) => {
         // Thrown error for request with OK status code
