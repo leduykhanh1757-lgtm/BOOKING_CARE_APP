@@ -1,17 +1,30 @@
 const { Sequelize } = require('sequelize');
+require('dotenv').config();
 
-// Khởi tạo kết nối Sequelize với thông tin database của bạn
-const sequelize = new Sequelize('database_development', 'root', 'Khanh17572005@?!', {
-    host: 'localhost',
-    dialect: 'mysql',
-    logging: false // Thêm dòng này để Terminal đỡ in ra nhiều câu lệnh SQL mặc định cho đỡ rối mắt
-});
+// Khởi tạo kết nối Sequelize sử dụng biến môi trường từ .env
+const sequelize = new Sequelize(
+    process.env.DB_NAME || 'bookingcare',
+    process.env.DB_USER || 'avnadmin',
+    process.env.DB_PASSWORD || '',
+    {
+        host: process.env.DB_HOST || 'bookingcare-db-leduykhanh1757-eccb.h.aivencloud.com',
+        port: process.env.DB_PORT || 20774,
+        dialect: 'mysql',
+        logging: false,
+        dialectOptions: process.env.DB_SSL === 'true' ? {
+            ssl: {
+                require: true,
+                rejectUnauthorized: false
+            }
+        } : {}
+    }
+);
 
 // Hàm test kết nối
 let connectDB = async () => {
     try {
         await sequelize.authenticate();
-        console.log('Connection has been established successfully.');
+        console.log('Connection to Aiven MySQL database has been established successfully.');
     } catch (error) {
         console.error('Unable to connect to the database:', error);
     }

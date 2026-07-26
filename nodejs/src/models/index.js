@@ -1,19 +1,30 @@
 'use strict';
-require('dotenv').config(); // Load environment variables from .env file
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
-let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
-} else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
-}
+const customizeConfig = {
+  host: process.env.DB_HOST || 'bookingcare-db-leduykhanh1757-eccb.h.aivencloud.com',
+  port: process.env.DB_PORT || 20774,
+  dialect: 'mysql',
+  logging: false,
+  dialectOptions: process.env.DB_SSL === 'true' ? {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
+  } : {}
+};
+
+const sequelize = new Sequelize(
+  process.env.DB_NAME || 'bookingcare',
+  process.env.DB_USER || 'avnadmin',
+  process.env.DB_PASSWORD || '',
+  customizeConfig
+);
 
 fs
   .readdirSync(__dirname)
