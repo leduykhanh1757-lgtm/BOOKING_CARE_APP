@@ -1,46 +1,81 @@
 require('dotenv').config();
 import nodemailer from 'nodemailer';
-import axios from 'axios';
+const https = require('https');
 
-// --- HÀM GỬI EMAIL CHÍNH: KẾT HỢP BREVO API VÀ NODEMAILER IPV4 ---
+// --- HÀM GỬI EMAIL CHÍNH: BREVO REST API KHÔNG PHỤ THUỘC THƯ VIỆN BÊN NGOÀI + FALLBACK NODEMAILER IPV4 ---
+let sendBrevoRestApi = (apiKey, senderEmail, to, subject, html, attachments) => {
+    return new Promise((resolve, reject) => {
+        let payload = {
+            sender: { name: "BookingCare", email: senderEmail },
+            to: [{ email: to }],
+            subject: subject,
+            htmlContent: html,
+        };
+
+        if (attachments && attachments.length > 0) {
+            payload.attachment = attachments.map(att => ({
+                name: att.filename,
+                content: att.content // base64 string
+            }));
+        }
+
+        let data = JSON.stringify(payload);
+
+        let req = https.request({
+            hostname: 'api.brevo.com',
+            path: '/v3/smtp/email',
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'api-key': apiKey,
+                'content-type': 'application/json',
+                'content-length': Buffer.byteLength(data)
+            },
+            timeout: 10000
+        }, (res) => {
+            let resData = '';
+            res.on('data', chunk => resData += chunk);
+            res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    console.log("Sent email successfully via Brevo REST API:", resData);
+                    resolve(true);
+                } else {
+                    console.error("Brevo API error status:", res.statusCode, resData);
+                    reject(new Error(`Brevo API status ${res.statusCode}: ${resData}`));
+                }
+            });
+        });
+
+        req.on('error', (err) => {
+            console.error("Brevo API request error:", err);
+            reject(err);
+        });
+
+        req.on('timeout', () => {
+            req.destroy();
+            reject(new Error("Brevo API request timeout"));
+        });
+
+        req.write(data);
+        req.end();
+    });
+};
+
 let sendMailUnified = async ({ to, subject, html, attachments }) => {
     let apiKey = process.env.EMAIL_APP_PASSWORD || "";
     let senderEmail = process.env.EMAIL_APP || "leduykhanh1757@gmail.com";
 
-    // 1. Thử gửi bằng Brevo REST API nếu có API Key (dạng xkeysib-...)
+    // 1. Thử gửi bằng Brevo REST API nếu có API Key (dạng xkeysib-...) hoặc khi được gọi
     if (apiKey && apiKey.startsWith("xkeysib-")) {
         try {
-            let payload = {
-                sender: { name: "BookingCare", email: senderEmail },
-                to: [{ email: to }],
-                subject: subject,
-                htmlContent: html,
-            };
-
-            if (attachments && attachments.length > 0) {
-                payload.attachment = attachments.map(att => ({
-                    name: att.filename,
-                    content: att.content // base64 string
-                }));
-            }
-
-            let response = await axios.post('https://api.brevo.com/v3/smtp/email', payload, {
-                headers: {
-                    'accept': 'application/json',
-                    'api-key': apiKey,
-                    'content-type': 'application/json'
-                },
-                timeout: 10000
-            });
-
-            console.log("Sent email successfully via Brevo REST API:", response.data);
+            await sendBrevoRestApi(apiKey, senderEmail, to, subject, html, attachments);
             return true;
         } catch (apiError) {
-            console.error("Brevo REST API error, falling back to Nodemailer SMTP:", apiError.response ? apiError.response.data : apiError.message);
+            console.error("Brevo REST API error, falling back to Nodemailer SMTP:", apiError.message);
         }
     }
 
-    // 2. Dự phòng: Gửi qua Nodemailer SMTP (Ép dùng IPv4 để không bị đơ/timeout trên Railway)
+    // 2. Dự phòng: Gửi qua Nodemailer SMTP (Ép dùng IPv4 theo yêu cầu)
     let host = process.env.EMAIL_HOST || "smtp-relay.brevo.com";
     let port = Number(process.env.EMAIL_PORT) || 587;
 
@@ -48,7 +83,7 @@ let sendMailUnified = async ({ to, subject, html, attachments }) => {
         host: host,
         port: port,
         secure: port === 465,
-        family: 4, // ⚡ ÉP CHỈ DÙNG IPV4 theo yêu cầu
+        family: 4, // ⚡ ÉP CHỈ DÙNG IPV4
         auth: {
             user: senderEmail,
             pass: apiKey,
@@ -72,7 +107,7 @@ let sendMailUnified = async ({ to, subject, html, attachments }) => {
     return true;
 };
 
-// --- CÁC HÀM CŨ CỦA ĐẶT LỊCH BÁC SĨ ---
+// --- CÁC HÀM ĐẶT LỊCH KHM BỆNH & GÓI KHÁM ---
 let getBodyHTMLEmail = (dataSend) => {
     let result = '';
     if (dataSend.language === 'vi') {
