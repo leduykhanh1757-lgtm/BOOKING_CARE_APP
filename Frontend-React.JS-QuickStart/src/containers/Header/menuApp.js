@@ -9,6 +9,10 @@ export const adminMenu = [
             {
                 name: 'menu.admin.manage-doctor', // Quản lý Bác sĩ
                 link: '/system/manage-doctor'
+            },
+            {
+                name: 'menu.doctor.manage-schedule', // Quản lý lịch khám
+                link: '/doctor/manage-schedule'
             }
         ]
     },

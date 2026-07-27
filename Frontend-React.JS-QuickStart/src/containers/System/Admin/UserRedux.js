@@ -182,7 +182,9 @@ class UserRedux extends Component {
             if (typeof user.image === 'string') {
                 imageBase64 = user.image;
             } else if (user.image.data) {
-                imageBase64 = new Buffer(user.image.data).toString('utf8');
+                imageBase64 = new Buffer(user.image.data).toString('binary');
+            } else {
+                imageBase64 = new Buffer(user.image, 'base64').toString('binary');
             }
         }
 
