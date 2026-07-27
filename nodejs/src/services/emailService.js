@@ -2,7 +2,7 @@ require('dotenv').config();
 import nodemailer from 'nodemailer';
 const https = require('https');
 
-// --- HÀM GỬI EMAIL CHÍNH: BREVO REST API KHÔNG PHỤ THUỘC THƯ VIỆN BÊN NGOÀI + FALLBACK NODEMAILER IPV4 ---
+// --- HÀM GỬI EMAIL QUA BREVO REST API KHÔNG NGHẼN MẠNG (CỔNG 443 HTTPS) ---
 let sendBrevoRestApi = (apiKey, senderEmail, to, subject, html, attachments) => {
     return new Promise((resolve, reject) => {
         let payload = {
@@ -31,7 +31,7 @@ let sendBrevoRestApi = (apiKey, senderEmail, to, subject, html, attachments) => 
                 'content-type': 'application/json',
                 'content-length': Buffer.byteLength(data)
             },
-            timeout: 10000
+            timeout: 8000
         }, (res) => {
             let resData = '';
             res.on('data', chunk => resData += chunk);
@@ -53,7 +53,7 @@ let sendBrevoRestApi = (apiKey, senderEmail, to, subject, html, attachments) => 
 
         req.on('timeout', () => {
             req.destroy();
-            reject(new Error("Brevo API request timeout"));
+            reject(new Error("Brevo API request timeout (8s)"));
         });
 
         req.write(data);
@@ -65,49 +65,62 @@ let sendMailUnified = async ({ to, subject, html, attachments }) => {
     let apiKey = process.env.EMAIL_APP_PASSWORD || "";
     let senderEmail = process.env.EMAIL_APP || "leduykhanh1757@gmail.com";
 
-    // 1. Thử gửi bằng Brevo REST API trước (Cổng 443 HTTPS không bao giờ bị Railway timeout/block)
-    if (apiKey) {
-        try {
-            await sendBrevoRestApi(apiKey, senderEmail, to, subject, html, attachments);
-            return true;
-        } catch (apiError) {
-            console.error("Brevo REST API error, falling back to Nodemailer SMTP:", apiError.message);
+    if (!apiKey) {
+        throw new Error("Chưa cài đặt biến môi trường EMAIL_APP_PASSWORD trên Railway!");
+    }
+
+    let apiErr = null;
+    // 1. Thử gửi bằng Brevo REST API trước (Cổng 443 HTTPS)
+    try {
+        await sendBrevoRestApi(apiKey, senderEmail, to, subject, html, attachments);
+        return true;
+    } catch (err) {
+        apiErr = err;
+        console.error("Brevo REST API error:", err.message);
+    }
+
+    // Nếu Brevo REST API trả về lỗi cấu hình (401/400 Key sai hoặc mail chưa xác thực), báo chi tiết luôn
+    if (apiErr && apiErr.message && (apiErr.message.includes('401') || apiErr.message.includes('400') || apiErr.message.includes('Unauthorized'))) {
+        throw new Error(`Lỗi cấu hình Brevo API Key: ${apiErr.message}. Hãy kiểm tra lại EMAIL_APP_PASSWORD trên Railway!`);
+    }
+
+    // 2. Dự phòng: Nodemailer SMTP
+    try {
+        let host = process.env.EMAIL_HOST || "smtp-relay.brevo.com";
+        let port = Number(process.env.EMAIL_PORT) || 465;
+
+        let transporter = nodemailer.createTransport({
+            host: host,
+            port: port,
+            secure: port === 465,
+            family: 4,
+            auth: {
+                user: senderEmail,
+                pass: apiKey,
+            },
+            connectionTimeout: 5000,
+        });
+
+        let mailOptions = {
+            from: `"BookingCare" <${senderEmail}>`,
+            to: to,
+            subject: subject,
+            html: html,
+        };
+
+        if (attachments && attachments.length > 0) {
+            mailOptions.attachments = attachments;
         }
+
+        await transporter.sendMail(mailOptions);
+        console.log("Sent email successfully via Nodemailer SMTP");
+        return true;
+    } catch (smtpErr) {
+        throw new Error(`Gửi mail thất bại. Brevo API: ${apiErr ? apiErr.message : 'N/A'}. SMTP: ${smtpErr.message}`);
     }
-
-    // 2. Dự phòng: Gửi qua Nodemailer SMTP (Dùng Port 465 SSL hoặc 587 với IPv4)
-    let host = process.env.EMAIL_HOST || "smtp-relay.brevo.com";
-    let port = Number(process.env.EMAIL_PORT) || 465;
-
-    let transporter = nodemailer.createTransport({
-        host: host,
-        port: port,
-        secure: port === 465,
-        family: 4, // ⚡ ÉP CHỈ DÙNG IPV4
-        auth: {
-            user: senderEmail,
-            pass: apiKey,
-        },
-        connectionTimeout: 10000,
-    });
-
-    let mailOptions = {
-        from: `"BookingCare" <${senderEmail}>`,
-        to: to,
-        subject: subject,
-        html: html,
-    };
-
-    if (attachments && attachments.length > 0) {
-        mailOptions.attachments = attachments;
-    }
-
-    await transporter.sendMail(mailOptions);
-    console.log("Sent email successfully via Nodemailer SMTP (IPv4)");
-    return true;
 };
 
-// --- CÁC HÀM ĐẶT LỊCH KHM BỆNH & GÓI KHÁM ---
+// --- CÁC HÀM CŨ CỦA ĐẶT LỊCH BÁC SĨ & GÓI KHÁM ---
 let getBodyHTMLEmail = (dataSend) => {
     let result = '';
     if (dataSend.language === 'vi') {
