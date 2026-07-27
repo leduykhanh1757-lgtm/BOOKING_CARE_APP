@@ -60,6 +60,8 @@ let initWebRoute = (app) => {
     router.get('/api/get-detail-package-by-id', packageController.getDetailPackageById);
     router.post('/api/book-package', packageController.postBookPackage);
 
+    router.post('/api/test-send-email', userController.handleTestSendEmail);
+    router.get('/api/test-send-email', userController.handleTestSendEmail);
 
     return app.use('/', router);
 }

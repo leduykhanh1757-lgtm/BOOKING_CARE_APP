@@ -119,6 +119,25 @@ let handleVerifyForgotPassword = async (req, res) => {
     }
 }
 
+let handleTestSendEmail = async (req, res) => {
+    try {
+        let email = req.body.email || req.query.email;
+        if (!email) {
+            return res.status(200).json({ errCode: 1, message: 'Missing email parameter!' });
+        }
+        const emailService = require('../services/emailService');
+        await emailService.sendForgotPasswordEmail({
+            email: email,
+            otp: '123456',
+            language: 'vi'
+        });
+        return res.status(200).json({ errCode: 0, message: 'Test email sent successfully to ' + email });
+    } catch (e) {
+        console.error("Test send email error:", e);
+        return res.status(500).json({ errCode: -1, message: 'Error sending test email: ' + (e.message || e) });
+    }
+}
+
 module.exports = {
     handleLogin: handleLogin,
     getAllUsers: getAllUsers,
@@ -128,5 +147,6 @@ module.exports = {
     getAllCode: getAllCode,
     handleAskBot: handleAskBot,
     handleForgotPassword: handleForgotPassword,
-    handleVerifyForgotPassword: handleVerifyForgotPassword
+    handleVerifyForgotPassword: handleVerifyForgotPassword,
+    handleTestSendEmail: handleTestSendEmail
 }

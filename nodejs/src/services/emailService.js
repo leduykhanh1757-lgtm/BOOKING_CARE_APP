@@ -1,27 +1,75 @@
 require('dotenv').config();
 import nodemailer from 'nodemailer';
+import axios from 'axios';
 
-// --- HÀM TẠO TRANSPORTER TỐI ƯU CHO BREVO VÀ SMTP KHÁC ---
-let getTransporter = () => {
+// --- HÀM GỬI EMAIL CHÍNH: KẾT HỢP BREVO API VÀ NODEMAILER IPV4 ---
+let sendMailUnified = async ({ to, subject, html, attachments }) => {
+    let apiKey = process.env.EMAIL_APP_PASSWORD || "";
+    let senderEmail = process.env.EMAIL_APP || "leduykhanh1757@gmail.com";
+
+    // 1. Thử gửi bằng Brevo REST API nếu có API Key (dạng xkeysib-...)
+    if (apiKey && apiKey.startsWith("xkeysib-")) {
+        try {
+            let payload = {
+                sender: { name: "BookingCare", email: senderEmail },
+                to: [{ email: to }],
+                subject: subject,
+                htmlContent: html,
+            };
+
+            if (attachments && attachments.length > 0) {
+                payload.attachment = attachments.map(att => ({
+                    name: att.filename,
+                    content: att.content // base64 string
+                }));
+            }
+
+            let response = await axios.post('https://api.brevo.com/v3/smtp/email', payload, {
+                headers: {
+                    'accept': 'application/json',
+                    'api-key': apiKey,
+                    'content-type': 'application/json'
+                },
+                timeout: 10000
+            });
+
+            console.log("Sent email successfully via Brevo REST API:", response.data);
+            return true;
+        } catch (apiError) {
+            console.error("Brevo REST API error, falling back to Nodemailer SMTP:", apiError.response ? apiError.response.data : apiError.message);
+        }
+    }
+
+    // 2. Dự phòng: Gửi qua Nodemailer SMTP (Ép dùng IPv4 để không bị đơ/timeout trên Railway)
     let host = process.env.EMAIL_HOST || "smtp-relay.brevo.com";
     let port = Number(process.env.EMAIL_PORT) || 587;
-    let user = process.env.EMAIL_APP || "leduykhanh1757@gmail.com";
-    let pass = process.env.EMAIL_APP_PASSWORD || "";
 
-    return nodemailer.createTransport({
+    let transporter = nodemailer.createTransport({
         host: host,
         port: port,
-        secure: port === 465, // true nếu port 465, false cho port 587
+        secure: port === 465,
+        family: 4, // ⚡ ÉP CHỈ DÙNG IPV4 theo yêu cầu
         auth: {
-            user: user,
-            pass: pass,
+            user: senderEmail,
+            pass: apiKey,
         },
+        connectionTimeout: 10000,
     });
-};
 
-let getFromEmail = () => {
-    let fromEmail = process.env.EMAIL_APP || "leduykhanh1757@gmail.com";
-    return `"BookingCare" <${fromEmail}>`;
+    let mailOptions = {
+        from: `"BookingCare" <${senderEmail}>`,
+        to: to,
+        subject: subject,
+        html: html,
+    };
+
+    if (attachments && attachments.length > 0) {
+        mailOptions.attachments = attachments;
+    }
+
+    await transporter.sendMail(mailOptions);
+    console.log("Sent email successfully via Nodemailer SMTP (IPv4)");
+    return true;
 };
 
 // --- CÁC HÀM CŨ CỦA ĐẶT LỊCH BÁC SĨ ---
@@ -54,10 +102,8 @@ let getBodyHTMLEmail = (dataSend) => {
 
 let sendSimpleEmail = async (dataSend) => {
     try {
-        let transporter = getTransporter();
         let subjectTitle = dataSend.language === 'vi' ? "Thông tin đặt lịch khám bệnh | BookingCare" : "Information to book a medical appointment | BookingCare";
-        await transporter.sendMail({
-            from: getFromEmail(),
+        await sendMailUnified({
             to: dataSend.receiverEmail,
             subject: subjectTitle,
             html: getBodyHTMLEmail(dataSend),
@@ -83,9 +129,7 @@ let getBodyHTMLEmailRemedy = (dataSend) => {
 let sendAttachment = (dataSend) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let transporter = getTransporter();
-            await transporter.sendMail({
-                from: getFromEmail(),
+            await sendMailUnified({
                 to: dataSend.email,
                 subject: dataSend.language === 'vi' ? "Kết quả khám bệnh" : "Medical examination results",
                 html: getBodyHTMLEmailRemedy(dataSend),
@@ -160,13 +204,11 @@ let getPackageEmailBody = (dataSend) => {
 
 let sendPackageBookingEmail = async (dataSend) => {
     try {
-        let transporter = getTransporter();
         let subjectTitle = dataSend.language === 'en'
             ? "Medical Service Booking Confirmation | BookingCare"
             : "Xác nhận đặt lịch Dịch vụ Y tế thành công | BookingCare";
 
-        await transporter.sendMail({
-            from: getFromEmail(),
+        await sendMailUnified({
             to: dataSend.email,
             subject: subjectTitle,
             html: getPackageEmailBody(dataSend),
@@ -180,7 +222,6 @@ let sendPackageBookingEmail = async (dataSend) => {
 
 let sendForgotPasswordEmail = async (dataSend) => {
     try {
-        let transporter = getTransporter();
         let subjectTitle = dataSend.language === 'en'
             ? "Reset Password Verification Code | BookingCare"
             : "Mã xác nhận Đặt lại mật khẩu | BookingCare";
@@ -197,8 +238,7 @@ let sendForgotPasswordEmail = async (dataSend) => {
                <p>Mã này có hiệu lực trong 5 phút. Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
                <p>Trân trọng!</p>`;
 
-        await transporter.sendMail({
-            from: getFromEmail(),
+        await sendMailUnified({
             to: dataSend.email,
             subject: subjectTitle,
             html: bodyHtml,
