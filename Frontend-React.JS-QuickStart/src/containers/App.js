@@ -93,10 +93,10 @@ class App extends Component {
 
                                     {/* ROUTE CHO ADMIN (Đăng nhập quản trị) */}
                                     <Route path={path.LOGIN} component={Login} />
-                                    <Route path={path.SYSTEM} component={userIsAuthenticated(System)} />
+                                    <Route path={path.SYSTEM} component={System} />
 
                                     {/* ROUTE DÀNH CHO BÁC SĨ */}
-                                    <Route path={'/doctor/'} component={userIsAuthenticated(Doctor)} />
+                                    <Route path={'/doctor/'} component={Doctor} />
 
                                     {/* CÁC ROUTE PUBLIC DÀNH CHO BỆNH NHÂN (Không cần đăng nhập) */}
                                     <Route path={path.HOMEPAGE} component={HomePage} />
