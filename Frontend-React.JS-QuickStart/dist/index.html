@@ -3,25 +3,24 @@
 
 <head>
   <meta charset="utf-8" />
-  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
-  <link rel="manifest" href="/manifest.json" />
-  <title>Booking care</title>
-  
-  <!-- Polyfill process & global cho browser runtime của Vite (hỗ trợ CRA legacy code) -->
-  <script>
-    window.global = window;
-    window.process = {
-      env: {
-        NODE_ENV: 'development',
-        REACT_APP_BACKEND_URL: 'http://localhost:8080',
-        REACT_APP_ROUTER_BASE_NAME: '',
-        REACT_APP_IS_LOCALHOST: '1'
-      }
-    };
-  </script>
+  <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
 
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+  <title>Booking care</title>
   <style>
     /* Ép tàng hình banner Google (Class bản cũ) */
     .goog-te-banner-frame.skiptranslate,
@@ -29,7 +28,7 @@
       display: none !important;
     }
 
-    /* Ép tàng hình banner Google (Class bản cập nhật mới nhất) */
+    /* 🛠️ Ép tàng hình banner Google (Class bản cập nhật mới nhất) */
     iframe.skiptranslate,
     .VIpgJd-ZVi9od-ORHb-OEVmcd {
       display: none !important;
@@ -53,13 +52,21 @@
       display: none !important;
     }
   </style>
-  <script type="module" crossorigin src="/assets/index-4e7df566.js"></script>
-  <link rel="stylesheet" href="/assets/index-b2305dd8.css">
 </head>
 
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
+  <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
   <div id="google_translate_element" style="display: none;"></div>
 
   <!-- Script cấu hình Google Translate -->
@@ -76,9 +83,6 @@
   <!-- Nhúng thư viện của Google -->
   <script type="text/javascript"
     src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
-  <!-- Nạp React entry point cho Vite -->
-  
 </body>
 
 </html>

@@ -1,15 +1,7 @@
 import React, { Component } from 'react';
-import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import './TableManageUser.scss';
 import * as actions from '../../../store/actions';
-import markdownIt from 'markdown-it';
-import MdEditor from 'react-markdown-editor-lite';
-
-import 'react-markdown-editor-lite/lib/index.css';
-
-const mdParser = new markdownIt();
-
 
 class TableManageUser extends Component {
 
@@ -33,51 +25,44 @@ class TableManageUser extends Component {
     }
 
     handleDeleteUser = (user) => {
-        this.props.deleteUserRedux(user.id);
+        if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
+            this.props.deleteUserRedux(user.id);
+        }
     }
 
     handleEditUser = (user) => {
         this.props.handleEditUserFromParentKey(user);
     }
 
-    handleEditorOnChange({ html, text }) {
-        console.log('handleEditorOnChange', html, text);
-    }
-
     render() {
-        console.log('check user redux: ', this.props.ListUsers);
-        console.log('check user state: ', this.state.userRedux);
         let arrUsers = this.state.userRedux;
         return (
-            <reactFragment>
+            <div className="table-manage-user-container">
                 <table id="customers">
                     <tbody>
-                        {/* Tiêu đề các cột giữ nguyên */}
                         <tr>
                             <th>Email</th>
-                            <th>First name</th>
-                            <th>Last name</th>
-                            <th>Address</th>
-                            <th>Actions</th>
+                            <th>Họ</th>
+                            <th>Tên</th>
+                            <th>Số điện thoại</th>
+                            <th>Địa chỉ</th>
+                            <th>Hành động</th>
                         </tr>
 
-                        {/* Dùng map() để lặp qua mảng và in ra từng hàng dữ liệu */}
-                        {arrUsers && arrUsers.map((item, index) => {
+                        {arrUsers && arrUsers.length > 0 && arrUsers.map((item, index) => {
                             return (
                                 <tr key={index}>
                                     <td>{item.email}</td>
-                                    <td>{item.firstName}</td>
                                     <td>{item.lastName}</td>
+                                    <td>{item.firstName}</td>
+                                    <td>{item.phonenumber || item.phoneNumber || '-'}</td>
                                     <td>{item.address}</td>
                                     <td>
-                                        <button className="btn-edit">
-                                            <i className="fas fa-pencil-alt"
-                                                onClick={() => this.handleEditUser(item)}
-                                            ></i>
+                                        <button className="btn-edit" onClick={() => this.handleEditUser(item)} title="Sửa thông tin">
+                                            <i className="fas fa-pencil-alt"></i>
                                         </button>
-                                        <button className="btn-delete">
-                                            <i className="fas fa-trash"
-                                                onClick={() => this.handleDeleteUser(item)}></i>
+                                        <button className="btn-delete" onClick={() => this.handleDeleteUser(item)} title="Xóa người dùng">
+                                            <i className="fas fa-trash"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -85,13 +70,7 @@ class TableManageUser extends Component {
                         })}
                     </tbody>
                 </table>
-                <div className='mt-5 mb-5'>
-                    <MdEditor style={{ height: '500px' }}
-                        renderHTML={text => mdParser.render(text)}
-                        onChange={this.handleEditorOnChange} />
-
-                </div>
-            </reactFragment>
+            </div>
         );
     }
 }

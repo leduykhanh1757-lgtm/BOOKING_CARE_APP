@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
-import { getAllCodeService } from '../../../services/userService';
 import { languages, CRUD_actions, CommonUtils } from '../../../utils';
 import * as actions from '../../../store/actions';
 import './UserRedux.scss';
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css';
 import TableManageUser from './TableManageUser';
-import { set } from 'lodash';
 
 class UserRedux extends Component {
 
@@ -44,13 +42,10 @@ class UserRedux extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        // So sánh: Nếu Props của quá khứ (prevProps) KHÁC với Props hiện tại (this.props)
-        // Tức là Redux vừa mới bơm dữ liệu mới sang
         if (prevProps.genderRedux !== this.props.genderRedux) {
             let arrGenders = this.props.genderRedux;
             this.setState({
                 genderArr: arrGenders,
-                // Chọn sẵn mặc định thằng đầu tiên (Male) cho ô dropdown đỡ bị trống
                 gender: arrGenders && arrGenders.length > 0 ? arrGenders[0].keyMap : ''
             })
         }
@@ -70,8 +65,8 @@ class UserRedux extends Component {
                 role: arrRoles && arrRoles.length > 0 ? arrRoles[0].keyMap : ''
             })
         }
+
         if (prevProps.ListUsers !== this.props.ListUsers) {
-            let arrUsers = this.props.ListUsers;
             let arrGenders = this.props.genderRedux;
             let arrPositions = this.props.positionRedux;
             let arrRoles = this.props.roleRedux;
@@ -96,14 +91,12 @@ class UserRedux extends Component {
 
     handleonChangeImg = async (event) => {
         let data = event.target.files;
-        let file = data[0]; // Lấy cái file đầu tiên mà người dùng chọn
+        let file = data[0];
 
         if (file) {
             let base64 = await CommonUtils.getBase64(file);
-            // Tạo một cái link ảo URL cho cái file đó
             let objectUrl = URL.createObjectURL(file);
 
-            // Lưu link ảo vào previewImgURL để hiển thị, lưu file thật vào avatar
             this.setState({
                 previewImgURL: objectUrl,
                 avatar: base64
@@ -112,10 +105,7 @@ class UserRedux extends Component {
     }
 
     openPreviewImage = () => {
-        // Nếu chưa có ảnh (previewImgURL rỗng) thì bấm vào không có tác dụng gì cả
         if (!this.state.previewImgURL) return;
-
-        // Nếu có ảnh rồi thì bật cờ lên
         this.setState({
             isOpen: true
         })
@@ -125,10 +115,9 @@ class UserRedux extends Component {
         let isValid = this.checkValidateInput();
         if (isValid === false) return;
 
-        let { action } = this.state; // Lấy cái cờ ra kiểm tra xem đang ở chế độ CREATE hay EDIT
+        let { action } = this.state;
 
         if (action === CRUD_actions.CREATE) {
-            // Nếu đang ở chế độ CREATE thì gọi action tạo mới
             this.props.createNewUserRedux({
                 email: this.state.email,
                 password: this.state.password,
@@ -144,9 +133,8 @@ class UserRedux extends Component {
         }
 
         if (action === CRUD_actions.EDIT) {
-            // Nếu đang ở chế độ EDIT thì gọi action sửa
             this.props.editUserRedux({
-                id: this.state.userEditId, // Đem ID của user đang sửa ra
+                id: this.state.userEditId,
                 email: this.state.email,
                 password: this.state.password,
                 firstName: this.state.firstName,
@@ -162,25 +150,23 @@ class UserRedux extends Component {
     }
 
     onChangeInput = (event, id) => {
-        let copyState = { ...this.state }
-
+        let copyState = { ...this.state };
         copyState[id] = event.target.value;
-
         this.setState({
             ...copyState,
-        }, () => {
-            console.log('check input state', this.state)
         })
-
     }
 
     checkValidateInput = () => {
         let isValid = true;
+        let arrCheck = ['email', 'firstName', 'lastName', 'phoneNumber', 'address'];
 
-        let arrCheck = ['email', 'password', 'firstName', 'lastName', 'phoneNumber', 'address'];
+        // Nếu ở chế độ Tạo mới thì cần validate mật khẩu
+        if (this.state.action === CRUD_actions.CREATE) {
+            arrCheck.push('password');
+        }
 
         for (let i = 0; i < arrCheck.length; i++) {
-            // Nếu state của phần tử đó bị rỗng (falsy)
             if (!this.state[arrCheck[i]]) {
                 isValid = false;
                 alert('Vui lòng nhập đầy đủ thông tin: ' + arrCheck[i]);
@@ -192,27 +178,30 @@ class UserRedux extends Component {
 
     handleEditUserFromParent = (user) => {
         let imageBase64 = '';
-
         if (user.image) {
-            imageBase64 = new Buffer(user.image, 'base64').toString('binary');
+            if (typeof user.image === 'string') {
+                imageBase64 = user.image;
+            } else if (user.image.data) {
+                imageBase64 = new Buffer(user.image.data).toString('utf8');
+            }
         }
 
         this.setState({
-            email: user.email,
-            password: 'HARDCODE',
-            firstName: user.firstName,
-            lastName: user.lastName,
-            phoneNumber: user.phoneNumber,
-            address: user.address,
-            gender: user.gender,
-            position: user.positionId,
-            role: user.roleId,
-            avatar: '',
+            email: user.email || '',
+            password: 'HARDCODE_PASSWORD',
+            firstName: user.firstName || '',
+            lastName: user.lastName || '',
+            phoneNumber: user.phonenumber || user.phoneNumber || '',
+            address: user.address || '',
+            gender: user.gender || '',
+            position: user.positionId || '',
+            role: user.roleId || '',
+            avatar: imageBase64,
             previewImgURL: imageBase64,
 
             action: CRUD_actions.EDIT,
             userEditId: user.id
-        })
+        });
     }
 
     render() {
@@ -224,59 +213,49 @@ class UserRedux extends Component {
 
         let { email, password,
             firstName, lastName, phoneNumber, address,
-            gender, position, role, avatar } = this.state;
+            gender, position, role } = this.state;
 
         return (
             <div className='user-redux-container'>
-                <div className="title text-center mt-3" >
-                    <FormattedMessage id="manage-user.add" />
+                <div className="title text-center mt-3">
+                    <FormattedMessage id="manage-user.add" defaultMessage="Quản lý người dùng" />
                 </div>
-                <div className="text-center">
-                    {/* In ra chữ Loading để test */}
-                    {isLoadingGender === true ? 'Loading gender...' : ''}
-                </div>
-                <div className="user-redux-body" >
+
+                <div className="user-redux-body">
                     <div className='container'>
                         <div className='row'>
-
                             <div className="col-12 my-3">
-                                <strong><FormattedMessage id="manage-user.add" defaultMessage="Add a new user" /></strong>
+                                <strong>
+                                    {this.state.action === CRUD_actions.EDIT ? 'Chỉnh sửa thông tin người dùng' : 'Thêm mới người dùng'}
+                                </strong>
                             </div>
 
                             {/* --- DÒNG 1 --- */}
-                            <div className="col-3 mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage id="manage-user.email" defaultMessage="Email" />
-                                </label>
+                            <div className="col-3 mb-3 form-group">
+                                <label className="form-label">Email</label>
                                 <input type="email" className="form-control"
                                     value={email}
                                     onChange={(event) => { this.onChangeInput(event, 'email') }}
-                                    disabled={this.state.action === CRUD_actions.EDIT ? true : false}
+                                    disabled={this.state.action === CRUD_actions.EDIT}
                                 />
                             </div>
-                            <div className="col-3 mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage id="manage-user.password" defaultMessage="Password" />
-                                </label>
+                            <div className="col-3 mb-3 form-group">
+                                <label className="form-label">Mật khẩu</label>
                                 <input type="password" className="form-control"
                                     value={password}
                                     onChange={(event) => { this.onChangeInput(event, 'password') }}
-                                    disabled={this.state.action === CRUD_actions.EDIT ? true : false}
+                                    disabled={this.state.action === CRUD_actions.EDIT}
                                 />
                             </div>
-                            <div className="col-3 mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage id="manage-user.first-name" defaultMessage="First name" />
-                                </label>
+                            <div className="col-3 mb-3 form-group">
+                                <label className="form-label">Tên (First name)</label>
                                 <input type="text" className="form-control"
                                     value={firstName}
                                     onChange={(event) => { this.onChangeInput(event, 'firstName') }}
                                 />
                             </div>
-                            <div className="col-3 mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage id="manage-user.last-name" defaultMessage="Last name" />
-                                </label>
+                            <div className="col-3 mb-3 form-group">
+                                <label className="form-label">Họ (Last name)</label>
                                 <input type="text" className="form-control"
                                     value={lastName}
                                     onChange={(event) => { this.onChangeInput(event, 'lastName') }}
@@ -284,19 +263,15 @@ class UserRedux extends Component {
                             </div>
 
                             {/* --- DÒNG 2 --- */}
-                            <div className="col-3 mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage id="manage-user.phone-number" defaultMessage="Phone number" />
-                                </label>
+                            <div className="col-3 mb-3 form-group">
+                                <label className="form-label">Số điện thoại</label>
                                 <input type="text" className="form-control"
                                     value={phoneNumber}
                                     onChange={(event) => { this.onChangeInput(event, 'phoneNumber') }}
                                 />
                             </div>
-                            <div className="col-9 mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage id="manage-user.address" defaultMessage="Address" />
-                                </label>
+                            <div className="col-9 mb-3 form-group">
+                                <label className="form-label">Địa chỉ</label>
                                 <input type="text" className="form-control"
                                     value={address}
                                     onChange={(event) => { this.onChangeInput(event, 'address') }}
@@ -304,13 +279,9 @@ class UserRedux extends Component {
                             </div>
 
                             {/* --- DÒNG 3 --- */}
-
-                            {/* 1. Ô GENDER (Đang gọi từ Redux) */}
-                            <div className="col-3 mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage id="manage-user.gender" defaultMessage="Gender" />
-                                </label>
-                                <select className="form-select"
+                            <div className="col-3 mb-3 form-group">
+                                <label className="form-label">Giới tính</label>
+                                <select className="form-control"
                                     onChange={(event) => { this.onChangeInput(event, 'gender') }}
                                     value={gender}
                                 >
@@ -324,12 +295,9 @@ class UserRedux extends Component {
                                 </select>
                             </div>
 
-                            {/* Ô POSITION */}
-                            <div className="col-3 mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage id="manage-user.position" defaultMessage="Position" />
-                                </label>
-                                <select className="form-select"
+                            <div className="col-3 mb-3 form-group">
+                                <label className="form-label">Chức danh (Position)</label>
+                                <select className="form-control"
                                     onChange={(event) => { this.onChangeInput(event, 'position') }}
                                     value={position}
                                 >
@@ -343,12 +311,9 @@ class UserRedux extends Component {
                                 </select>
                             </div>
 
-                            {/* Ô ROLE  */}
-                            <div className="col-3 mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage id="manage-user.role" defaultMessage="Role" />
-                                </label>
-                                <select className="form-select"
+                            <div className="col-3 mb-3 form-group">
+                                <label className="form-label">Vai trò (Role)</label>
+                                <select className="form-control"
                                     onChange={(event) => { this.onChangeInput(event, 'role') }}
                                     value={role}
                                 >
@@ -362,29 +327,20 @@ class UserRedux extends Component {
                                 </select>
                             </div>
 
-                            <div className="col-3 mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage id="manage-user.image" defaultMessage="Avatar" />
-                                </label>
+                            <div className="col-3 mb-3 form-group">
+                                <label className="form-label">Ảnh đại diện (Avatar)</label>
                                 <div className="preview-img-container">
-                                    {/* Thêm chữ hidden để giấu nút mặc định đi */}
                                     <input id='previewImg' type="file" hidden
                                         onChange={(event) => this.handleonChangeImg(event)}
-
                                     />
-
-                                    {/* Thêm class label-upload và icon */}
                                     <label className="label-upload" htmlFor='previewImg'>
                                         Tải ảnh <i className="fas fa-upload"></i>
                                     </label>
 
-                                    {/* Khung hiển thị ảnh xem trước */}
                                     <div className='preview-image'
                                         style={{ backgroundImage: `url(${this.state.previewImgURL})` }}
                                         onClick={() => this.openPreviewImage()}
-                                    >
-
-                                    </div>
+                                    />
                                     {this.state.isOpen === true &&
                                         <Lightbox
                                             mainSrc={this.state.previewImgURL}
@@ -393,17 +349,15 @@ class UserRedux extends Component {
                                     }
                                 </div>
                             </div>
+
                             <div className="col-12 mt-3">
                                 <button className={this.state.action === CRUD_actions.CREATE ? "btn btn-primary" : "btn btn-warning"}
                                     onClick={() => this.handleSaveUser()}
                                 >
-                                    {this.state.action === CRUD_actions.CREATE ?
-                                        <FormattedMessage id="manage-user.save" defaultMessage="Save user" />
-                                        :
-                                        <FormattedMessage id="manage-user.update" defaultMessage="Update user" />
-                                    }
+                                    {this.state.action === CRUD_actions.CREATE ? 'Lưu người dùng' : 'Cập nhật thông tin'}
                                 </button>
                             </div>
+
                             <div className="col-12 mt-5 mb-5">
                                 <TableManageUser
                                     handleEditUserFromParentKey={this.handleEditUserFromParent}
@@ -416,7 +370,6 @@ class UserRedux extends Component {
             </div>
         )
     }
-
 }
 
 const mapStateToProps = state => {
