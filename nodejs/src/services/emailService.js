@@ -1,7 +1,30 @@
 require('dotenv').config();
 import nodemailer from 'nodemailer';
 
-// --- CÁC HÀM CŨ CỦA ĐẶT LỊCH BÁC SĨ (GIỮ NGUYÊN) ---
+// --- HÀM TẠO TRANSPORTER TỐI ƯU CHO BREVO VÀ SMTP KHÁC ---
+let getTransporter = () => {
+    let host = process.env.EMAIL_HOST || "smtp-relay.brevo.com";
+    let port = Number(process.env.EMAIL_PORT) || 587;
+    let user = process.env.EMAIL_APP || "leduykhanh1757@gmail.com";
+    let pass = process.env.EMAIL_APP_PASSWORD || "";
+
+    return nodemailer.createTransport({
+        host: host,
+        port: port,
+        secure: port === 465, // true nếu port 465, false cho port 587
+        auth: {
+            user: user,
+            pass: pass,
+        },
+    });
+};
+
+let getFromEmail = () => {
+    let fromEmail = process.env.EMAIL_APP || "leduykhanh1757@gmail.com";
+    return `"BookingCare" <${fromEmail}>`;
+};
+
+// --- CÁC HÀM CŨ CỦA ĐẶT LỊCH BÁC SĨ ---
 let getBodyHTMLEmail = (dataSend) => {
     let result = '';
     if (dataSend.language === 'vi') {
@@ -30,17 +53,20 @@ let getBodyHTMLEmail = (dataSend) => {
 }
 
 let sendSimpleEmail = async (dataSend) => {
-    let transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com", port: 587, secure: false,
-        auth: { user: process.env.EMAIL_APP, pass: process.env.EMAIL_APP_PASSWORD },
-    });
-    let subjectTitle = dataSend.language === 'vi' ? "Thông tin đặt lịch khám bệnh | BookingCare" : "Information to book a medical appointment | BookingCare";
-    await transporter.sendMail({
-        from: '"BookingCare LDK" <latla17572005@gmail.com>',
-        to: dataSend.receiverEmail,
-        subject: subjectTitle,
-        html: getBodyHTMLEmail(dataSend),
-    });
+    try {
+        let transporter = getTransporter();
+        let subjectTitle = dataSend.language === 'vi' ? "Thông tin đặt lịch khám bệnh | BookingCare" : "Information to book a medical appointment | BookingCare";
+        await transporter.sendMail({
+            from: getFromEmail(),
+            to: dataSend.receiverEmail,
+            subject: subjectTitle,
+            html: getBodyHTMLEmail(dataSend),
+        });
+        return true;
+    } catch (e) {
+        console.error("Error sendSimpleEmail:", e);
+        throw e;
+    }
 }
 
 let getBodyHTMLEmailRemedy = (dataSend) => {
@@ -57,12 +83,9 @@ let getBodyHTMLEmailRemedy = (dataSend) => {
 let sendAttachment = (dataSend) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let transporter = nodemailer.createTransport({
-                host: "smtp.gmail.com", port: 587, secure: false,
-                auth: { user: process.env.EMAIL_APP, pass: process.env.EMAIL_APP_PASSWORD },
-            });
+            let transporter = getTransporter();
             await transporter.sendMail({
-                from: '"BookingCare LDK" <latla17572005@gmail.com>', // Đã cập nhật đúng mail gửi
+                from: getFromEmail(),
                 to: dataSend.email,
                 subject: dataSend.language === 'vi' ? "Kết quả khám bệnh" : "Medical examination results",
                 html: getBodyHTMLEmailRemedy(dataSend),
@@ -73,17 +96,18 @@ let sendAttachment = (dataSend) => {
                 }]
             });
             resolve(true);
-        } catch (e) { reject(e); }
+        } catch (e) {
+            console.error("Error sendAttachment:", e);
+            reject(e);
+        }
     })
 }
 
-// --- CÁC HÀM MỚI CHO GÓI KHÁM ĐÃ FIX ---
+// --- CÁC HÀM CHO GÓI KHÁM ---
 let getPackageEmailBody = (dataSend) => {
     let result = '';
-    // Kiểm tra xem có phải là khám từ xa hay tư vấn tâm lý không
     let isOnline = (dataSend.serviceType === 'remote-examination' || dataSend.serviceType === 'mental-health');
 
-    // ================= GIAO DIỆN TIẾNG ANH =================
     if (dataSend.language === 'en') {
         let instruction = isOnline
             ? `<h4><b style="color: #d93025;">IMPORTANT NOTE FOR ONLINE CONSULTATION:</b></h4>
@@ -100,16 +124,14 @@ let getPackageEmailBody = (dataSend) => {
             <p><b>Your Booking Information:</b></p>
             <ul>
                 <li><b>Service Name:</b> ${dataSend.packageName}</li>
-                <li><b>Scheduled Date:</b> ${dataSend.bookingDate}</li> <!-- 🛠️ ĐÃ THÊM NGÀY KHÁM -->
+                <li><b>Scheduled Date:</b> ${dataSend.bookingDate}</li>
                 <li><b>Phone Number:</b> ${dataSend.phoneNumber}</li>
                 <li><b>Reason for visit:</b> ${dataSend.reason || 'None'}</li>
             </ul>
             ${instruction}
             <p>Thank you for trusting our services!</p>
         `;
-    }
-    // ================= GIAO DIỆN TIẾNG VIỆT =================
-    else {
+    } else {
         let instruction = isOnline
             ? `<h4><b style="color: #d93025;">LƯU Ý QUAN TRỌNG VỀ KHÁM TRỰC TUYẾN:</b></h4>
                <p>Vì đây là dịch vụ khám/tư vấn từ xa, quý khách vui lòng truy cập vào đường link phòng khám ảo vào đúng giờ hẹn:</p>
@@ -125,7 +147,7 @@ let getPackageEmailBody = (dataSend) => {
             <p><b>Thông tin đặt lịch của bạn:</b></p>
             <ul>
                 <li><b>Tên dịch vụ:</b> ${dataSend.packageName}</li>
-                <li><b>Ngày khám dự kiến:</b> ${dataSend.bookingDate}</li> <!-- 🛠️ ĐÃ THÊM NGÀY KHÁM -->
+                <li><b>Ngày khám dự kiến:</b> ${dataSend.bookingDate}</li>
                 <li><b>Số điện thoại:</b> ${dataSend.phoneNumber}</li>
                 <li><b>Lý do khám:</b> ${dataSend.reason || 'Không có'}</li>
             </ul>
@@ -136,63 +158,56 @@ let getPackageEmailBody = (dataSend) => {
     return result;
 }
 
-// Hàm chính để gửi mail Gói Khám
 let sendPackageBookingEmail = async (dataSend) => {
-    let transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: {
-            user: process.env.EMAIL_APP,
-            pass: process.env.EMAIL_APP_PASSWORD,
-        },
-    });
+    try {
+        let transporter = getTransporter();
+        let subjectTitle = dataSend.language === 'en'
+            ? "Medical Service Booking Confirmation | BookingCare"
+            : "Xác nhận đặt lịch Dịch vụ Y tế thành công | BookingCare";
 
-    let subjectTitle = dataSend.language === 'en'
-        ? "Medical Service Booking Confirmation | BookingCare"
-        : "Xác nhận đặt lịch Dịch vụ Y tế thành công | BookingCare";
-
-    await transporter.sendMail({
-        from: '"BookingCare LDK" <latla17572005@gmail.com>',
-        to: dataSend.email,
-        subject: subjectTitle,
-        html: getPackageEmailBody(dataSend),
-    });
+        await transporter.sendMail({
+            from: getFromEmail(),
+            to: dataSend.email,
+            subject: subjectTitle,
+            html: getPackageEmailBody(dataSend),
+        });
+        return true;
+    } catch (e) {
+        console.error("Error sendPackageBookingEmail:", e);
+        throw e;
+    }
 }
 
 let sendForgotPasswordEmail = async (dataSend) => {
-    let transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: {
-            user: process.env.EMAIL_APP,
-            pass: process.env.EMAIL_APP_PASSWORD,
-        },
-    });
+    try {
+        let transporter = getTransporter();
+        let subjectTitle = dataSend.language === 'en'
+            ? "Reset Password Verification Code | BookingCare"
+            : "Mã xác nhận Đặt lại mật khẩu | BookingCare";
 
-    let subjectTitle = dataSend.language === 'en'
-        ? "Reset Password Verification Code | BookingCare"
-        : "Mã xác nhận Đặt lại mật khẩu | BookingCare";
+        let bodyHtml = dataSend.language === 'en'
+            ? `<h3>Dear User,</h3>
+               <p>You requested a password reset on BookingCare. Your verification code is:</p>
+               <h2 style="color: #d93025; font-size: 24px; padding: 10px; border: 1px solid #ccc; display: inline-block;">${dataSend.otp}</h2>
+               <p>This code is valid for 5 minutes. If you did not request this, please ignore this email.</p>
+               <p>Best regards!</p>`
+            : `<h3>Xin chào,</h3>
+               <p>Bạn đã yêu cầu đặt lại mật khẩu trên BookingCare. Mã xác nhận của bạn là:</p>
+               <h2 style="color: #d93025; font-size: 24px; padding: 10px; border: 1px solid #ccc; display: inline-block;">${dataSend.otp}</h2>
+               <p>Mã này có hiệu lực trong 5 phút. Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
+               <p>Trân trọng!</p>`;
 
-    let bodyHtml = dataSend.language === 'en'
-        ? `<h3>Dear User,</h3>
-           <p>You requested a password reset on BookingCare. Your verification code is:</p>
-           <h2 style="color: #d93025; font-size: 24px; padding: 10px; border: 1px solid #ccc; display: inline-block;">${dataSend.otp}</h2>
-           <p>This code is valid for 5 minutes. If you did not request this, please ignore this email.</p>
-           <p>Best regards!</p>`
-        : `<h3>Xin chào,</h3>
-           <p>Bạn đã yêu cầu đặt lại mật khẩu trên BookingCare. Mã xác nhận của bạn là:</p>
-           <h2 style="color: #d93025; font-size: 24px; padding: 10px; border: 1px solid #ccc; display: inline-block;">${dataSend.otp}</h2>
-           <p>Mã này có hiệu lực trong 5 phút. Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
-           <p>Trân trọng!</p>`;
-
-    await transporter.sendMail({
-        from: '"BookingCare LDK" <latla17572005@gmail.com>',
-        to: dataSend.email,
-        subject: subjectTitle,
-        html: bodyHtml,
-    });
+        await transporter.sendMail({
+            from: getFromEmail(),
+            to: dataSend.email,
+            subject: subjectTitle,
+            html: bodyHtml,
+        });
+        return true;
+    } catch (e) {
+        console.error("Error sendForgotPasswordEmail:", e);
+        throw e;
+    }
 }
 
 module.exports = {
