@@ -3,7 +3,7 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Comment extends Model {
     static associate(models) {
-      // Định nghĩa quan hệ (sau này có thể nối với bảng Doctor)
+      // Định nghĩa quan hệ
     }
   };
   Comment.init({
@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Comment',
+    tableName: 'comments'
   });
   return Comment;
 };
