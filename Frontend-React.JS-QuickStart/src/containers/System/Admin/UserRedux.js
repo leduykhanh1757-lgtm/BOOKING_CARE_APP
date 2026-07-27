@@ -182,13 +182,24 @@ class UserRedux extends Component {
     // Hàm nhận dữ liệu khi bấm nút BÚT CHÌ ở bảng bên dưới
     handleEditUserFromParent = (user) => {
         let imageBase64 = '';
-        if (user.image) {
+        if (user && user.image) {
             if (typeof user.image === 'string') {
                 imageBase64 = user.image;
-            } else if (user.image.data) {
-                imageBase64 = new Buffer(user.image.data).toString('binary');
-            } else if (Buffer.isBuffer(user.image)) {
-                imageBase64 = user.image.toString('utf8');
+            } else if (user.image.data && Array.isArray(user.image.data)) {
+                try {
+                    imageBase64 = new TextDecoder('utf-8').decode(new Uint8Array(user.image.data));
+                } catch (e) {
+                    console.error('Error decoding image array:', e);
+                }
+            } else if (typeof user.image === 'object') {
+                try {
+                    let arr = user.image.data || user.image;
+                    if (Array.isArray(arr)) {
+                        imageBase64 = new TextDecoder('utf-8').decode(new Uint8Array(arr));
+                    }
+                } catch (e) {
+                    console.error('Error decoding image object:', e);
+                }
             }
         }
 
