@@ -121,7 +121,7 @@ let handleVerifyForgotPassword = async (req, res) => {
 
 let handleTestSendEmail = async (req, res) => {
     try {
-        let email = req.body.email || req.query.email;
+        let email = (req.body && req.body.email) || (req.query && req.query.email);
         if (!email) {
             return res.status(200).json({ errCode: 1, message: 'Missing email parameter!' });
         }
