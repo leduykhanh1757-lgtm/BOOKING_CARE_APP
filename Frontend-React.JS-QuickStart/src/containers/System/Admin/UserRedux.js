@@ -70,22 +70,25 @@ class UserRedux extends Component {
             let arrGenders = this.props.genderRedux;
             let arrPositions = this.props.positionRedux;
             let arrRoles = this.props.roleRedux;
-            this.setState({
-                email: '',
-                password: '',
-                firstName: '',
-                lastName: '',
-                phoneNumber: '',
-                address: '',
-                gender: arrGenders && arrGenders.length > 0 ? arrGenders[0].keyMap : '',
-                position: arrPositions && arrPositions.length > 0 ? arrPositions[0].keyMap : '',
-                role: arrRoles && arrRoles.length > 0 ? arrRoles[0].keyMap : '',
 
-                avatar: '',
-                previewImgURL: '',
-                action: CRUD_actions.CREATE,
-                userEditId: ''
-            })
+            // Chỉ reset form về rỗng khi vừa lưu/xóa thành công (ở chế độ CREATE)
+            if (this.state.action === CRUD_actions.CREATE) {
+                this.setState({
+                    email: '',
+                    password: '',
+                    firstName: '',
+                    lastName: '',
+                    phoneNumber: '',
+                    address: '',
+                    gender: arrGenders && arrGenders.length > 0 ? arrGenders[0].keyMap : '',
+                    position: arrPositions && arrPositions.length > 0 ? arrPositions[0].keyMap : '',
+                    role: arrRoles && arrRoles.length > 0 ? arrRoles[0].keyMap : '',
+
+                    avatar: '',
+                    previewImgURL: '',
+                    userEditId: ''
+                })
+            }
         }
     }
 
