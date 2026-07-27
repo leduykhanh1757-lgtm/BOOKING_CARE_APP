@@ -65,8 +65,8 @@ let sendMailUnified = async ({ to, subject, html, attachments }) => {
     let apiKey = process.env.EMAIL_APP_PASSWORD || "";
     let senderEmail = process.env.EMAIL_APP || "leduykhanh1757@gmail.com";
 
-    // 1. Thử gửi bằng Brevo REST API nếu có API Key (dạng xkeysib-...) hoặc khi được gọi
-    if (apiKey && apiKey.startsWith("xkeysib-")) {
+    // 1. Thử gửi bằng Brevo REST API trước (Cổng 443 HTTPS không bao giờ bị Railway timeout/block)
+    if (apiKey) {
         try {
             await sendBrevoRestApi(apiKey, senderEmail, to, subject, html, attachments);
             return true;
@@ -75,9 +75,9 @@ let sendMailUnified = async ({ to, subject, html, attachments }) => {
         }
     }
 
-    // 2. Dự phòng: Gửi qua Nodemailer SMTP (Ép dùng IPv4 theo yêu cầu)
+    // 2. Dự phòng: Gửi qua Nodemailer SMTP (Dùng Port 465 SSL hoặc 587 với IPv4)
     let host = process.env.EMAIL_HOST || "smtp-relay.brevo.com";
-    let port = Number(process.env.EMAIL_PORT) || 587;
+    let port = Number(process.env.EMAIL_PORT) || 465;
 
     let transporter = nodemailer.createTransport({
         host: host,
