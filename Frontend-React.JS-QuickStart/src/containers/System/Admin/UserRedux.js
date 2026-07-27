@@ -30,8 +30,8 @@ class UserRedux extends Component {
             role: '',
             avatar: '',
 
-            action: CRUD_actions.CREATE, // Mặc định vừa vào form là chế độ Tạo mới
-            userEditId: '',              // Chỗ để lưu ID của user đang bị đem ra sửa
+            action: CRUD_actions.CREATE, // Mặc định vừa vào trang là chế độ Thêm mới (Form trống)
+            userEditId: '',
         }
     }
 
@@ -66,29 +66,29 @@ class UserRedux extends Component {
             })
         }
 
+        // Khi danh sách User trong Redux thay đổi (sau khi Thêm/Sửa/Xóa thành công)
+        // Reset form về lại trạng thái ban đầu (Rỗng) và chuyển cờ về CREATE
         if (prevProps.ListUsers !== this.props.ListUsers) {
             let arrGenders = this.props.genderRedux;
             let arrPositions = this.props.positionRedux;
             let arrRoles = this.props.roleRedux;
 
-            // Chỉ reset form về rỗng khi vừa lưu/xóa thành công (ở chế độ CREATE)
-            if (this.state.action === CRUD_actions.CREATE) {
-                this.setState({
-                    email: '',
-                    password: '',
-                    firstName: '',
-                    lastName: '',
-                    phoneNumber: '',
-                    address: '',
-                    gender: arrGenders && arrGenders.length > 0 ? arrGenders[0].keyMap : '',
-                    position: arrPositions && arrPositions.length > 0 ? arrPositions[0].keyMap : '',
-                    role: arrRoles && arrRoles.length > 0 ? arrRoles[0].keyMap : '',
+            this.setState({
+                email: '',
+                password: '',
+                firstName: '',
+                lastName: '',
+                phoneNumber: '',
+                address: '',
+                gender: arrGenders && arrGenders.length > 0 ? arrGenders[0].keyMap : '',
+                position: arrPositions && arrPositions.length > 0 ? arrPositions[0].keyMap : '',
+                role: arrRoles && arrRoles.length > 0 ? arrRoles[0].keyMap : '',
 
-                    avatar: '',
-                    previewImgURL: '',
-                    userEditId: ''
-                })
-            }
+                avatar: '',
+                previewImgURL: '',
+                action: CRUD_actions.CREATE,
+                userEditId: ''
+            })
         }
     }
 
@@ -121,6 +121,7 @@ class UserRedux extends Component {
         let { action } = this.state;
 
         if (action === CRUD_actions.CREATE) {
+            // Chế độ THÊM MỚI
             this.props.createNewUserRedux({
                 email: this.state.email,
                 password: this.state.password,
@@ -136,10 +137,10 @@ class UserRedux extends Component {
         }
 
         if (action === CRUD_actions.EDIT) {
+            // Chế độ CHỈNH SỬA
             this.props.editUserRedux({
                 id: this.state.userEditId,
                 email: this.state.email,
-                password: this.state.password,
                 firstName: this.state.firstName,
                 lastName: this.state.lastName,
                 address: this.state.address,
@@ -164,7 +165,6 @@ class UserRedux extends Component {
         let isValid = true;
         let arrCheck = ['email', 'firstName', 'lastName', 'phoneNumber', 'address'];
 
-        // Nếu ở chế độ Tạo mới thì cần validate mật khẩu
         if (this.state.action === CRUD_actions.CREATE) {
             arrCheck.push('password');
         }
@@ -179,6 +179,7 @@ class UserRedux extends Component {
         return isValid;
     }
 
+    // Hàm nhận dữ liệu khi bấm nút BÚT CHÌ ở bảng bên dưới
     handleEditUserFromParent = (user) => {
         let imageBase64 = '';
         if (user.image) {
@@ -186,8 +187,8 @@ class UserRedux extends Component {
                 imageBase64 = user.image;
             } else if (user.image.data) {
                 imageBase64 = new Buffer(user.image.data).toString('binary');
-            } else {
-                imageBase64 = new Buffer(user.image, 'base64').toString('binary');
+            } else if (Buffer.isBuffer(user.image)) {
+                imageBase64 = user.image.toString('utf8');
             }
         }
 
@@ -196,7 +197,7 @@ class UserRedux extends Component {
             password: 'HARDCODE_PASSWORD',
             firstName: user.firstName || '',
             lastName: user.lastName || '',
-            phoneNumber: user.phonenumber || user.phoneNumber || '',
+            phoneNumber: user.phoneNumber || user.phonenumber || '',
             address: user.address || '',
             gender: user.gender || '',
             position: user.positionId || '',
@@ -212,7 +213,6 @@ class UserRedux extends Component {
     render() {
         let genders = this.state.genderArr;
         let language = this.props.language;
-        let isLoadingGender = this.props.isLoadingGender;
         let positions = this.state.positionArr;
         let roles = this.state.roleArr;
 
@@ -223,7 +223,7 @@ class UserRedux extends Component {
         return (
             <div className='user-redux-container'>
                 <div className="title text-center mt-3">
-                    <FormattedMessage id="manage-user.add" defaultMessage="Quản lý người dùng" />
+                    QUẢN LÝ NGƯỜI DÙNG (ADMIN)
                 </div>
 
                 <div className="user-redux-body">
@@ -242,6 +242,7 @@ class UserRedux extends Component {
                                     value={email}
                                     onChange={(event) => { this.onChangeInput(event, 'email') }}
                                     disabled={this.state.action === CRUD_actions.EDIT}
+                                    autoComplete="new-password"
                                 />
                             </div>
                             <div className="col-3 mb-3 form-group">
@@ -250,6 +251,7 @@ class UserRedux extends Component {
                                     value={password}
                                     onChange={(event) => { this.onChangeInput(event, 'password') }}
                                     disabled={this.state.action === CRUD_actions.EDIT}
+                                    autoComplete="new-password"
                                 />
                             </div>
                             <div className="col-3 mb-3 form-group">
@@ -257,6 +259,7 @@ class UserRedux extends Component {
                                 <input type="text" className="form-control"
                                     value={firstName}
                                     onChange={(event) => { this.onChangeInput(event, 'firstName') }}
+                                    autoComplete="off"
                                 />
                             </div>
                             <div className="col-3 mb-3 form-group">
@@ -264,6 +267,7 @@ class UserRedux extends Component {
                                 <input type="text" className="form-control"
                                     value={lastName}
                                     onChange={(event) => { this.onChangeInput(event, 'lastName') }}
+                                    autoComplete="off"
                                 />
                             </div>
 
@@ -273,6 +277,7 @@ class UserRedux extends Component {
                                 <input type="text" className="form-control"
                                     value={phoneNumber}
                                     onChange={(event) => { this.onChangeInput(event, 'phoneNumber') }}
+                                    autoComplete="off"
                                 />
                             </div>
                             <div className="col-9 mb-3 form-group">
@@ -280,6 +285,7 @@ class UserRedux extends Component {
                                 <input type="text" className="form-control"
                                     value={address}
                                     onChange={(event) => { this.onChangeInput(event, 'address') }}
+                                    autoComplete="off"
                                 />
                             </div>
 
@@ -359,7 +365,7 @@ class UserRedux extends Component {
                                 <button className={this.state.action === CRUD_actions.CREATE ? "btn btn-primary" : "btn btn-warning"}
                                     onClick={() => this.handleSaveUser()}
                                 >
-                                    {this.state.action === CRUD_actions.CREATE ? 'Lưu người dùng' : 'Cập nhật thông tin'}
+                                    {this.state.action === CRUD_actions.CREATE ? 'Lưu người dùng' : 'Cập nhật người dùng'}
                                 </button>
                             </div>
 
