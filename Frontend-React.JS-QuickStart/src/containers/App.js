@@ -92,7 +92,7 @@ class App extends Component {
                                     <Route path={path.HOME} exact component={(Home)} />
 
                                     {/* ROUTE CHO ADMIN (Đăng nhập quản trị) */}
-                                    <Route path={path.LOGIN} component={userIsNotAuthenticated(Login)} />
+                                    <Route path={path.LOGIN} component={Login} />
                                     <Route path={path.SYSTEM} component={userIsAuthenticated(System)} />
 
                                     {/* ROUTE DÀNH CHO BÁC SĨ */}

@@ -5,64 +5,80 @@
     margin: 0;
     padding: 0;
     list-style-type: none;
+    height: 100%;
+    align-items: center;
 
     .menu-group {
-        position: relative; // Quan trọng để dropdown xổ xuống đúng chỗ
+        position: relative;
+        height: 100%;
+        display: flex;
+        align-items: center;
 
         .menu-group-name {
-            line-height: 40px;
-            padding: 0 20px;
-            color: white; // Chữ menu ngang màu trắng (vì header của admin thường tối màu)
-            font-weight: 500;
-            transition: background-color 0.2s;
+            line-height: 48px;
+            padding: 0 16px;
+            color: #f1f5f9;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.2px;
+            transition: all 0.2s ease;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
 
             &:hover {
-                background-color: rgba(255, 255, 255, 0.1); // Rê chuột vào thì nền sáng lên tí xíu
+                background-color: rgba(255, 255, 255, 0.12);
+                color: #ffffff;
             }
         }
 
-        // --- BẮT ĐẦU: MENU XỔ XUỐNG (DROPDOWN) ---
+        // --- MENU XỔ XUỐNG (DROPDOWN) ---
         .menu-list {
-            display: none; // Mặc định ẩn
+            display: none;
             position: absolute;
-            top: 40px; // Đẩy xuống dưới thanh menu ngang
+            top: 48px;
             left: 0;
-            min-width: 200px;
-            background-color: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); // Đổ bóng cho nó bồng bềnh
-            border-radius: 4px; // Bo góc nhẹ cho mềm mại
-            padding: 8px 0; // Tạo tí lề trên/dưới cho hộp menu
-            z-index: 100;
+            min-width: 210px;
+            background-color: #ffffff;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            padding: 6px 0;
+            z-index: 9999;
+            animation: fadeIn 0.15s ease-in-out;
 
             .menu {
                 width: 100%;
-                height: 42px;
-                /* Tăng chiều cao lên cho dễ bấm */
-                line-height: 42px;
+                height: 40px;
+                line-height: 40px;
                 text-transform: none;
-                border-bottom: 1px solid #f0f0f0;
-                /* Kẻ 1 đường mỏng ngăn cách các hàng */
-                transition: background-color 0.2s ease;
+                border-bottom: 1px solid #f1f5f9;
+                transition: all 0.2s ease;
+                position: relative;
+
+                &:last-child {
+                    border-bottom: none;
+                }
 
                 .menu-link,
                 span {
                     display: block;
-                    padding: 0 15px;
+                    padding: 0 16px;
                     text-decoration: none;
-                    color: #333;
-                    /* Chữ mặc định màu đen/xám đậm */
+                    color: #334155;
+                    font-size: 13px;
+                    font-weight: 500;
+                    transition: color 0.15s ease;
                 }
 
-                /* 1. KHI RÊ CHUỘT VÀO (HOVER) */
+                /* 1. HOVER */
                 &:hover {
-                    background-color: #f8f9fa;
-                    /* Đổi nền thành xám cực nhạt */
+                    background-color: #f8fafc;
 
                     .menu-link,
                     span {
-                        color: $colormain;
-                        /* Chữ đổi sang xanh */
+                        color: #1d4ed8;
                     }
 
                     .sub-menu-list {
@@ -70,19 +86,15 @@
                     }
                 }
 
-                /* 2. KHI ĐANG ĐƯỢC CHỌN (ACTIVE) - SANG XỊN MỊN Ở ĐÂY */
+                /* 2. ACTIVE */
                 &.active {
-                    background-color: #e6f2ff;
-                    /* Nền xanh lơ nhạt thanh lịch */
-                    border-left: 4px solid $colormain;
-                    /* Vạch kẻ xanh đậm bên trái */
+                    background-color: #eff6ff;
+                    border-left: 4px solid #2563eb;
 
                     .menu-link,
                     span {
-                        color: $colormain;
-                        /* Chữ xanh đồng màu */
+                        color: #1d4ed8;
                         font-weight: 600;
-                        /* In đậm lên */
                     }
                 }
 
@@ -90,16 +102,28 @@
                     display: block;
                     position: absolute;
                     top: 0;
-                    right: 10px;
+                    right: 12px;
+                    color: #94a3b8;
                 }
             }
         }
 
-        // Hiệu ứng xổ menu ra khi rê chuột vào nhóm menu lớn
+        // Hiệu ứng xổ menu khi rê chuột
         &:hover {
             .menu-list {
                 display: block;
             }
         }
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

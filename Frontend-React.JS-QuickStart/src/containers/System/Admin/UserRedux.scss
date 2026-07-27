@@ -1,41 +1,85 @@
+.title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e3a8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 20px 0;
+}
+
+.user-redux-body {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+
+    .form-group {
+        margin-bottom: 15px;
+
+        label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+
+            &:focus {
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            }
+        }
+    }
+}
+
 .preview-img-container {
     display: flex;
     flex-direction: column;
 
-    /* CSS cho cái nút tải ảnh */
     .label-upload {
-        display: block;
-        width: fit-content;
-        padding: 5px 10px;
-        background-color: #ddd;
-        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        background-color: #e2e8f0;
+        color: #1e293b;
+        border-radius: 6px;
         cursor: pointer;
         font-weight: 500;
-        transition: all 0.2s;
+        font-size: 13px;
+        transition: all 0.2s ease;
         margin-bottom: 10px;
+        width: fit-content;
 
         i {
-            margin-left: 5px;
-            /* Cách cái icon ra một chút */
+            color: #3b82f6;
         }
 
         &:hover {
-            background-color: #ccc;
-            /* Rê chuột vào thì màu đậm lên */
+            background-color: #cbd5e1;
+            transform: translateY(-1px);
         }
     }
 
-    /* CSS cho cái khung vuông hiển thị ảnh */
     .preview-image {
         height: 120px;
         width: 100%;
         background: center center no-repeat;
-        /* Canh ảnh ra giữa */
         background-size: contain;
-        /* Ép ảnh hiển thị vừa vặn trong khung, không bị méo */
         cursor: pointer;
+        border-radius: 8px;
+        border: 2px dashed #cbd5e1;
+        background-color: #f8fafc;
+        transition: all 0.2s ease;
 
-        /* Tạo một màu nền xám nhạt nhẹ lúc chưa có ảnh */
-        background-color: #f8f9fa;
+        &:hover {
+            border-color: #3b82f6;
+        }
     }
 }
