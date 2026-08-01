@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { languages, CRUD_actions, CommonUtils } from '../../../utils';
 import * as actions from '../../../store/actions';
 import './UserRedux.scss';
+import '../../../components/LoadingButton.scss';
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css';
 import TableManageUser from './TableManageUser';
@@ -32,6 +33,7 @@ class UserRedux extends Component {
 
             action: CRUD_actions.CREATE, // Mặc định vừa vào trang là chế độ Thêm mới (Form trống)
             userEditId: '',
+            isLoading: false,
         }
     }
 
@@ -87,7 +89,8 @@ class UserRedux extends Component {
                 avatar: '',
                 previewImgURL: '',
                 action: CRUD_actions.CREATE,
-                userEditId: ''
+                userEditId: '',
+                isLoading: false,
             })
         }
     }
@@ -115,8 +118,12 @@ class UserRedux extends Component {
     }
 
     handleSaveUser = () => {
+        if (this.state.isLoading) return; // Chặn double-click
+
         let isValid = this.checkValidateInput();
         if (isValid === false) return;
+
+        this.setState({ isLoading: true });
 
         let { action } = this.state;
 
@@ -151,6 +158,14 @@ class UserRedux extends Component {
                 avatar: this.state.avatar,
             });
         }
+
+        // isLoading sẽ được tắt trong componentDidUpdate khi ListUsers thay đổi
+        // Fallback timeout phòng trường hợp API bị lỗi không cập nhật Redux
+        setTimeout(() => {
+            if (this.state.isLoading) {
+                this.setState({ isLoading: false });
+            }
+        }, 10000);
     }
 
     onChangeInput = (event, id) => {
@@ -229,11 +244,11 @@ class UserRedux extends Component {
 
         let { email, password,
             firstName, lastName, phoneNumber, address,
-            gender, position, role } = this.state;
+            gender, position, role, isLoading } = this.state;
 
         return (
             <div className='user-redux-container'>
-                <div className="title text-center mt-3">
+                <div className="title text-center">
                     QUẢN LÝ NGƯỜI DÙNG (ADMIN)
                 </div>
 
@@ -242,7 +257,9 @@ class UserRedux extends Component {
                         <div className='row'>
                             <div className="col-12 my-3">
                                 <strong>
-                                    {this.state.action === CRUD_actions.EDIT ? 'Chỉnh sửa thông tin người dùng' : 'Thêm mới người dùng'}
+                                    {this.state.action === CRUD_actions.EDIT
+                                        ? '✏️ Chỉnh sửa thông tin người dùng'
+                                        : '➕ Thêm mới người dùng'}
                                 </strong>
                             </div>
 
@@ -252,7 +269,7 @@ class UserRedux extends Component {
                                 <input type="email" className="form-control"
                                     value={email}
                                     onChange={(event) => { this.onChangeInput(event, 'email') }}
-                                    disabled={this.state.action === CRUD_actions.EDIT}
+                                    disabled={this.state.action === CRUD_actions.EDIT || isLoading}
                                     autoComplete="new-password"
                                 />
                             </div>
@@ -261,7 +278,7 @@ class UserRedux extends Component {
                                 <input type="password" className="form-control"
                                     value={password}
                                     onChange={(event) => { this.onChangeInput(event, 'password') }}
-                                    disabled={this.state.action === CRUD_actions.EDIT}
+                                    disabled={this.state.action === CRUD_actions.EDIT || isLoading}
                                     autoComplete="new-password"
                                 />
                             </div>
@@ -271,6 +288,7 @@ class UserRedux extends Component {
                                     value={firstName}
                                     onChange={(event) => { this.onChangeInput(event, 'firstName') }}
                                     autoComplete="off"
+                                    disabled={isLoading}
                                 />
                             </div>
                             <div className="col-3 mb-3 form-group">
@@ -279,6 +297,7 @@ class UserRedux extends Component {
                                     value={lastName}
                                     onChange={(event) => { this.onChangeInput(event, 'lastName') }}
                                     autoComplete="off"
+                                    disabled={isLoading}
                                 />
                             </div>
 
@@ -289,6 +308,7 @@ class UserRedux extends Component {
                                     value={phoneNumber}
                                     onChange={(event) => { this.onChangeInput(event, 'phoneNumber') }}
                                     autoComplete="off"
+                                    disabled={isLoading}
                                 />
                             </div>
                             <div className="col-9 mb-3 form-group">
@@ -297,6 +317,7 @@ class UserRedux extends Component {
                                     value={address}
                                     onChange={(event) => { this.onChangeInput(event, 'address') }}
                                     autoComplete="off"
+                                    disabled={isLoading}
                                 />
                             </div>
 
@@ -306,6 +327,7 @@ class UserRedux extends Component {
                                 <select className="form-control"
                                     onChange={(event) => { this.onChangeInput(event, 'gender') }}
                                     value={gender}
+                                    disabled={isLoading}
                                 >
                                     {genders && genders.length > 0 && genders.map((item, index) => {
                                         return (
@@ -322,6 +344,7 @@ class UserRedux extends Component {
                                 <select className="form-control"
                                     onChange={(event) => { this.onChangeInput(event, 'position') }}
                                     value={position}
+                                    disabled={isLoading}
                                 >
                                     {positions && positions.length > 0 && positions.map((item, index) => {
                                         return (
@@ -338,6 +361,7 @@ class UserRedux extends Component {
                                 <select className="form-control"
                                     onChange={(event) => { this.onChangeInput(event, 'role') }}
                                     value={role}
+                                    disabled={isLoading}
                                 >
                                     {roles && roles.length > 0 && roles.map((item, index) => {
                                         return (
@@ -354,6 +378,7 @@ class UserRedux extends Component {
                                 <div className="preview-img-container">
                                     <input id='previewImg' type="file" hidden
                                         onChange={(event) => this.handleonChangeImg(event)}
+                                        disabled={isLoading}
                                     />
                                     <label className="label-upload" htmlFor='previewImg'>
                                         Tải ảnh <i className="fas fa-upload"></i>
@@ -373,10 +398,16 @@ class UserRedux extends Component {
                             </div>
 
                             <div className="col-12 mt-3">
-                                <button className={this.state.action === CRUD_actions.CREATE ? "btn btn-primary" : "btn btn-warning"}
+                                <button
+                                    className={`${this.state.action === CRUD_actions.CREATE ? "btn btn-primary" : "btn btn-warning"} ${isLoading ? 'btn-loading' : ''}`}
                                     onClick={() => this.handleSaveUser()}
+                                    disabled={isLoading}
                                 >
-                                    {this.state.action === CRUD_actions.CREATE ? 'Lưu người dùng' : 'Cập nhật người dùng'}
+                                    {isLoading && <span className="btn-spinner"></span>}
+                                    {isLoading
+                                        ? 'Đang xử lý...'
+                                        : (this.state.action === CRUD_actions.CREATE ? '💾 Lưu người dùng' : '✅ Cập nhật người dùng')
+                                    }
                                 </button>
                             </div>
 

@@ -1,76 +1,126 @@
 .login-background {
-    height: 100vh;
-    background: linear-gradient(135deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1) 100%);
-    /* Dùng flexbox để căn giữa cái form trắng vào giữa màn hình */
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #1a1a4e 70%, #2d1b69 100%);
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
+
+    /* Animated gradient orbs */
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.4;
+        animation: floatOrb 8s ease-in-out infinite alternate;
+    }
+
+    &::before {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, #6366f1, transparent 70%);
+        top: -100px;
+        right: -100px;
+    }
+
+    &::after {
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle, #06b6d4, transparent 70%);
+        bottom: -80px;
+        left: -80px;
+        animation-delay: 4s;
+    }
 
     .login-container {
-        width: 90%;
-        max-width: 400px;
-        background-color: white;
-        border-radius: 15px;
-        padding: 20px;
-        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        width: 92%;
+        max-width: 420px;
+        /* Glassmorphism card */
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 36px 30px;
+        box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        position: relative;
+        z-index: 2;
+        animation: cardSlideUp 0.5s ease-out;
 
         .login-content {
-            padding: 10px;
+            padding: 0;
 
             .login-title {
-                font-size: 30px;
-                font-weight: 600;
-                margin-bottom: 30px;
-                color: #333;
+                font-size: 28px;
+                font-weight: 700;
+                margin-bottom: 8px;
+                color: #ffffff;
+                letter-spacing: -0.5px;
+            }
+
+            .login-subtitle {
+                font-size: 14px;
+                color: rgba(255, 255, 255, 0.5);
+                margin-bottom: 32px;
             }
 
             .login-input {
-                margin-bottom: 20px;
+                margin-bottom: 22px;
 
                 label {
                     font-size: 13px;
-                    color: #a0a0a0;
+                    color: rgba(255, 255, 255, 0.6);
                     font-weight: 500;
+                    text-transform: uppercase;
+                    letter-spacing: 0.8px;
+                    margin-bottom: 8px;
                 }
 
                 input {
                     border: none;
-                    border-bottom: 1px solid #d3d3d3;
-                    /* Chỉ để lại đường kẻ dưới */
+                    border-bottom: 2px solid rgba(255, 255, 255, 0.15);
                     border-radius: 0;
-                    padding-left: 0;
+                    padding: 10px 0;
                     box-shadow: none;
-                    /* Xóa hiệu ứng sáng mặc định của Bootstrap */
+                    background: transparent;
+                    color: #ffffff;
+                    font-size: 15px;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
                     &:focus {
-                        border-bottom: 2px solid #22c1c3;
-                        /* Đổi màu xanh khi click vào */
+                        border-bottom-color: #60a5fa;
+                        box-shadow: 0 2px 0 0 #60a5fa;
+                        background: transparent;
+                        color: #ffffff;
                     }
 
                     &::placeholder {
-                        color: #d3d3d3;
+                        color: rgba(255, 255, 255, 0.25);
                     }
                 }
 
                 .custom-input-password {
                     position: relative;
-                    /* Đặt làm điểm tựa */
 
                     span {
                         position: absolute;
-                        right: 10px;
-                        /* Cách mép phải 10px */
+                        right: 0;
                         top: 50%;
-                        /* Canh giữa theo chiều dọc */
                         transform: translateY(-50%);
-                        /* Kéo nhích lên cho chuẩn giữa */
                         cursor: pointer;
-                        color: #a0a0a0;
+                        color: rgba(255, 255, 255, 0.4);
                         font-size: 16px;
+                        padding: 8px;
+                        transition: all 0.2s ease;
 
                         &:hover {
-                            color: #22c1c3;
-                            /* Đổi màu xanh khi di chuột vào */
+                            color: #60a5fa;
+                            transform: translateY(-50%) scale(1.1);
                         }
                     }
                 }
@@ -79,78 +129,127 @@
             .btn-login {
                 width: 100%;
                 border: none;
-                padding: 10px;
-                border-radius: 25px;
-                /* Nút hình viên thuốc */
-                background: linear-gradient(90deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1) 100%);
+                padding: 13px;
+                border-radius: 12px;
+                background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
                 color: white;
-                font-size: 18px;
+                font-size: 16px;
                 font-weight: 600;
-                margin-top: 10px;
+                margin-top: 12px;
                 cursor: pointer;
+                letter-spacing: 0.5px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
 
-                &:hover {
-                    opacity: 0.9;
+                &:hover:not(.btn-loading) {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
                 }
 
+                &:active:not(.btn-loading) {
+                    transform: translateY(0);
+                    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+                }
             }
 
             .forgot-password {
                 display: inline-block;
-                font-size: 14px;
-                color: #22c1c3;
-                /* Lấy luôn màu xanh của theme cho tone-sur-tone */
+                font-size: 13px;
+                color: rgba(255, 255, 255, 0.5);
                 cursor: pointer;
-                transition: 0.3s;
+                transition: all 0.25s ease;
+                text-decoration: none !important;
 
                 &:hover {
-                    text-decoration: underline;
-                    color: #1a9698;
-                    /* Đậm hơn chút khi di chuột vào */
+                    color: #60a5fa;
+                    text-decoration: underline !important;
                 }
             }
 
             .text-other-login {
-                font-size: 14px;
-                color: #a0a0a0;
+                font-size: 13px;
+                color: rgba(255, 255, 255, 0.45);
+
+                &[style*="cursor: pointer"] {
+                    color: #818cf8 !important;
+                    font-weight: 600 !important;
+                    transition: all 0.25s ease;
+
+                    &:hover {
+                        color: #a78bfa !important;
+                    }
+                }
             }
 
             .social-login {
                 display: flex;
                 justify-content: center;
-                gap: 15px;
-                /* Khoảng cách giữa các nút */
+                gap: 14px;
+                margin-bottom: 8px;
 
                 i {
-                    font-size: 18px;
+                    font-size: 16px;
                     color: white;
-                    width: 40px;
-                    height: 40px;
+                    width: 42px;
+                    height: 42px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    border-radius: 50%;
-                    /* Bo tròn thành hình cầu */
+                    border-radius: 12px;
                     cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
 
-                    /* Đổ màu chuẩn cho từng mạng xã hội */
                     &.fa-facebook-f {
-                        background-color: #3b5998;
+                        background: rgba(59, 89, 152, 0.6);
                     }
 
                     &.fa-twitter {
-                        background-color: #1da1f2;
+                        background: rgba(29, 161, 242, 0.6);
                     }
 
                     &.fa-google-plus-g {
-                        background-color: #db4437;
+                        background: rgba(219, 68, 55, 0.6);
                     }
 
                     &:hover {
-                        opacity: 0.8;
+                        transform: translateY(-3px) scale(1.05);
+                        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+                        border-color: rgba(255, 255, 255, 0.25);
                     }
                 }
             }
         }
+    }
+}
+
+/* Error message styling */
+.login-background .login-container [style*="color: red"] {
+    color: #f87171 !important;
+    font-size: 13px;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 8px;
+    padding: 8px 12px !important;
+    border-left: 3px solid #ef4444;
+    margin-top: 4px !important;
+}
+
+@keyframes floatOrb {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(30px, -30px) scale(1.15); }
+}
+
+@keyframes cardSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

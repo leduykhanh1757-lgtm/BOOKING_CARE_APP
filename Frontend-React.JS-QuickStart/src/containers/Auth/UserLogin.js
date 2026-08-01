@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import { push } from "connected-react-router";
 import * as actions from "../../store/actions";
 import './UserLogin.scss';
-// import { FormattedMessage } from 'react-intl'; // (Bác có thể mở comment nếu dùng file .json)
+import '../../components/LoadingButton.scss';
 import { handleLoginApi } from '../../services/userService';
+
 class UserLogin extends Component {
     constructor(props) {
         super(props);
@@ -12,14 +13,11 @@ class UserLogin extends Component {
             username: '',
             password: '',
             isShowPassword: false,
-            errMessage: ''
+            errMessage: '',
+            isLoading: false
         }
     }
 
-    // =====================================================================
-    // TỐI ƯU DRY (Don't Repeat Yourself):
-    // Gộp 2 hàm handleOnChangeUsername và handleOnChangePassword thành 1 hàm duy nhất.
-    // =====================================================================
     handleOnChangeInput = (event, id) => {
         let copyState = { ...this.state };
         copyState[id] = event.target.value;
@@ -29,7 +27,9 @@ class UserLogin extends Component {
     }
 
     handleLogin = async () => {
-        this.setState({ errMessage: '' })
+        if (this.state.isLoading) return; // Chặn double-click
+
+        this.setState({ errMessage: '', isLoading: true });
 
         try {
             let data = await handleLoginApi(this.state.username, this.state.password);
@@ -37,19 +37,27 @@ class UserLogin extends Component {
 
             if (realData && realData.errCode !== 0) {
                 this.setState({
-                    errMessage: realData.message
+                    errMessage: realData.message,
+                    isLoading: false
                 });
             }
 
             if (realData && realData.errCode === 0) {
                 this.props.userLoginSuccess(realData.user);
                 this.props.navigate('/home');
+                // Không cần tắt loading vì sẽ redirect sang trang khác
             }
 
         } catch (error) {
             if (error.response && error.response.data) {
                 this.setState({
-                    errMessage: error.response.data.message
+                    errMessage: error.response.data.message,
+                    isLoading: false
+                });
+            } else {
+                this.setState({
+                    errMessage: 'Lỗi kết nối đến máy chủ!',
+                    isLoading: false
                 });
             }
         }
@@ -62,22 +70,18 @@ class UserLogin extends Component {
     }
 
     handleKeyDown = (event) => {
+        if (this.state.isLoading) return;
         if (event.key === 'Enter' || event.keyCode === 13) {
             this.handleLogin();
         }
     }
 
     render() {
-        // TỐI ƯU 2: Destructuring state giúp code bên dưới ngắn gọn, dễ đọc, 
-        // không cần phải viết this.state.username lặp đi lặp lại.
-        let { username, password, isShowPassword, errMessage } = this.state;
+        let { username, password, isShowPassword, errMessage, isLoading } = this.state;
 
         return (
             <div className="login-background">
                 <div className="login-container">
-
-                    {/* CHỐT HẠ ĐA NGÔN NGỮ (i18n): 
-                        Gắn class 'notranslate' vào thẻ bọc toàn bộ form. */}
                     <div className="login-content row notranslate">
 
                         <div className="col-12 text-center login-title">
@@ -92,6 +96,7 @@ class UserLogin extends Component {
                                 placeholder="Enter your username"
                                 value={username}
                                 onChange={(event) => this.handleOnChangeInput(event, 'username')}
+                                disabled={isLoading}
                             />
                         </div>
 
@@ -105,6 +110,7 @@ class UserLogin extends Component {
                                     value={password}
                                     onChange={(event) => this.handleOnChangeInput(event, 'password')}
                                     onKeyDown={(event) => this.handleKeyDown(event)}
+                                    disabled={isLoading}
                                 />
                                 <span onClick={() => this.handleShowHidePassword()}>
                                     <i className={isShowPassword ? "fas fa-eye" : "fas fa-eye-slash"}></i>
@@ -118,18 +124,25 @@ class UserLogin extends Component {
                             </div>
                         }
                         <div className="col-12">
-                            <button className="btn-login" onClick={() => this.handleLogin()}>Log in</button>
+                            <button
+                                className={`btn-login ${isLoading ? 'btn-loading' : ''}`}
+                                onClick={() => this.handleLogin()}
+                                disabled={isLoading}
+                            >
+                                {isLoading && <span className="btn-spinner"></span>}
+                                {isLoading ? 'Đang xử lý...' : 'Log in'}
+                            </button>
                         </div>
 
                         <div className="col-12 text-center mt-2">
-                            <span className="forgot-password" style={{ cursor: 'pointer', textDecoration: 'underline' }} 
+                            <span className="forgot-password" style={{ cursor: 'pointer' }}
                                   onClick={() => this.props.navigate('/forgot-password')}>
                                 Forgot your password?
                             </span>
                         </div>
 
                         <div className="col-12 text-center mt-3">
-                            <span className="text-other-login" style={{ cursor: 'pointer', color: '#2248bd', fontWeight: '600' }} 
+                            <span className="text-other-login" style={{ cursor: 'pointer', color: '#2248bd', fontWeight: '600' }}
                                   onClick={() => this.props.navigate('/user-register')}>
                                 Don't have an account? Register now
                             </span>

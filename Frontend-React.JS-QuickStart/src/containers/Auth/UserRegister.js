@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from "connected-react-router";
 import './UserRegister.scss';
+import '../../components/LoadingButton.scss';
 import { createNewUserService, getAllCodeService } from '../../services/userService';
 import { toast } from 'react-toastify';
 
@@ -18,7 +19,8 @@ class UserRegister extends Component {
             gender: '',
             genderArr: [],
             isShowPassword: false,
-            errMessage: ''
+            errMessage: '',
+            isLoading: false
         }
     }
 
@@ -51,12 +53,14 @@ class UserRegister extends Component {
     }
 
     handleRegister = async () => {
-        this.setState({ errMessage: '' })
+        if (this.state.isLoading) return;
+
+        this.setState({ errMessage: '', isLoading: true });
         let { email, password, firstName, lastName, phoneNumber, address, gender } = this.state;
         
         // Simple Validation
         if (!email || !password || !firstName || !lastName || !phoneNumber || !address) {
-            this.setState({ errMessage: "Please fill out all required fields!" });
+            this.setState({ errMessage: "Please fill out all required fields!", isLoading: false });
             return;
         }
 
@@ -75,7 +79,7 @@ class UserRegister extends Component {
             });
 
             if (res && res.errCode !== 0) {
-                this.setState({ errMessage: res.errMessage });
+                this.setState({ errMessage: res.errMessage, isLoading: false });
                 toast.error(res.errMessage);
             } else {
                 toast.success("Account created successfully!");
@@ -84,21 +88,23 @@ class UserRegister extends Component {
 
         } catch (error) {
             if (error.response && error.response.data) {
-                this.setState({ errMessage: error.response.data.errMessage });
+                this.setState({ errMessage: error.response.data.errMessage, isLoading: false });
             } else {
                 toast.error("Registration failed!");
+                this.setState({ isLoading: false });
             }
         }
     }
 
     handleKeyDown = (event) => {
+        if (this.state.isLoading) return;
         if (event.key === 'Enter' || event.keyCode === 13) {
             this.handleRegister();
         }
     }
 
     render() {
-        let { email, password, firstName, lastName, phoneNumber, address, gender, genderArr, isShowPassword, errMessage } = this.state;
+        let { email, password, firstName, lastName, phoneNumber, address, gender, genderArr, isShowPassword, errMessage, isLoading } = this.state;
         let language = this.props.language;
 
         return (
@@ -112,19 +118,22 @@ class UserRegister extends Component {
                         <div className="col-6 form-group register-input">
                             <label>First Name (*)</label>
                             <input type="text" className="form-control" placeholder="Enter first name"
-                                value={firstName} onChange={(event) => this.handleOnChangeInput(event, 'firstName')} />
+                                value={firstName} onChange={(event) => this.handleOnChangeInput(event, 'firstName')}
+                                disabled={isLoading} />
                         </div>
                         
                         <div className="col-6 form-group register-input">
                             <label>Last Name (*)</label>
                             <input type="text" className="form-control" placeholder="Enter last name"
-                                value={lastName} onChange={(event) => this.handleOnChangeInput(event, 'lastName')} />
+                                value={lastName} onChange={(event) => this.handleOnChangeInput(event, 'lastName')}
+                                disabled={isLoading} />
                         </div>
 
                         <div className="col-12 form-group register-input">
                             <label>Email (*)</label>
                             <input type="email" className="form-control" placeholder="Enter your email"
-                                value={email} onChange={(event) => this.handleOnChangeInput(event, 'email')} />
+                                value={email} onChange={(event) => this.handleOnChangeInput(event, 'email')}
+                                disabled={isLoading} />
                         </div>
 
                         <div className="col-12 form-group register-input">
@@ -132,7 +141,8 @@ class UserRegister extends Component {
                             <div className='custom-input-password'>
                                 <input type={isShowPassword ? "text" : "password"} className="form-control" placeholder="Enter your password"
                                     value={password} onChange={(event) => this.handleOnChangeInput(event, 'password')}
-                                    onKeyDown={(event) => this.handleKeyDown(event)} />
+                                    onKeyDown={(event) => this.handleKeyDown(event)}
+                                    disabled={isLoading} />
                                 <span onClick={() => this.handleShowHidePassword()}>
                                     <i className={isShowPassword ? "fas fa-eye" : "fas fa-eye-slash"}></i>
                                 </span>
@@ -142,12 +152,14 @@ class UserRegister extends Component {
                         <div className="col-6 form-group register-input">
                             <label>Phone Number (*)</label>
                             <input type="text" className="form-control" placeholder="Enter phone number"
-                                value={phoneNumber} onChange={(event) => this.handleOnChangeInput(event, 'phoneNumber')} />
+                                value={phoneNumber} onChange={(event) => this.handleOnChangeInput(event, 'phoneNumber')}
+                                disabled={isLoading} />
                         </div>
 
                         <div className="col-6 form-group register-input">
                             <label>Gender (*)</label>
-                            <select className="form-select" value={gender} onChange={(event) => this.handleOnChangeInput(event, 'gender')}>
+                            <select className="form-select" value={gender} onChange={(event) => this.handleOnChangeInput(event, 'gender')}
+                                disabled={isLoading}>
                                 {genderArr && genderArr.length > 0 &&
                                     genderArr.map((item, index) => {
                                         return (
@@ -164,7 +176,8 @@ class UserRegister extends Component {
                             <label>Address (*)</label>
                             <input type="text" className="form-control" placeholder="Enter address"
                                 value={address} onChange={(event) => this.handleOnChangeInput(event, 'address')} 
-                                onKeyDown={(event) => this.handleKeyDown(event)} />
+                                onKeyDown={(event) => this.handleKeyDown(event)}
+                                disabled={isLoading} />
                         </div>
 
                         {errMessage &&
@@ -174,7 +187,14 @@ class UserRegister extends Component {
                         }
 
                         <div className="col-12">
-                            <button className="btn-register" onClick={() => this.handleRegister()}>Register</button>
+                            <button
+                                className={`btn-register ${isLoading ? 'btn-loading' : ''}`}
+                                onClick={() => this.handleRegister()}
+                                disabled={isLoading}
+                            >
+                                {isLoading && <span className="btn-spinner"></span>}
+                                {isLoading ? 'Đang xử lý...' : 'Register'}
+                            </button>
                         </div>
 
                         <div className="col-12 text-center mt-3">
