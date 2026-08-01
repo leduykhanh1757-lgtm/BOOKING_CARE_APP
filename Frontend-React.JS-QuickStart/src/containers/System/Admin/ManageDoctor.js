@@ -108,8 +108,8 @@ class ManageDoctor extends Component {
         let { listPrice, listPayment, listProvince, listSpecialty, listClinic } = this.state;
 
         let res = await getDetailInforDoctor(selectedOption.value);
-        if (res && res.errCode === 0 && res.data && res.data.Markdown) {
-            let markdown = res.data.Markdown;
+        if (res && res.errCode === 0 && res.data) {
+            let markdown = res.data.Markdown || {};
 
             let addressClinic = '', nameClinic = '', note = '',
                 paymentId = '', priceId = '', provinceId = '', specialtyId = '', clinicId = '',
@@ -117,27 +117,29 @@ class ManageDoctor extends Component {
                 selectedSpecialty = '', selectedClinic = '';
 
             if (res.data.Doctor_Infor) {
-                addressClinic = res.data.Doctor_Infor.addressClinic;
-                nameClinic = res.data.Doctor_Infor.nameClinic;
-                note = res.data.Doctor_Infor.note;
-                paymentId = res.data.Doctor_Infor.paymentId;
-                priceId = res.data.Doctor_Infor.priceId;
-                provinceId = res.data.Doctor_Infor.provinceId;
-                specialtyId = res.data.Doctor_Infor.specialtyId;
-                clinicId = res.data.Doctor_Infor.clinicId;
+                addressClinic = res.data.Doctor_Infor.addressClinic || '';
+                nameClinic = res.data.Doctor_Infor.nameClinic || '';
+                note = res.data.Doctor_Infor.note || '';
+                paymentId = res.data.Doctor_Infor.paymentId || '';
+                priceId = res.data.Doctor_Infor.priceId || '';
+                provinceId = res.data.Doctor_Infor.provinceId || '';
+                specialtyId = res.data.Doctor_Infor.specialtyId || '';
+                clinicId = res.data.Doctor_Infor.clinicId || '';
 
-                selectedPayment = listPayment.find(item => item && item.value === paymentId);
-                selectedPrice = listPrice.find(item => item && item.value === priceId);
-                selectedProvince = listProvince.find(item => item && item.value === provinceId);
-                selectedSpecialty = listSpecialty.find(item => item && item.value === specialtyId);
-                selectedClinic = listClinic.find(item => item && item.value === clinicId);
+                selectedPayment = listPayment.find(item => item && item.value === paymentId) || '';
+                selectedPrice = listPrice.find(item => item && item.value === priceId) || '';
+                selectedProvince = listProvince.find(item => item && item.value === provinceId) || '';
+                selectedSpecialty = listSpecialty.find(item => item && item.value === specialtyId) || '';
+                selectedClinic = listClinic.find(item => item && item.value === clinicId) || '';
             }
 
+            let hasOldData = !!(markdown.contentHTML || markdown.contentMarkdown || markdown.description || res.data.Doctor_Infor);
+
             this.setState({
-                contentHTML: markdown.contentHTML,
-                contentMarkdown: markdown.contentMarkdown,
-                description: markdown.description,
-                hasOldData: true,
+                contentHTML: markdown.contentHTML || '',
+                contentMarkdown: markdown.contentMarkdown || '',
+                description: markdown.description || '',
+                hasOldData: hasOldData,
 
                 addressClinic: addressClinic,
                 nameClinic: nameClinic,
