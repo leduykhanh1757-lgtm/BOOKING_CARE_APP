@@ -207,19 +207,5 @@
             border-color: #818cf8;
             background-color: #eef2ff;
         }
-
-        /* Empty state indicator */
-        &[style*="url()"]::after,
-        &:not([style*="url(data"])::after {
-            content: '\f03e';
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            font-size: 24px;
-            color: #c7d2fe;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
     }
 }

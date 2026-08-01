@@ -258,8 +258,8 @@ class UserRedux extends Component {
                             <div className="col-12 my-3">
                                 <strong>
                                     {this.state.action === CRUD_actions.EDIT
-                                        ? '✏️ Chỉnh sửa thông tin người dùng'
-                                        : '➕ Thêm mới người dùng'}
+                                        ? 'Chỉnh sửa thông tin người dùng'
+                                        : 'Thêm mới người dùng'}
                                 </strong>
                             </div>
 
@@ -406,7 +406,7 @@ class UserRedux extends Component {
                                     {isLoading && <span className="btn-spinner"></span>}
                                     {isLoading
                                         ? 'Đang xử lý...'
-                                        : (this.state.action === CRUD_actions.CREATE ? '💾 Lưu người dùng' : '✅ Cập nhật người dùng')
+                                        : (this.state.action === CRUD_actions.CREATE ? 'Lưu người dùng' : 'Cập nhật người dùng')
                                     }
                                 </button>
                             </div>
