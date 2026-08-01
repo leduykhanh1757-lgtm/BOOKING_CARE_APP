@@ -322,7 +322,7 @@ class UserRedux extends Component {
                             </div>
 
                             {/* --- DÒNG 3 --- */}
-                            <div className="col-3 mb-3 form-group">
+                            <div className="col-4 mb-3 form-group">
                                 <label className="form-label">Giới tính</label>
                                 <select className="form-control"
                                     onChange={(event) => { this.onChangeInput(event, 'gender') }}
@@ -339,7 +339,7 @@ class UserRedux extends Component {
                                 </select>
                             </div>
 
-                            <div className="col-3 mb-3 form-group">
+                            <div className="col-4 mb-3 form-group">
                                 <label className="form-label">Chức danh (Position)</label>
                                 <select className="form-control"
                                     onChange={(event) => { this.onChangeInput(event, 'position') }}
@@ -356,7 +356,7 @@ class UserRedux extends Component {
                                 </select>
                             </div>
 
-                            <div className="col-3 mb-3 form-group">
+                            <div className="col-4 mb-3 form-group">
                                 <label className="form-label">Vai trò (Role)</label>
                                 <select className="form-control"
                                     onChange={(event) => { this.onChangeInput(event, 'role') }}
@@ -373,7 +373,8 @@ class UserRedux extends Component {
                                 </select>
                             </div>
 
-                            <div className="col-3 mb-3 form-group">
+                            {/* --- DÒNG 4 --- */}
+                            <div className="col-12 mb-3 form-group">
                                 <label className="form-label">Ảnh đại diện (Avatar)</label>
                                 <div className="preview-img-container">
                                     <input id='previewImg' type="file" hidden
@@ -387,7 +388,13 @@ class UserRedux extends Component {
                                     <div className='preview-image'
                                         style={{ backgroundImage: `url(${this.state.previewImgURL})` }}
                                         onClick={() => this.openPreviewImage()}
-                                    />
+                                    >
+                                        {!this.state.previewImgURL && (
+                                            <span className="preview-placeholder">
+                                                <i className="fas fa-image"></i> Chưa chọn ảnh
+                                            </span>
+                                        )}
+                                    </div>
                                     {this.state.isOpen === true &&
                                         <Lightbox
                                             mainSrc={this.state.previewImgURL}
