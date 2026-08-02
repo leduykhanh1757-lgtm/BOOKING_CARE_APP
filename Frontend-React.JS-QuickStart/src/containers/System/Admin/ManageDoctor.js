@@ -101,56 +101,42 @@ class ManageDoctor extends Component {
 
         let res = await getDetailInforDoctor(selectedDoctor.value);
 
-        if (res && res.errCode === 0 && res.data && res.data.markdownData) {
-            let markdown = res.data.markdownData;
+        if (res && res.errCode === 0 && res.data) {
+            let markdown = res.data.markdownData || {};
+            let doctorInfor = res.data.Doctor_Infor || {};
 
-            let addressClinic = '', nameClinic = '', note = '';
-            let paymentId = '', provinceId = '', priceId = '';
-            let selectedPayment = '', selectedPrice = '', selectedProvince = '';
+            let addressClinic = doctorInfor.addressClinic || '';
+            let nameClinic = doctorInfor.nameClinic || '';
+            let note = doctorInfor.note || '';
+            let paymentId = doctorInfor.paymentId || '';
+            let provinceId = doctorInfor.provinceId || '';
+            let priceId = doctorInfor.priceId || '';
+            let specialtyId = doctorInfor.specialtyId || '';
+            let clinicId = doctorInfor.clinicId || '';
 
-            // 🛠️ 1. Khai báo thêm biến hứng chuyên khoa và phòng khám
-            let specialtyId = '', selectedSpecialty = '';
-            let clinicId = '', selectedClinic = '';
+            let selectedPayment = this.state.listPayment.find(item => item && (item.value == paymentId || String(item.value).toLowerCase() === String(paymentId).toLowerCase())) || '';
+            let selectedPrice = this.state.listPrice.find(item => item && (item.value == priceId || String(item.value).toLowerCase() === String(priceId).toLowerCase())) || '';
+            let selectedProvince = this.state.listProvince.find(item => item && (item.value == provinceId || String(item.value).toLowerCase() === String(provinceId).toLowerCase())) || '';
+            let selectedSpecialty = this.state.listSpecialty.find(item => item && (item.value == specialtyId || String(item.value).toLowerCase() === String(specialtyId).toLowerCase())) || '';
+            let selectedClinic = this.state.listClinic.find(item => item && (item.value == clinicId || String(item.value).toLowerCase() === String(clinicId).toLowerCase())) || '';
 
-            if (res.data.Doctor_Infor) {
-                addressClinic = res.data.Doctor_Infor.addressClinic;
-                nameClinic = res.data.Doctor_Infor.nameClinic;
-                note = res.data.Doctor_Infor.note;
-                paymentId = res.data.Doctor_Infor.paymentId;
-                provinceId = res.data.Doctor_Infor.provinceId;
-                priceId = res.data.Doctor_Infor.priceId;
-
-                // 🛠️ 2. Hứng Id từ DB trả ra
-                specialtyId = res.data.Doctor_Infor.specialtyId;
-                clinicId = res.data.Doctor_Infor.clinicId;
-
-                selectedPayment = this.state.listPayment.find(item => item && item.value === paymentId) || '';
-                selectedPrice = this.state.listPrice.find(item => item && item.value === priceId) || '';
-                selectedProvince = this.state.listProvince.find(item => item && item.value === provinceId) || '';
-
-                // 🛠️ 3. Lọc tìm object chuẩn cho Select
-                selectedSpecialty = this.state.listSpecialty.find(item => item && item.value === specialtyId) || '';
-                selectedClinic = this.state.listClinic.find(item => item && item.value === clinicId) || '';
-            }
+            let hasOldData = !!(res.data.markdownData && (res.data.markdownData.contentHTML || res.data.markdownData.description) || res.data.Doctor_Infor);
 
             this.setState({
-                contentHTML: markdown.contentHTML,
-                contentMarkdown: markdown.contentMarkdown,
-                description: markdown.description,
-                hasOldData: true,
+                contentHTML: markdown.contentHTML || '',
+                contentMarkdown: markdown.contentMarkdown || '',
+                description: markdown.description || '',
+                hasOldData: hasOldData,
                 addressClinic: addressClinic,
                 nameClinic: nameClinic,
                 note: note,
                 selectedPayment: selectedPayment,
                 selectedPrice: selectedPrice,
                 selectedProvince: selectedProvince,
-
-                // 🛠️ 4. Set lên State
                 selectedSpecialty: selectedSpecialty,
                 selectedClinic: selectedClinic
             });
         } else {
-            // 🛠️ 5. Reset trắng toàn bộ nếu bác sĩ chưa có data
             this.setState({
                 contentHTML: '', contentMarkdown: '', description: '',
                 hasOldData: false, addressClinic: '', nameClinic: '', note: '',

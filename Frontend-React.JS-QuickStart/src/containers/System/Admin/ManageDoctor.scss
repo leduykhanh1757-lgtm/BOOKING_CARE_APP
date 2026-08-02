@@ -24,11 +24,11 @@
         }
     }
 
-    /* Khung card cho 2 vùng thông tin */
+    /* Container gom nhóm các phần thông tin */
     .more-infor,
     .more-infor-extra {
         background: #ffffff;
-        padding: 24px;
+        padding: 28px 24px;
         border-radius: 16px;
         box-shadow:
             0 1px 3px rgba(0, 0, 0, 0.04),
@@ -36,6 +36,9 @@
         border: 1px solid #e2e8f0;
         position: relative;
         margin-bottom: 20px;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
 
         /* Vệt màu trang trí phía trên card */
         &::before {
@@ -52,7 +55,7 @@
 
     .more-infor {
         display: flex;
-        gap: 20px;
+        gap: 24px;
 
         .content-left {
             width: 40%;
@@ -65,7 +68,7 @@
 
     /* Cấu hình chung cho nhãn và các ô nhập liệu */
     .form-group {
-        margin-bottom: 12px;
+        margin-bottom: 14px;
 
         label {
             font-weight: 600;
@@ -92,6 +95,35 @@
                 background: #ffffff;
             }
         }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+    }
+
+    /* Nâng cấp style cho React-Select */
+    div[class*="-container"] {
+        div[class*="-control"] {
+            border-radius: 10px;
+            border: 1.5px solid #e2e8f0;
+            background-color: #f8fafc;
+            min-height: 42px;
+            box-shadow: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+            &:hover {
+                border-color: #818cf8;
+            }
+        }
+
+        div[class*="-menu"] {
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            z-index: 10;
+        }
     }
 
     .manage-doctor-editor {
@@ -103,6 +135,9 @@
             0 1px 3px rgba(0, 0, 0, 0.04),
             0 8px 24px rgba(0, 0, 0, 0.06);
         margin-bottom: 24px;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
 
         .rc-md-editor {
             border: none;
