@@ -23,18 +23,44 @@ class Header extends Component {
 
         if (userInfo && !_.isEmpty(userInfo)) {
             let role = userInfo.roleId;
-
-            // TỐI ƯU NHẸ: Dùng else if thay vì if rời rạc cho chuẩn logic phân nhánh
             if (role === USER_ROLE.ADMIN) {
                 menu = adminMenu;
             } else if (role === USER_ROLE.DOCTOR) {
                 menu = doctorMenu;
+            } else {
+                menu = adminMenu;
             }
+        } else {
+            menu = adminMenu;
         }
 
         this.setState({
             menuApp: menu
         });
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.userInfo !== this.props.userInfo) {
+            let { userInfo } = this.props;
+            let menu = [];
+
+            if (userInfo && !_.isEmpty(userInfo)) {
+                let role = userInfo.roleId;
+                if (role === USER_ROLE.ADMIN) {
+                    menu = adminMenu;
+                } else if (role === USER_ROLE.DOCTOR) {
+                    menu = doctorMenu;
+                } else {
+                    menu = adminMenu;
+                }
+            } else {
+                menu = adminMenu;
+            }
+
+            this.setState({
+                menuApp: menu
+            });
+        }
     }
 
     // =====================================================================
