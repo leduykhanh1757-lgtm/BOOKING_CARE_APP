@@ -452,6 +452,12 @@ let createNewComment = (data) => {
                     authorAvatar: data.authorAvatar,
                     content: data.content
                 });
+                if (data.authorAvatar && data.authorName) {
+                    await db.Comment.update(
+                        { authorAvatar: data.authorAvatar },
+                        { where: { authorName: data.authorName } }
+                    );
+                }
                 resolve({ errCode: 0, errMessage: 'Create comment succeed!' });
             }
         } catch (e) { reject(e); }
@@ -466,14 +472,37 @@ let getCommentsByDoctorId = (doctorId) => {
             } else {
                 let comments = await db.Comment.findAll({
                     where: { doctorId: doctorId },
-                    order: [['createdAt', 'DESC']], // Sắp xếp bình luận mới nhất lên đầu
+                    order: [['createdAt', 'DESC']],
                     raw: true
                 });
+
                 if (comments && comments.length > 0) {
+                    let users = await db.User.findAll({
+                        attributes: ['firstName', 'lastName', 'image'],
+                        raw: true
+                    });
+
+                    let userMap = {};
+                    if (users && users.length > 0) {
+                        users.forEach(u => {
+                            let imgStr = '';
+                            if (u.image) {
+                                imgStr = Buffer.isBuffer(u.image) ? u.image.toString('utf8') : u.image;
+                            }
+                            if (imgStr) {
+                                let name1 = `${u.lastName} ${u.firstName}`.trim().toLowerCase();
+                                let name2 = `${u.firstName} ${u.lastName}`.trim().toLowerCase();
+                                userMap[name1] = imgStr;
+                                userMap[name2] = imgStr;
+                            }
+                        });
+                    }
+
                     comments = comments.map(item => {
-                        // ✅ Cột authorAvatar là BLOB -> Sequelize trả về Buffer.
-                        // Chỉ cần chuyển Buffer -> string (utf8), không decode base64 thêm.
-                        if (item.authorAvatar && Buffer.isBuffer(item.authorAvatar)) {
+                        let nameLower = item.authorName ? item.authorName.trim().toLowerCase() : '';
+                        if (nameLower && userMap[nameLower]) {
+                            item.authorAvatar = userMap[nameLower];
+                        } else if (item.authorAvatar && Buffer.isBuffer(item.authorAvatar)) {
                             item.authorAvatar = item.authorAvatar.toString('utf8');
                         }
                         return item;

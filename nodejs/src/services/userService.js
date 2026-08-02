@@ -178,6 +178,18 @@ let editUser = (data) => {
 
                 if (data.avatar) {
                     user.image = data.avatar;
+                    try {
+                        let name1 = `${user.lastName} ${user.firstName}`.trim();
+                        let name2 = `${user.firstName} ${user.lastName}`.trim();
+                        let newName1 = `${data.lastName} ${data.firstName}`.trim();
+                        let newName2 = `${data.firstName} ${data.lastName}`.trim();
+                        await db.Comment.update(
+                            { authorAvatar: data.avatar, authorName: newName1 },
+                            { where: { authorName: [name1, name2, newName1, newName2] } }
+                        );
+                    } catch (errComment) {
+                        console.log('Update comment avatar error:', errComment);
+                    }
                 }
                 // 4. LƯU LẠI: Đẩy cục dữ liệu đã cập nhật xuống Database
                 await user.save();
