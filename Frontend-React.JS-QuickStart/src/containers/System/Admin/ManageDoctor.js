@@ -288,8 +288,9 @@ class ManageDoctor extends Component {
                     <FormattedMessage id="admin.manage-doctor.title" />
                 </div>
 
-                <div className='more-infor'>
-                    <div className="content-left form-group">
+                <div className="add-new-doctor row">
+                    {/* DÒNG 1: Chọn bác sĩ & Thông tin giới thiệu */}
+                    <div className="col-4 form-group">
                         <label><FormattedMessage id="admin.manage-doctor.select-doctor" /></label>
                         <Select
                             value={this.state.selectedDoctor}
@@ -298,19 +299,18 @@ class ManageDoctor extends Component {
                             placeholder={<FormattedMessage id="admin.manage-doctor.select-doctor" />}
                         />
                     </div>
-                    <div className='content-right'>
+                    <div className="col-8 form-group">
                         <label><FormattedMessage id="admin.manage-doctor.intro" /></label>
-                        <textarea className='form-control'
-                            rows='4'
+                        <textarea className="form-control"
+                            rows="3"
                             onChange={(event) => this.handleOnChangeDesc(event)}
                             value={this.state.description}
                         >
                         </textarea>
                     </div>
-                </div>
-                <div className="row more-infor-extra my-4">
-                    {/* HÀNG 1: Giá - Thanh toán - Tỉnh thành */}
-                    <div className="col-4 form-group">
+
+                    {/* DÒNG 2: Giá - Thanh toán - Tỉnh thành */}
+                    <div className="col-4 form-group mt-3">
                         <label><FormattedMessage id="admin.manage-doctor.price" /></label>
                         <Select
                             value={this.state.selectedPrice}
@@ -320,7 +320,7 @@ class ManageDoctor extends Component {
                             name="selectedPrice"
                         />
                     </div>
-                    <div className="col-4 form-group">
+                    <div className="col-4 form-group mt-3">
                         <label><FormattedMessage id="admin.manage-doctor.payment" /></label>
                         <Select
                             value={this.state.selectedPayment}
@@ -330,7 +330,7 @@ class ManageDoctor extends Component {
                             name="selectedPayment"
                         />
                     </div>
-                    <div className="col-4 form-group">
+                    <div className="col-4 form-group mt-3">
                         <label><FormattedMessage id="admin.manage-doctor.province" /></label>
                         <Select
                             value={this.state.selectedProvince}
@@ -341,7 +341,7 @@ class ManageDoctor extends Component {
                         />
                     </div>
 
-                    {/* HÀNG 2: Tên PK - Địa chỉ PK - Ghi chú */}
+                    {/* DÒNG 3: Tên PK - Địa chỉ PK - Ghi chú */}
                     <div className="col-4 form-group mt-3">
                         <label><FormattedMessage id="admin.manage-doctor.nameClinic" /></label>
                         <input className="form-control"
@@ -364,8 +364,8 @@ class ManageDoctor extends Component {
                         />
                     </div>
 
-                    {/* HÀNG 3: Chuyên khoa - Phòng khám */}
-                    <div className="col-4 form-group mt-3">
+                    {/* DÒNG 4: Chuyên khoa - Phòng khám */}
+                    <div className="col-6 form-group mt-3">
                         <label><FormattedMessage id="admin.manage-doctor.specialty" /></label>
                         <Select
                             value={this.state.selectedSpecialty}
@@ -375,36 +375,40 @@ class ManageDoctor extends Component {
                             name="selectedSpecialty"
                         />
                     </div>
-                    <div className="col-4 form-group mt-3">
+                    <div className="col-6 form-group mt-3">
                         <label><FormattedMessage id="admin.manage-doctor.select-clinic" /></label>
                         <Select
                             value={this.state.selectedClinic}
                             options={this.state.listClinic}
                             placeholder={<FormattedMessage id="admin.manage-doctor.select-clinic" />}
                             onChange={this.handleChangeSelectDoctorInfor}
-                            name="selectedClinic" // Quan trọng để hàm handleChangeSelectDoctorInfor hoạt động
+                            name="selectedClinic"
                         />
                     </div>
-                </div>
 
-                <div className="manage-doctor-editor">
-                    <MdEditor
-                        style={{ height: '500px' }}
-                        renderHTML={text => mdParser.render(text)}
-                        onChange={this.handleEditorChange}
-                        value={this.state.contentMarkdown}
-                    />
-                </div>
+                    {/* DÒNG 5: Markdown Editor */}
+                    <div className="col-12 manage-doctor-editor mt-4">
+                        <MdEditor
+                            style={{ height: '350px' }}
+                            renderHTML={text => mdParser.render(text)}
+                            onChange={this.handleEditorChange}
+                            value={this.state.contentMarkdown}
+                        />
+                    </div>
 
-                <button
-                    className={hasOldData === true ? "save-content-doctor" : "create-content-doctor"}
-                    onClick={() => this.handleSaveContentMarkdown()}
-                >
-                    {hasOldData === true ?
-                        <span><FormattedMessage id="admin.manage-doctor.save" /></span> :
-                        <span><FormattedMessage id="admin.manage-doctor.add" /></span>
-                    }
-                </button>
+                    {/* DÒNG 6: Nút thao tác */}
+                    <div className="col-12">
+                        <button
+                            className={hasOldData === true ? "btn btn-warning mt-3" : "btn btn-primary mt-3"}
+                            onClick={() => this.handleSaveContentMarkdown()}
+                        >
+                            {hasOldData === true ?
+                                <span><FormattedMessage id="admin.manage-doctor.save" /></span> :
+                                <span><FormattedMessage id="admin.manage-doctor.add" /></span>
+                            }
+                        </button>
+                    </div>
+                </div>
             </div>
         );
     }
