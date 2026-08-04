@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import './HomeHeader.scss';
-import { languages } from '../../utils';
+import { languages, USER_ROLE } from '../../utils';
 import { changeLanguageApp } from '../../store/actions/appActions';
 import * as actions from '../../store/actions';
 import { withRouter } from 'react-router';
@@ -254,11 +254,36 @@ class HomeHeader extends Component {
                                                     </div>
                                                 </div>
                                                 <div className="popup-actions">
-                                                    <button className="btn-manage" onClick={this.handleAvatarClick}>
-                                                        <i className="fas fa-tasks"></i>
-                                                        {language === languages.VI ? 'Quản lý hệ thống' : 'System Management'}
+                                                    {userInfo && userInfo.roleId === USER_ROLE.ADMIN && (
+                                                        <button className="btn-manage" onClick={() => {
+                                                            this.setState({ isShowProfileInfo: false });
+                                                            this.props.history.push('/system/user-redux');
+                                                        }}>
+                                                            <i className="fas fa-list-ul"></i>
+                                                            {language === languages.VI ? 'Quản lý hệ thống' : 'System Management'}
+                                                        </button>
+                                                    )}
+
+                                                    {userInfo && userInfo.roleId === USER_ROLE.DOCTOR && (
+                                                        <button className="btn-manage" onClick={() => {
+                                                            this.setState({ isShowProfileInfo: false });
+                                                            this.props.history.push('/doctor/manage-schedule');
+                                                        }}>
+                                                            <i className="fas fa-user-md"></i>
+                                                            {language === languages.VI ? 'Trang quản lý Bác sĩ' : 'Doctor Management'}
+                                                        </button>
+                                                    )}
+
+                                                    <button className="btn-profile" onClick={() => {
+                                                        this.setState({ isShowProfileInfo: false });
+                                                        this.props.history.push('/user/profile');
+                                                    }}>
+                                                        <i className="fas fa-id-card"></i>
+                                                        {language === languages.VI ? 'Thông tin cá nhân' : 'Personal Profile'}
                                                     </button>
+
                                                     <button className="btn-logout" onClick={() => {
+                                                        this.setState({ isShowProfileInfo: false });
                                                         processLogout();
                                                         this.props.history.push('/home');
                                                     }}>

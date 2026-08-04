@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import { push } from "connected-react-router";
 import * as actions from "../store/actions";
 import './Login.scss'; // Import CSS mới
 import { handleLoginApi } from '../services/userService';
+import { USER_ROLE } from '../utils/constant';
 
 class Login extends Component {
     constructor(props) {
@@ -55,11 +57,17 @@ class Login extends Component {
 
             // Nếu thành công 100%
             if (realData && realData.errCode === 0) {
-                // Giao toàn bộ data thật (có chứa firstName, lastName) cho Redux giữ
+                // Giao toàn bộ data thật cho Redux giữ
                 userLoginSuccess(realData.user);
 
-                // Chuyển trang vào hệ thống
-                this.props.navigate('/system/user-manage');
+                let role = realData.user ? realData.user.roleId : '';
+                if (role === USER_ROLE.ADMIN) {
+                    this.props.navigate('/system/user-redux');
+                } else if (role === USER_ROLE.DOCTOR) {
+                    this.props.navigate('/doctor/manage-schedule');
+                } else {
+                    this.props.navigate('/home');
+                }
             }
         } catch (error) {
             // Bắt lỗi Server sập hoặc mất mạng
@@ -79,6 +87,16 @@ class Login extends Component {
     }
 
     render() {
+        const { isLoggedIn, userInfo } = this.props;
+
+        if (isLoggedIn && userInfo) {
+            let role = userInfo.roleId;
+            if (role === USER_ROLE.DOCTOR) {
+                return <Redirect to="/doctor/manage-schedule" />;
+            }
+            return <Redirect to="/system/user-redux" />;
+        }
+
         return (
             <div className="admin-login-background">
                 <div className="admin-login-container">
@@ -136,7 +154,9 @@ class Login extends Component {
 
 const mapStateToProps = state => {
     return {
-        language: state.app.language
+        language: state.app.language,
+        isLoggedIn: state.user.isLoggedIn,
+        userInfo: state.user.userInfo
     };
 };
 

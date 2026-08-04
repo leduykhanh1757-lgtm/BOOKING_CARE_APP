@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { CommonUtils } from '../../../utils';
-import LoadingOverlay from 'react-loading-overlay';
+import CustomLoadingOverlay from '../../../components/CustomLoadingOverlay';
 
 class RemedyModal extends Component {
     constructor(props) {
@@ -61,9 +61,8 @@ class RemedyModal extends Component {
                 size="md"
                 centered
             >
-                <LoadingOverlay
+                <CustomLoadingOverlay
                     active={isShowLoading}
-                    spinner
                     text='Đang gửi email hóa đơn...'
                 >
                     <div className="modal-header">
@@ -92,7 +91,7 @@ class RemedyModal extends Component {
                         <Button color="primary" onClick={() => this.handleSendRemedy()}>Gửi</Button>{' '}
                         <Button color="secondary" onClick={closeRemedyModal}>Hủy</Button>
                     </ModalFooter>
-                </LoadingOverlay>
+                </CustomLoadingOverlay>
             </Modal>
         );
     }

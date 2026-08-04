@@ -27,11 +27,7 @@ class Header extends Component {
                 menu = adminMenu;
             } else if (role === USER_ROLE.DOCTOR) {
                 menu = doctorMenu;
-            } else {
-                menu = adminMenu;
             }
-        } else {
-            menu = adminMenu;
         }
 
         this.setState({
@@ -50,11 +46,7 @@ class Header extends Component {
                     menu = adminMenu;
                 } else if (role === USER_ROLE.DOCTOR) {
                     menu = doctorMenu;
-                } else {
-                    menu = adminMenu;
                 }
-            } else {
-                menu = adminMenu;
             }
 
             this.setState({
@@ -105,6 +97,10 @@ class Header extends Component {
                         <FormattedMessage id="home-header.welcome" />
                         {userInfo && userInfo.firstName ? userInfo.firstName : ' '}
                         ! </span>
+                    <a href="/home" className="btn-home-redirect" title={language === languages.VI ? "Về trang chủ" : "Go to Homepage"}>
+                        <i className="fas fa-home"></i>
+                        <span>{language === languages.VI ? "Trang chủ" : "Home"}</span>
+                    </a>
                     <span className={language === languages.VI ? 'languages-vi active' : 'languages-vi'}
                         onClick={() => this.handleChangeLanguage(languages.VI)}>VN</span>
                     <span className={language === languages.EN ? 'languages-en active' : 'languages-en'}

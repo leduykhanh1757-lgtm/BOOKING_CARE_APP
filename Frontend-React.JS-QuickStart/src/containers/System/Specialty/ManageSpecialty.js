@@ -9,6 +9,7 @@ import { createNewSpecialty, getAllSpecialty, getAllDetailSpecialtyById, editSpe
 import { toast } from 'react-toastify';
 import Select from 'react-select';
 import { FormattedMessage } from 'react-intl';
+import CustomLoadingOverlay from '../../../components/CustomLoadingOverlay';
 
 const mdParser = new MarkdownIt();
 
@@ -24,6 +25,7 @@ class ManageSpecialty extends Component {
             listSpecialty: [],
             selectedSpecialty: '',
             hasOldData: false,
+            isShowLoading: false
         }
     }
 
@@ -91,38 +93,47 @@ class ManageSpecialty extends Component {
 
     handleSaveNewSpecialty = async () => {
         let { hasOldData } = this.state;
+        this.setState({ isShowLoading: true });
 
-        if (hasOldData === false) {
-            let res = await createNewSpecialty(this.state);
-            if (res && res.errCode === 0) {
-                toast.success('Thêm chuyên khoa thành công!');
-                this.handleClearForm();
-                this.componentDidMount();
+        try {
+            if (hasOldData === false) {
+                let res = await createNewSpecialty(this.state);
+                if (res && res.errCode === 0) {
+                    toast.success('Thêm chuyên khoa thành công!');
+                    this.handleClearForm();
+                    this.componentDidMount();
+                } else {
+                    toast.error('Lỗi thêm mới chuyên khoa!');
+                }
             } else {
-                toast.error('Lỗi thêm mới chuyên khoa!');
+                let res = await editSpecialtyService({
+                    id: this.state.selectedSpecialty.value,
+                    name: this.state.name,
+                    imageBase64: this.state.imageBase64,
+                    descriptionHTML: this.state.descriptionHTML,
+                    descriptionMarkdown: this.state.descriptionMarkdown,
+                });
+                if (res && res.errCode === 0) {
+                    toast.success('Cập nhật chuyên khoa thành công!');
+                    this.handleClearForm();
+                    this.componentDidMount();
+                } else {
+                    toast.error('Lỗi cập nhật chuyên khoa!');
+                }
             }
-        } else {
-            let res = await editSpecialtyService({
-                id: this.state.selectedSpecialty.value,
-                name: this.state.name,
-                imageBase64: this.state.imageBase64,
-                descriptionHTML: this.state.descriptionHTML,
-                descriptionMarkdown: this.state.descriptionMarkdown,
-            });
-            if (res && res.errCode === 0) {
-                toast.success('Cập nhật chuyên khoa thành công!');
-                this.handleClearForm();
-                this.componentDidMount();
-            } else {
-                toast.error('Lỗi cập nhật chuyên khoa!');
-            }
+        } catch (error) {
+            console.error("Lỗi lưu chuyên khoa:", error);
+            toast.error("Đã xảy ra lỗi khi lưu chuyên khoa!");
+        } finally {
+            this.setState({ isShowLoading: false });
         }
     }
 
     render() {
-        let { hasOldData } = this.state;
+        let { hasOldData, isShowLoading } = this.state;
         return (
-            <div className="manage-specialty-container">
+            <CustomLoadingOverlay active={isShowLoading} text="Đang lưu thông tin chuyên khoa...">
+                <div className="manage-specialty-container">
                 <div className="ms-title"><FormattedMessage id="admin.manage-specialty.title" /></div>
 
                 <div className="add-new-specialty row">
@@ -183,6 +194,7 @@ class ManageSpecialty extends Component {
                     </div>
                 </div>
             </div>
+        </CustomLoadingOverlay>
         );
     }
 }

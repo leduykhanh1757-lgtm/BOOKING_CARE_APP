@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 import Select from 'react-select';
 import _ from 'lodash';
 import moment from 'moment';
-import LoadingOverlay from 'react-loading-overlay';
+import CustomLoadingOverlay from '../../../../components/CustomLoadingOverlay';
 
 const EMPTY_FORM = {
     fullName: '',
@@ -138,7 +138,8 @@ class BookingModal extends Component {
             timeType: timeType,
             language: this.props.language,
             timeString: timeString,
-            doctorName: doctorName
+            doctorName: doctorName,
+            redirectUrl: window.location.origin
         });
 
         if (res && res.errCode === 0) {
@@ -210,9 +211,8 @@ class BookingModal extends Component {
                 size="lg"
                 centered
             >
-                <LoadingOverlay
+                <CustomLoadingOverlay
                     active={this.state.isShowLoading}
-                    spinner
                     text={intl.formatMessage({ id: 'patient.booking-modal.processing', defaultMessage: 'Đang xử lý dữ liệu...' })}
                 >
                     <div className="booking-modal-content">
@@ -298,7 +298,7 @@ class BookingModal extends Component {
                             </button>
                         </div>
                     </div>
-                </LoadingOverlay>
+                </CustomLoadingOverlay>
             </Modal>
         );
     }

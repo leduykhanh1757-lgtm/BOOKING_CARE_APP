@@ -10,8 +10,9 @@ import 'react-markdown-editor-lite/lib/index.css';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 import { getDetailInforDoctor } from '../../../services/userService';
-import { CRUD_actions } from '../../../utils';
+import { CRUD_actions, USER_ROLE } from '../../../utils';
 import { getAllSpecialty } from '../../../services/userService';
+import CustomLoadingOverlay from '../../../components/CustomLoadingOverlay';
 // Khởi tạo bộ dịch
 const mdParser = new MarkdownIt();
 
@@ -39,7 +40,8 @@ class ManageDoctor extends Component {
             listSpecialty: [],
             selectedSpecialty: '',
             listClinic: [],
-            selectedClinic: ''
+            selectedClinic: '',
+            isShowLoading: false
         }
     }
 
@@ -58,9 +60,22 @@ class ManageDoctor extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         // 1. Hứng danh sách bác sĩ
-        if (prevProps.allDoctors !== this.props.allDoctors) {
+        if (
+            prevProps.allDoctors !== this.props.allDoctors ||
+            prevProps.userInfo !== this.props.userInfo
+        ) {
+            let listDocs = this.buildDataInputSelect(this.props.allDoctors, 'USERS');
+            let { userInfo } = this.props;
+
             this.setState({
-                listDoctors: this.buildDataInputSelect(this.props.allDoctors, 'USERS')
+                listDoctors: listDocs
+            }, () => {
+                if (userInfo && userInfo.roleId === USER_ROLE.DOCTOR) {
+                    let foundDoctor = listDocs.find(item => item.value === userInfo.id);
+                    if (foundDoctor && (!this.state.selectedDoctor || this.state.selectedDoctor.value !== foundDoctor.value)) {
+                        this.handleChangeSelect(foundDoctor);
+                    }
+                }
             });
         }
 
@@ -77,16 +92,27 @@ class ManageDoctor extends Component {
             });
         }
 
-        // 3. Hứng dữ liệu bắt buộc (Giá, Thanh toán, Tỉnh thành)
+        // 3. Hứng dữ liệu bắt buộc (Giá, Thanh toán, Tỉnh thành, Chuyên khoa, Phòng khám)
         if (prevProps.allRequiredDoctorInfor !== this.props.allRequiredDoctorInfor) {
             let { resPrice, resPayment, resProvince, resSpecialty, resClinic } = this.props.allRequiredDoctorInfor;
+            let { userInfo } = this.props;
+
             this.setState({
                 listPrice: this.buildDataInputSelect(resPrice, 'PRICE'),
                 listPayment: this.buildDataInputSelect(resPayment, 'PAYMENT'),
                 listProvince: this.buildDataInputSelect(resProvince, 'PROVINCE'),
                 listSpecialty: this.buildDataInputSelect(resSpecialty, 'SPECIALTY'),
                 listClinic: this.buildDataInputSelect(resClinic, 'CLINIC'),
-            })
+            }, () => {
+                if (this.state.selectedDoctor && this.state.selectedDoctor.value) {
+                    this.handleChangeSelect(this.state.selectedDoctor);
+                } else if (userInfo && userInfo.roleId === USER_ROLE.DOCTOR && this.state.listDoctors.length > 0) {
+                    let foundDoctor = this.state.listDoctors.find(item => item.value === userInfo.id);
+                    if (foundDoctor) {
+                        this.handleChangeSelect(foundDoctor);
+                    }
+                }
+            });
         }
     }
     handleEditorChange = ({ html, text }) => {
@@ -200,6 +226,8 @@ class ManageDoctor extends Component {
             return;
         }
 
+        this.setState({ isShowLoading: true });
+
         // 2. Gom hết tất cả đạn dược gửi qua Redux
         this.props.saveDetailDoctor({
             contentHTML: contentHTML,
@@ -233,6 +261,7 @@ class ManageDoctor extends Component {
             selectedSpecialty: '',
             hasOldData: false,
             selectedClinic: '',
+            isShowLoading: false
         });
     }
 
@@ -282,8 +311,12 @@ class ManageDoctor extends Component {
 
     render() {
         let { hasOldData } = this.state;
+        let { userInfo } = this.props;
+        let isDoctorRole = userInfo && userInfo.roleId === USER_ROLE.DOCTOR;
+
         return (
-            <div className="manage-doctor-container">
+            <CustomLoadingOverlay active={this.state.isShowLoading} text="Đang lưu thông tin bác sĩ...">
+                <div className="manage-doctor-container">
                 <div className="manage-doctor-title">
                     <FormattedMessage id="admin.manage-doctor.title" />
                 </div>
@@ -292,17 +325,27 @@ class ManageDoctor extends Component {
                     {/* DÒNG 1: Chọn bác sĩ & Thông tin giới thiệu */}
                     <div className="col-4 form-group">
                         <label><FormattedMessage id="admin.manage-doctor.select-doctor" /></label>
-                        <Select
-                            value={this.state.selectedDoctor}
-                            onChange={this.handleChangeSelect}
-                            options={this.state.listDoctors}
-                            placeholder={<FormattedMessage id="admin.manage-doctor.select-doctor" />}
-                        />
+                        {isDoctorRole ? (
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={this.state.selectedDoctor && this.state.selectedDoctor.label ? this.state.selectedDoctor.label : ''}
+                                disabled
+                            />
+                        ) : (
+                            <Select
+                                value={this.state.selectedDoctor}
+                                onChange={this.handleChangeSelect}
+                                options={this.state.listDoctors}
+                                placeholder={<FormattedMessage id="admin.manage-doctor.select-doctor" />}
+                            />
+                        )}
                     </div>
                     <div className="col-8 form-group">
                         <label><FormattedMessage id="admin.manage-doctor.intro" /></label>
                         <textarea className="form-control"
                             rows="3"
+                            placeholder="Nhập thông tin giới thiệu ngắn về bác sĩ..."
                             onChange={(event) => this.handleOnChangeDesc(event)}
                             value={this.state.description}
                         >
@@ -345,6 +388,7 @@ class ManageDoctor extends Component {
                     <div className="col-4 form-group mt-3">
                         <label><FormattedMessage id="admin.manage-doctor.nameClinic" /></label>
                         <input className="form-control"
+                            placeholder="Nhập tên phòng khám..."
                             onChange={(event) => this.handleOnChangeText(event, 'nameClinic')}
                             value={this.state.nameClinic}
                         />
@@ -352,6 +396,7 @@ class ManageDoctor extends Component {
                     <div className="col-4 form-group mt-3">
                         <label><FormattedMessage id="admin.manage-doctor.addressClinic" /></label>
                         <input className="form-control"
+                            placeholder="Nhập địa chỉ phòng khám..."
                             onChange={(event) => this.handleOnChangeText(event, 'addressClinic')}
                             value={this.state.addressClinic}
                         />
@@ -359,6 +404,7 @@ class ManageDoctor extends Component {
                     <div className="col-4 form-group mt-3">
                         <label><FormattedMessage id="admin.manage-doctor.note" /></label>
                         <input className="form-control"
+                            placeholder="Nhập ghi chú thêm..."
                             onChange={(event) => this.handleOnChangeText(event, 'note')}
                             value={this.state.note}
                         />
@@ -410,6 +456,7 @@ class ManageDoctor extends Component {
                     </div>
                 </div>
             </div>
+        </CustomLoadingOverlay>
         );
     }
 }
@@ -419,6 +466,7 @@ const mapStateToProps = state => {
         language: state.app.language,
         allDoctors: state.admin.allDoctors,
         allRequiredDoctorInfor: state.admin.allRequiredDoctorInfor,
+        userInfo: state.user.userInfo,
     };
 };
 

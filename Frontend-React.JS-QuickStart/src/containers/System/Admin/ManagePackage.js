@@ -8,6 +8,8 @@ import CommonUtils from '../../../utils/CommonUtils';
 import { createNewPackageApi, getAllClinic, getAllPackagesApi, editPackageService } from '../../../services/userService';
 import { toast } from 'react-toastify';
 import Select from 'react-select';
+import CustomLoadingOverlay from '../../../components/CustomLoadingOverlay';
+
 // FIX: import chung SERVICE_CONFIG để build dropdown loại dịch vụ, tránh
 // liệt kê tay danh sách 7 loại dịch vụ ở 2 chỗ (dễ bị lệch khi thêm dịch vụ mới).
 // Đường dẫn dưới đây có thể cần chỉnh lại cho khớp vị trí thực tế của
@@ -40,7 +42,8 @@ class ManagePackage extends Component {
 
             listPackages: [],
             selectedPackage: '',
-            hasOldData: false
+            hasOldData: false,
+            isShowLoading: false
         }
     }
 
@@ -55,7 +58,7 @@ class ManagePackage extends Component {
             }));
             this.setState({
                 listClinics: dataClinicSelect,
-                selectedClinic: dataClinicSelect && dataClinicSelect.length > 0 ? dataClinicSelect[0] : ''
+                selectedClinic: ''
             });
         }
 
@@ -119,8 +122,8 @@ class ManagePackage extends Component {
         this.setState({
             selectedPackage: '', name: '', price: '', imageBase64: '',
             descriptionHTML: '', descriptionMarkdown: '', hasOldData: false,
-            selectedClinic: this.state.listClinics.length > 0 ? this.state.listClinics[0] : '',
-            selectedServiceType: '' // 🛠️ FIX: reset luôn loại dịch vụ khi làm mới form
+            selectedClinic: '',
+            selectedServiceType: ''
         });
     }
 
@@ -165,36 +168,46 @@ class ManagePackage extends Component {
             serviceType: selectedServiceType.value // 🛠️ FIX: gửi kèm loại dịch vụ lên server
         };
 
-        if (hasOldData === false) {
-            let res = await createNewPackageApi(dataToSave);
-            if (res && res.errCode === 0) {
-                toast.success("Thêm gói khám thành công!");
-                this.handleClearForm();
-                this.componentDidMount();
-            } else {
-                toast.error("Lỗi: " + res.errMessage);
-            }
-        } else {
-            let res = await editPackageService({
-                ...dataToSave,
-                id: selectedPackage.value
-            });
+        this.setState({ isShowLoading: true });
 
-            if (res && res.errCode === 0) {
-                toast.success("Cập nhật Gói khám thành công!");
-                this.handleClearForm();
-                this.componentDidMount();
+        try {
+            if (hasOldData === false) {
+                let res = await createNewPackageApi(dataToSave);
+                if (res && res.errCode === 0) {
+                    toast.success("Thêm gói khám thành công!");
+                    this.handleClearForm();
+                    this.componentDidMount();
+                } else {
+                    toast.error("Lỗi: " + res.errMessage);
+                }
             } else {
-                toast.error("Lỗi cập nhật!");
+                let res = await editPackageService({
+                    ...dataToSave,
+                    id: selectedPackage.value
+                });
+
+                if (res && res.errCode === 0) {
+                    toast.success("Cập nhật Gói khám thành công!");
+                    this.handleClearForm();
+                    this.componentDidMount();
+                } else {
+                    toast.error("Lỗi cập nhật!");
+                }
             }
+        } catch (error) {
+            console.error("Lỗi lưu gói khám:", error);
+            toast.error("Đã xảy ra lỗi khi lưu gói khám!");
+        } finally {
+            this.setState({ isShowLoading: false });
         }
     }
 
     render() {
-        let { hasOldData, listClinics, selectedClinic, selectedServiceType } = this.state;
+        let { hasOldData, listClinics, selectedClinic, selectedServiceType, isShowLoading } = this.state;
 
         return (
-            <div className="manage-handbook-container">
+            <CustomLoadingOverlay active={isShowLoading} text="Đang lưu thông tin gói khám...">
+                <div className="manage-handbook-container">
                 <div className="ms-title">Quản lý Gói Khám Sức Khỏe</div>
 
                 <div className="add-new-handbook row">
@@ -224,7 +237,7 @@ class ManagePackage extends Component {
 
                     <div className="col-4 form-group mt-3">
                         <label>Tên gói khám</label>
-                        <input className="form-control" type="text" value={this.state.name} onChange={(event) => this.handleOnChangeInput(event, 'name')} />
+                        <input className="form-control" type="text" placeholder="Nhập tên gói khám..." value={this.state.name} onChange={(event) => this.handleOnChangeInput(event, 'name')} />
                     </div>
 
                     <div className="col-4 form-group mt-3">
@@ -239,7 +252,7 @@ class ManagePackage extends Component {
 
                     <div className="col-4 form-group mt-3">
                         <label>Giá tiền</label>
-                        <input className="form-control" type="text" value={this.state.price} onChange={(event) => this.handleOnChangeInput(event, 'price')} />
+                        <input className="form-control" type="text" placeholder="Nhập giá gói khám (VNĐ)..." value={this.state.price} onChange={(event) => this.handleOnChangeInput(event, 'price')} />
                     </div>
 
                     {/* FIX: DROPDOWN LOẠI DỊCH VỤ - ĐÂY LÀ PHẦN CÒN THIẾU GÂY RA BUG serviceType = null */}
@@ -267,6 +280,7 @@ class ManagePackage extends Component {
                     </div>
                 </div>
             </div>
+        </CustomLoadingOverlay>
         );
     }
 }

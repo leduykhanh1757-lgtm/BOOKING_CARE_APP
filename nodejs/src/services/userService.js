@@ -150,10 +150,8 @@ let createNewUser = (data) => {
 let editUser = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            // 1. BƯỚC BẢO VỆ: Kiểm tra đầu vào cực kỳ chặt chẽ
-            // Dùng data.gender === undefined để lách lỗi Javascript coi số 0 là rỗng
-            if (!data.id || !data.roleId || !data.positionId || data.gender === undefined) {
-                // BẮT BUỘC PHẢI CÓ 'return' ĐỂ DỪNG NGAY HÀM LẠI NẾU CÓ LỖI
+            // 1. BƯỚC BẢO VỆ: Kiểm tra đầu vào
+            if (!data.id || !data.roleId || data.gender === undefined) {
                 return resolve({
                     errCode: 2,
                     errMessage: 'Missing required parameters!'
@@ -163,7 +161,7 @@ let editUser = (data) => {
             // 2. TÌM KIẾM: Lôi người dùng từ Database lên
             let user = await db.User.findOne({
                 where: { id: data.id },
-                raw: false // Bắt buộc raw: false để giữ lại các hàm của Sequelize (như hàm save)
+                raw: false
             });
 
             // 3. CẬP NHẬT: Nếu tìm thấy thì đổ dữ liệu mới vào
@@ -172,7 +170,7 @@ let editUser = (data) => {
                 user.lastName = data.lastName;
                 user.address = data.address;
                 user.roleId = data.roleId;
-                user.positionId = data.positionId;
+                user.positionId = data.positionId || 'P0';
                 user.gender = data.gender;
                 user.phoneNumber = data.phoneNumber;
 
@@ -199,7 +197,6 @@ let editUser = (data) => {
                     errMessage: 'Update the user succeeds!'
                 });
             } else {
-                // Truyền một cái ID bậy bạ không tồn tại trong DB
                 return resolve({
                     errCode: 1,
                     errMessage: 'User not found!'

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import { languages, dateFormat, CRUD_actions } from '../../../utils';
+import { languages, dateFormat, CRUD_actions, USER_ROLE } from '../../../utils';
 import Select from 'react-select';
 import * as actions from "../../../store/actions";
 import { FormattedMessage } from 'react-intl';
@@ -12,6 +12,7 @@ import _ from 'lodash';
 import './ManageSchedule.scss';
 import { toast } from 'react-toastify';
 import { saveBulkScheduleDoctor } from '../../../services/userService';
+import CustomLoadingOverlay from '../../../components/CustomLoadingOverlay';
 
 class ManageSchedule extends Component {
 
@@ -22,7 +23,7 @@ class ManageSchedule extends Component {
             selectedDoctor: {},
             currentDate: new Date(new Date().setHours(0, 0, 0, 0)),
             rangeTime: [],
-
+            isShowLoading: false
         }
     }
 
@@ -32,16 +33,29 @@ class ManageSchedule extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.allDoctors !== this.props.allDoctors) {
+        if (
+            prevProps.allDoctors !== this.props.allDoctors ||
+            prevProps.userInfo !== this.props.userInfo ||
+            prevProps.language !== this.props.language
+        ) {
+            let dataSelect = this.buildDataInputSelect(this.props.allDoctors);
+            let { userInfo } = this.props;
+            let selectedDoctor = this.state.selectedDoctor;
+
+            // Nếu người dùng đăng nhập là Bác sĩ -> Tự động chọn về chính tài khoản đó
+            if (userInfo && userInfo.roleId === USER_ROLE.DOCTOR) {
+                let foundDoctor = dataSelect.find(item => item.value === userInfo.id);
+                if (foundDoctor) {
+                    selectedDoctor = foundDoctor;
+                }
+            }
+
             this.setState({
-                listDoctors: this.buildDataInputSelect(this.props.allDoctors)
+                listDoctors: dataSelect,
+                selectedDoctor: selectedDoctor
             });
         }
-        if (prevProps.language !== this.props.language) {
-            this.setState({
-                listDoctors: this.buildDataInputSelect(this.props.allDoctors)
-            });
-        }
+
         if (prevProps.allScheduleTime !== this.props.allScheduleTime) {
             let data = this.props.allScheduleTime;
             if (data && data.length > 0) {
@@ -97,7 +111,7 @@ class ManageSchedule extends Component {
             toast.error('Invalid date!');
             return;
         }
-        if (selectedDoctor && _.isEmpty(selectedDoctor)) {
+        if (!selectedDoctor || _.isEmpty(selectedDoctor)) {
             toast.error('Invalid selected doctor!');
             return;
         }
@@ -115,82 +129,107 @@ class ManageSchedule extends Component {
                     result.push(object);
                 });
             } else {
-                toast.error('Invalid selected time!');
+                toast.error('Vui lòng chọn ít nhất một khoảng thời gian!');
                 return;
             }
         }
 
-        let res = await saveBulkScheduleDoctor({
-            arrSchedule: result,
-            doctorId: selectedDoctor.value,
-            formatedDate: formattedDate
-        });
+        this.setState({ isShowLoading: true });
 
-        if (res && res.errCode === 0) {
-            toast.success("Lưu lịch khám thành công!");
-        } else {
-            toast.error("Lỗi lưu lịch khám...");
+        try {
+            let res = await saveBulkScheduleDoctor({
+                arrSchedule: result,
+                doctorId: selectedDoctor.value,
+                formatedDate: formattedDate
+            });
+
+            if (res && res.errCode === 0) {
+                toast.success("Lưu lịch khám thành công!");
+                // 🛠️ RESET LẠI TẤT CẢ KHUNG GIỜ VỀ MẶC ĐỊNH CHƯA CHỌN
+                let resetRangeTime = rangeTime.map(item => ({ ...item, isSelected: false }));
+                this.setState({ rangeTime: resetRangeTime });
+            } else {
+                toast.error("Lỗi lưu lịch khám: " + (res?.errMessage || ""));
+            }
+        } catch (error) {
+            console.error("Lỗi lưu lịch khám:", error);
+            toast.error("Đã xảy ra lỗi khi lưu lịch khám!");
+        } finally {
+            this.setState({ isShowLoading: false });
         }
     }
+
     render() {
-        let { rangeTime } = this.state;
-        let { language } = this.props;
+        let { rangeTime, isShowLoading, selectedDoctor, listDoctors } = this.state;
+        let { language, userInfo } = this.props;
+        let isDoctorRole = userInfo && userInfo.roleId === USER_ROLE.DOCTOR;
+
         return (
-            <div className="manage-schedule-container">
-                <div className="m-s-title notranslate">
+            <CustomLoadingOverlay active={isShowLoading} text="Đang lưu thông tin lịch khám...">
+                <div className="manage-schedule-container">
+                    <div className="m-s-title notranslate">
+                        <FormattedMessage id="manage-schedule.manage-schedule" />
+                    </div>
 
-                    <FormattedMessage id="manage-schedule.manage-schedule" />
-                </div>
+                    <div className="container">
+                        <div className="row">
+                            <div className="col-6 form-group">
+                                <label className="notranslate">
+                                    <FormattedMessage id="manage-schedule.choose-doctor" />
+                                </label>
+                                {isDoctorRole ? (
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={selectedDoctor && selectedDoctor.label ? selectedDoctor.label : ''}
+                                        disabled
+                                    />
+                                ) : (
+                                    <Select
+                                        value={selectedDoctor}
+                                        onChange={this.handleChangeSelect}
+                                        options={listDoctors}
+                                    />
+                                )}
+                            </div>
 
-                <div className="container">
-                    <div className="row">
-                        <div className="col-6 form-group">
-
-                            <label className="notranslate"><FormattedMessage id="manage-schedule.choose-doctor" /></label>
-                            <Select
-                                value={this.state.selectedDoctor}
-                                onChange={this.handleChangeSelect}
-                                options={this.state.listDoctors}
-                            />
-                        </div>
-
-                        <div className="col-6 form-group">
-
-                            <label className="notranslate"><FormattedMessage id="manage-schedule.select-date" /></label>
-                            <DatePicker
-                                onChange={this.handleOnChangeDatePicker}
-                                className="form-control"
-                                value={this.state.currentDate}
-                                minDate={new Date(new Date().setHours(0, 0, 0, 0))}
-                            />
-                        </div>
+                            <div className="col-6 form-group">
+                                <label className="notranslate"><FormattedMessage id="manage-schedule.select-date" /></label>
+                                <DatePicker
+                                    onChange={this.handleOnChangeDatePicker}
+                                    className="form-control"
+                                    value={this.state.currentDate}
+                                    minDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                                />
+                            </div>
 
 
-                        <div className="col-12 pick-hour-container">
-                            {rangeTime && rangeTime.length > 0 && rangeTime.map((item, index) => {
-                                return (
-                                    <button className={item.isSelected === true ?
-                                        "btn btn-schedule active" : "btn btn-schedule"}
-                                        key={index}
-                                        onClick={() => this.handleClickBtnTime(item)}
-                                    >
-                                        {this.props.language === languages.VI ? item.valueVi : item.valueEn}
-                                    </button>
-                                );
-                            })}
-                        </div>
+                            <div className="col-12 pick-hour-container">
+                                {rangeTime && rangeTime.length > 0 && rangeTime.map((item, index) => {
+                                    return (
+                                        <button className={item.isSelected === true ?
+                                            "btn btn-schedule active" : "btn btn-schedule"}
+                                            key={index}
+                                            onClick={() => this.handleClickBtnTime(item)}
+                                        >
+                                            {this.props.language === languages.VI ? item.valueVi : item.valueEn}
+                                        </button>
+                                    );
+                                })}
+                            </div>
 
-                        <div className="col-12">
-                            <button className="btn btn-primary btn-save-schedule notranslate"
-                                onClick={() => this.handleSaveSchedule()}
-                            >
-
-                                <FormattedMessage id="manage-schedule.save-schedule" />
-                            </button>
+                            <div className="col-12">
+                                <button className="btn btn-primary btn-save-schedule notranslate"
+                                    disabled={isShowLoading}
+                                    onClick={() => this.handleSaveSchedule()}
+                                >
+                                    <FormattedMessage id="manage-schedule.save-schedule" />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </CustomLoadingOverlay>
         );
     }
 }
@@ -201,6 +240,7 @@ const mapStateToProps = state => {
         language: state.app.language,
         allDoctors: state.admin.allDoctors,
         allScheduleTime: state.admin.allScheduleTime,
+        userInfo: state.user.userInfo,
     };
 };
 

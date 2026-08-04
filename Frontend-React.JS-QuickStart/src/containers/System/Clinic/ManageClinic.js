@@ -9,6 +9,7 @@ import { createNewClinic, getAllClinic, getAllDetailClinicById, editClinicServic
 import { toast } from 'react-toastify';
 import Select from 'react-select'; // 🛠️ Import thêm thư viện Select
 import { FormattedMessage } from 'react-intl';
+import CustomLoadingOverlay from '../../../components/CustomLoadingOverlay';
 
 const mdParser = new MarkdownIt();
 
@@ -26,6 +27,7 @@ class ManageClinic extends Component {
             listClinic: [],
             selectedClinic: '',
             hasOldData: false, // Cờ hiệu để biết là Sửa hay Tạo mới
+            isShowLoading: false
         }
     }
 
@@ -98,41 +100,50 @@ class ManageClinic extends Component {
 
     handleSaveNewClinic = async () => {
         let { hasOldData } = this.state;
+        this.setState({ isShowLoading: true });
 
-        if (hasOldData === false) {
-            // TẠO MỚI
-            let res = await createNewClinic(this.state);
-            if (res && res.errCode === 0) {
-                toast.success('Thêm phòng khám thành công!');
-                this.handleClearForm(); // Tạo xong xóa form
-                this.componentDidMount(); // Tải lại danh sách dropdown
+        try {
+            if (hasOldData === false) {
+                // TẠO MỚI
+                let res = await createNewClinic(this.state);
+                if (res && res.errCode === 0) {
+                    toast.success('Thêm phòng khám thành công!');
+                    this.handleClearForm(); // Tạo xong xóa form
+                    this.componentDidMount(); // Tải lại danh sách dropdown
+                } else {
+                    toast.error('Lỗi thêm mới phòng khám!');
+                }
             } else {
-                toast.error('Lỗi thêm mới phòng khám!');
+                // CHỈNH SỬA
+                let res = await editClinicService({
+                    id: this.state.selectedClinic.value,
+                    name: this.state.name,
+                    address: this.state.address,
+                    imageBase64: this.state.imageBase64,
+                    descriptionHTML: this.state.descriptionHTML,
+                    descriptionMarkdown: this.state.descriptionMarkdown,
+                });
+                if (res && res.errCode === 0) {
+                    toast.success('Cập nhật phòng khám thành công!');
+                    this.componentDidMount(); // Tải lại tên phòng khám trên dropdown lỡ người dùng có đổi tên
+                    this.handleClearForm();
+                } else {
+                    toast.error('Lỗi cập nhật phòng khám!');
+                }
             }
-        } else {
-            // CHỈNH SỬA
-            let res = await editClinicService({
-                id: this.state.selectedClinic.value,
-                name: this.state.name,
-                address: this.state.address,
-                imageBase64: this.state.imageBase64,
-                descriptionHTML: this.state.descriptionHTML,
-                descriptionMarkdown: this.state.descriptionMarkdown,
-            });
-            if (res && res.errCode === 0) {
-                toast.success('Cập nhật phòng khám thành công!');
-                this.componentDidMount(); // Tải lại tên phòng khám trên dropdown lỡ người dùng có đổi tên
-                this.handleClearForm();
-            } else {
-                toast.error('Lỗi cập nhật phòng khám!');
-            }
+        } catch (error) {
+            console.error("Lỗi lưu phòng khám:", error);
+            toast.error("Đã xảy ra lỗi khi lưu phòng khám!");
+        } finally {
+            this.setState({ isShowLoading: false });
         }
     }
 
     render() {
-        let { hasOldData } = this.state;
+        let { hasOldData, isShowLoading } = this.state;
         return (
-            <div className="manage-clinic-container">
+            <CustomLoadingOverlay active={isShowLoading} text="Đang lưu thông tin phòng khám...">
+                <div className="manage-clinic-container">
                 <div className="ms-title notranslate"><FormattedMessage id="admin.manage-clinic.title" /></div>
 
                 <div className="add-new-clinic row">
@@ -199,6 +210,7 @@ class ManageClinic extends Component {
                     </div>
                 </div>
             </div>
+        </CustomLoadingOverlay>
         );
     }
 }

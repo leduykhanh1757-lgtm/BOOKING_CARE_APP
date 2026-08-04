@@ -91,8 +91,8 @@ class App extends Component {
                                 <Switch>
                                     <Route path={path.HOME} exact component={(Home)} />
 
-                                    {/* ROUTE CHO ADMIN (Đăng nhập quản trị) */}
-                                    <Route path={path.LOGIN} component={Login} />
+                                    {/* ROUTE DÙNG CHUNG ĐĂNG NHẬP (UNIFIED LOGIN) */}
+                                    <Route path={path.LOGIN} component={UserLogin} />
                                     <Route path={path.SYSTEM} component={System} />
 
                                     {/* ROUTE DÀNH CHO BÁC SĨ */}

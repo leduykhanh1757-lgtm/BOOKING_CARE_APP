@@ -6,6 +6,9 @@ import './UserLogin.scss';
 import '../../components/LoadingButton.scss';
 import { handleLoginApi } from '../../services/userService';
 
+import { USER_ROLE } from '../../utils/constant';
+import { Redirect } from 'react-router-dom';
+
 class UserLogin extends Component {
     constructor(props) {
         super(props);
@@ -45,7 +48,6 @@ class UserLogin extends Component {
             if (realData && realData.errCode === 0) {
                 this.props.userLoginSuccess(realData.user);
                 this.props.navigate('/home');
-                // Không cần tắt loading vì sẽ redirect sang trang khác
             }
 
         } catch (error) {
@@ -78,6 +80,11 @@ class UserLogin extends Component {
 
     render() {
         let { username, password, isShowPassword, errMessage, isLoading } = this.state;
+        let { isLoggedIn, userInfo } = this.props;
+
+        if (isLoggedIn && userInfo) {
+            return <Redirect to="/home" />;
+        }
 
         return (
             <div className="login-background">
@@ -166,7 +173,9 @@ class UserLogin extends Component {
 
 const mapStateToProps = state => {
     return {
-        language: state.app.language
+        language: state.app.language,
+        isLoggedIn: state.user.isLoggedIn,
+        userInfo: state.user.userInfo
     };
 };
 

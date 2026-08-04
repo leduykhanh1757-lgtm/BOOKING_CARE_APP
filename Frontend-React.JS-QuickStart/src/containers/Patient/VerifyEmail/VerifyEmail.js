@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { postVerifyBookAppointment } from '../../../services/userService';
 import './VerifyEmail.scss';
 import HomeHeader from '../../HomePage/HomeHeader';
-import LoadingOverlay from 'react-loading-overlay';
+import CustomLoadingOverlay from '../../../components/CustomLoadingOverlay';
 
 class VerifyEmail extends Component {
     constructor(props) {
@@ -48,10 +48,9 @@ class VerifyEmail extends Component {
         let { statusVerify, errCode, isShowLoading } = this.state;
 
         return (
-            <LoadingOverlay
+            <CustomLoadingOverlay
                 active={isShowLoading}
-                spinner
-                text='Đang tải dữ liệu...'
+                text='Đang xác nhận lịch hẹn...'
             >
                 <div>
                     <HomeHeader isShowBanner={false} />
@@ -76,7 +75,7 @@ class VerifyEmail extends Component {
                         }
                     </div>
                 </div>
-            </LoadingOverlay>
+            </CustomLoadingOverlay>
         );
     }
 }

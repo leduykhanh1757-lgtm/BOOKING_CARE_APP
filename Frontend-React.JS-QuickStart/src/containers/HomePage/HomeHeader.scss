@@ -388,6 +388,16 @@
                                 }
                             }
 
+                            &.btn-profile {
+                                background: rgba(99, 102, 241, 0.06);
+                                color: #6366f1;
+
+                                &:hover {
+                                    background: rgba(99, 102, 241, 0.12);
+                                    transform: translateY(-1px);
+                                }
+                            }
+
                             &.btn-logout {
                                 background: rgba(239, 68, 68, 0.06);
                                 color: #ef4444;

@@ -8,6 +8,7 @@ import { CommonUtils } from '../../../utils';
 import { createNewHandbook, getAllHandbook, editHandbookService, getDetailHandbookById } from '../../../services/userService';
 import { toast } from 'react-toastify';
 import Select from 'react-select';
+import CustomLoadingOverlay from '../../../components/CustomLoadingOverlay';
 
 const mdParser = new MarkdownIt();
 
@@ -23,6 +24,7 @@ class ManageHandbook extends Component {
             listHandbook: [],
             selectedHandbook: '',
             hasOldData: false,
+            isShowLoading: false
         }
     }
 
@@ -92,39 +94,48 @@ class ManageHandbook extends Component {
 
     handleSaveNewHandbook = async () => {
         let { hasOldData } = this.state;
+        this.setState({ isShowLoading: true });
 
-        if (hasOldData === false) {
-            let res = await createNewHandbook(this.state);
-            if (res && res.errCode === 0) {
-                toast.success('Thêm cẩm nang thành công!');
-                this.handleClearForm();
-                this.componentDidMount();
+        try {
+            if (hasOldData === false) {
+                let res = await createNewHandbook(this.state);
+                if (res && res.errCode === 0) {
+                    toast.success('Thêm cẩm nang thành công!');
+                    this.handleClearForm();
+                    this.componentDidMount();
+                } else {
+                    toast.error('Lỗi thêm mới cẩm nang!');
+                }
             } else {
-                toast.error('Lỗi thêm mới cẩm nang!');
-            }
-        } else {
-            let res = await editHandbookService({
-                id: this.state.selectedHandbook.value,
-                name: this.state.name,
-                imageBase64: this.state.imageBase64,
-                descriptionHTML: this.state.descriptionHTML,
-                descriptionMarkdown: this.state.descriptionMarkdown,
-            });
+                let res = await editHandbookService({
+                    id: this.state.selectedHandbook.value,
+                    name: this.state.name,
+                    imageBase64: this.state.imageBase64,
+                    descriptionHTML: this.state.descriptionHTML,
+                    descriptionMarkdown: this.state.descriptionMarkdown,
+                });
 
-            if (res && res.errCode === 0) {
-                toast.success('Cập nhật cẩm nang thành công!');
-                this.handleClearForm(); // Update xong thì clear form về giao diện trắng
-                this.componentDidMount(); // Load lại data mới vào Dropdown
-            } else {
-                toast.error('Lỗi cập nhật cẩm nang!');
+                if (res && res.errCode === 0) {
+                    toast.success('Cập nhật cẩm nang thành công!');
+                    this.handleClearForm(); // Update xong thì clear form về giao diện trắng
+                    this.componentDidMount(); // Load lại data mới vào Dropdown
+                } else {
+                    toast.error('Lỗi cập nhật cẩm nang!');
+                }
             }
+        } catch (error) {
+            console.error("Lỗi lưu cẩm nang:", error);
+            toast.error("Đã xảy ra lỗi khi lưu cẩm nang!");
+        } finally {
+            this.setState({ isShowLoading: false });
         }
     }
 
     render() {
-        let { hasOldData } = this.state;
+        let { hasOldData, isShowLoading } = this.state;
         return (
-            <div className="manage-handbook-container">
+            <CustomLoadingOverlay active={isShowLoading} text="Đang lưu thông tin cẩm nang...">
+                <div className="manage-handbook-container">
                 <div className="ms-title">Quản lý Cẩm nang bài viết</div>
 
                 <div className="add-new-handbook row">
@@ -183,6 +194,7 @@ class ManageHandbook extends Component {
                     </div>
                 </div>
             </div>
+        </CustomLoadingOverlay>
         );
     }
 }

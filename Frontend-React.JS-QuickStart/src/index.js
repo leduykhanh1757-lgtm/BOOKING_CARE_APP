@@ -50,12 +50,16 @@ if (typeof Node === 'function' && Node.prototype) {
 }
 // ============================================================
 
+import { PersistGate } from 'redux-persist/integration/react';
+
 const renderApp = () => {
     ReactDOM.render(
         <Provider store={reduxStore}>
-            <IntlProviderWrapper>
-                <App persistor={persistor} />
-            </IntlProviderWrapper>
+            <PersistGate loading={null} persistor={persistor}>
+                <IntlProviderWrapper>
+                    <App persistor={persistor} />
+                </IntlProviderWrapper>
+            </PersistGate>
         </Provider>,
         document.getElementById('root')
     );

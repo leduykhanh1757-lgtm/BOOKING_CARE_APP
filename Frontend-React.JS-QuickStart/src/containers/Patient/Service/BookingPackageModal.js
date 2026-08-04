@@ -6,7 +6,7 @@ import { postBookPackage } from '../../../services/userService';
 import { toast } from 'react-toastify';
 import DatePicker from '../../../components/Input/DatePicker';
 import moment from 'moment';
-import LoadingOverlay from 'react-loading-overlay';
+import CustomLoadingOverlay from '../../../components/CustomLoadingOverlay';
 
 class BookingPackageModal extends Component {
     constructor(props) {
@@ -66,9 +66,8 @@ class BookingPackageModal extends Component {
 
         return (
             <Modal isOpen={isOpenModal} className={'booking-modal-container'} size="lg" centered>
-                <LoadingOverlay
+                <CustomLoadingOverlay
                     active={this.state.isShowLoading}
-                    spinner
                     text='Đang xử lý gửi Email...'
                 >
                     <div className="booking-modal-content">
@@ -143,7 +142,7 @@ class BookingPackageModal extends Component {
                             <button className="btn-booking-confirm" onClick={() => this.handleConfirmBooking()}>Xác nhận đặt lịch</button>
                         </div>
                     </div>
-                </LoadingOverlay>
+                </CustomLoadingOverlay>
 
             </Modal>
         );

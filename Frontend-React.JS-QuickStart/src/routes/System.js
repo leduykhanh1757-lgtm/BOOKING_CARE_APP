@@ -9,12 +9,29 @@ import ManageSpecialty from '../containers/System/Specialty/ManageSpecialty';
 import ManageClinic from '../containers/System/Clinic/ManageClinic';
 import ManageHandbook from '../containers/System/Handbook/ManageHandbook';
 import ManagePackage from '../containers/System/Admin/ManagePackage';
+import { USER_ROLE } from '../utils/constant';
+
 class System extends Component {
     render() {
-        const { systemMenuPath, isLoggedIn } = this.props;
+        const { systemMenuPath, isLoggedIn, userInfo } = this.props;
+
+        if (!isLoggedIn) {
+            return <Redirect to="/login" />;
+        }
+
+        if (userInfo) {
+            let role = userInfo.roleId;
+            if (role === USER_ROLE.DOCTOR) {
+                return <Redirect to="/doctor/manage-schedule" />;
+            }
+            if (role === USER_ROLE.PATIENT) {
+                return <Redirect to="/home" />;
+            }
+        }
+
         return (
             <React.Fragment>
-                {isLoggedIn && <Header />}
+                <Header />
                 <div className="system-container">
                     <div className="system-list">
                         <Switch>
@@ -38,7 +55,8 @@ class System extends Component {
 const mapStateToProps = state => {
     return {
         systemMenuPath: state.app.systemMenuPath,
-        isLoggedIn: state.user.isLoggedIn
+        isLoggedIn: state.user.isLoggedIn,
+        userInfo: state.user.userInfo
     };
 };
 

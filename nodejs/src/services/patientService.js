@@ -3,8 +3,9 @@ import emailService from './emailService';
 import { v4 as uuidv4 } from 'uuid';
 require('dotenv').config(); // 🛠️ Phải có dòng này để load biến URL_REACT
 
-let buildUrlEmail = (doctorId, token) => {
-    let result = `${process.env.URL_REACT}/verify-booking?token=${token}&doctorId=${doctorId}`;
+let buildUrlEmail = (doctorId, token, redirectUrl) => {
+    let baseUrl = redirectUrl ? redirectUrl : process.env.URL_REACT;
+    let result = `${baseUrl}/verify-booking?token=${token}&doctorId=${doctorId}`;
     return result;
 }
 
@@ -62,7 +63,7 @@ let postBookAppointment = (data) => {
                             time: data.timeString,
                             doctorName: data.doctorName,
                             language: data.language,
-                            redirectLink: buildUrlEmail(data.doctorId, token)
+                            redirectLink: buildUrlEmail(data.doctorId, token, data.redirectUrl)
                         });
                     }
                 }
@@ -130,12 +131,21 @@ let getListPatientForDoctor = (data) => {
                     errMessage: 'Missing parameter'
                 })
             } else {
+                let whereCondition = {
+                    doctorId: data.doctorId,
+                    date: data.date
+                };
+
+                if (data.statusId === 'ALL') {
+                    whereCondition.statusId = ['S2', 'S3'];
+                } else if (data.statusId) {
+                    whereCondition.statusId = data.statusId;
+                } else {
+                    whereCondition.statusId = 'S2'; // Mặc định chỉ lấy S2 nếu không truyền
+                }
+
                 let dataPatient = await db.Booking.findAll({
-                    where: {
-                        statusId: 'S2', // S2 là trạng thái "Đã xác nhận"
-                        doctorId: data.doctorId,
-                        date: data.date
-                    },
+                    where: whereCondition,
                     include: [
                         {
                             model: db.User, as: 'patientData', // Thông tin bệnh nhân

@@ -478,7 +478,7 @@ let getCommentsByDoctorId = (doctorId) => {
 
                 if (comments && comments.length > 0) {
                     let users = await db.User.findAll({
-                        attributes: ['firstName', 'lastName', 'image'],
+                        attributes: ['id', 'firstName', 'lastName', 'email', 'image'],
                         raw: true
                     });
 
@@ -490,10 +490,14 @@ let getCommentsByDoctorId = (doctorId) => {
                                 imgStr = Buffer.isBuffer(u.image) ? u.image.toString('utf8') : u.image;
                             }
                             if (imgStr) {
-                                let name1 = `${u.lastName} ${u.firstName}`.trim().toLowerCase();
-                                let name2 = `${u.firstName} ${u.lastName}`.trim().toLowerCase();
-                                userMap[name1] = imgStr;
-                                userMap[name2] = imgStr;
+                                let fn = (u.firstName || '').trim().toLowerCase();
+                                let ln = (u.lastName || '').trim().toLowerCase();
+                                if (fn && ln) {
+                                    userMap[`${fn} ${ln}`] = imgStr;
+                                    userMap[`${ln} ${fn}`] = imgStr;
+                                }
+                                if (fn) userMap[fn] = imgStr;
+                                if (ln) userMap[ln] = imgStr;
                             }
                         });
                     }

@@ -87,7 +87,8 @@ const editSpecialtyService = (data) => {
     return axios.put('/api/edit-specialty', data);
 }
 const getAllPatientForDoctor = (data) => {
-    return axios.get(`/api/get-list-patient-for-doctor?doctorId=${data.doctorId}&date=${data.date}`);
+    let statusParam = data.statusId ? `&statusId=${data.statusId}` : '';
+    return axios.get(`/api/get-list-patient-for-doctor?doctorId=${data.doctorId}&date=${data.date}${statusParam}`);
 }
 const postSendRemedy = (data) => {
     return axios.post('/api/send-remedy', data);
