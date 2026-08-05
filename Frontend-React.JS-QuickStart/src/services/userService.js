@@ -141,6 +141,12 @@ const forgotPasswordService = (email, language) => {
 const verifyForgotPasswordService = (data) => {
     return axios.post('/api/verify-forgot-password', data);
 }
+const sendPrivateMessageApi = (data) => {
+    return axios.post('/api/send-private-message', data);
+}
+const getPrivateMessagesApi = (doctorId, patientId) => {
+    return axios.get(`/api/get-private-messages?doctorId=${doctorId}${patientId ? `&patientId=${patientId}` : ''}`);
+}
 export {
     handleLoginApi, getAllUsers,
     createNewUserService, deleteUserService,
@@ -160,5 +166,6 @@ export {
     toggleLikeDoctorApi, getLikesDoctorApi,
     askChatbotApi,
     createNewPackageApi, getAllPackagesApi, editPackageService, getDetailPackageById, postBookPackage,
-    forgotPasswordService, verifyForgotPasswordService
+    forgotPasswordService, verifyForgotPasswordService,
+    sendPrivateMessageApi, getPrivateMessagesApi
 };

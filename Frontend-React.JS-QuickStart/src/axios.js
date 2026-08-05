@@ -9,12 +9,20 @@ if (backendUrl && !backendUrl.startsWith('http://') && !backendUrl.startsWith('h
 const instance = axios.create({
     baseURL: backendUrl,
 });
-console.log("Check baseURL:", backendUrl);
 instance.interceptors.response.use(
     (response) => {
-        // Thrown error for request with OK status code
-        const { data } = response;
         return response.data;
+    },
+    (error) => {
+        const status = error.response?.status;
+        if (status === 401) {
+            console.warn('Phiên đăng nhập hết hạn hoặc chưa xác thực.');
+        } else if (status === 403) {
+            console.warn('Không có quyền truy cập tài nguyên này.');
+        } else if (status === 500) {
+            console.error('Lỗi máy chủ nội bộ (500).');
+        }
+        return Promise.reject(error);
     }
 );
 

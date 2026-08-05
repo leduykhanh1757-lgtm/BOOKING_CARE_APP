@@ -152,6 +152,25 @@ let getLikesByDoctorId = async (req, res) => {
         return res.status(200).json(info);
     } catch (e) { return res.status(200).json({ errCode: -1, errMessage: 'Error from server' }); }
 }
+
+let postPrivateMessage = async (req, res) => {
+    try {
+        let info = await doctorService.postPrivateMessage(req.body);
+        return res.status(200).json(info);
+    } catch (e) {
+        return res.status(200).json({ errCode: -1, errMessage: 'Error from server' });
+    }
+}
+
+let getPrivateMessages = async (req, res) => {
+    try {
+        let info = await doctorService.getPrivateMessages(req.query.doctorId, req.query.patientId, req.query.limit, req.query.page);
+        return res.status(200).json(info);
+    } catch (e) {
+        return res.status(200).json({ errCode: -1, errMessage: 'Error from server' });
+    }
+}
+
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
@@ -165,5 +184,7 @@ module.exports = {
     createNewComment: createNewComment,
     getCommentsByDoctorId: getCommentsByDoctorId,
     toggleLikeDoctor: toggleLikeDoctor,
-    getLikesByDoctorId: getLikesByDoctorId
+    getLikesByDoctorId: getLikesByDoctorId,
+    postPrivateMessage: postPrivateMessage,
+    getPrivateMessages: getPrivateMessages
 }

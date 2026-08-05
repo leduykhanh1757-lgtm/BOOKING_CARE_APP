@@ -8,7 +8,7 @@ import moment from 'moment';
 import { languages } from '../../../utils';
 import RemedyModal from './RemedyModal';
 import DoctorChatModal from './Modal/DoctorChatModal';
-import { postSendRemedy } from '../../../services/userService';
+import { postSendRemedy, getProfileDoctorById } from '../../../services/userService';
 import { toast } from 'react-toastify';
 
 class ManagePatient extends Component {
@@ -22,24 +22,42 @@ class ManagePatient extends Component {
             isOpenChatModal: false,
             dataChatModal: {},
             isShowLoading: false,
-            statusTab: 'S2' // 'S2': Chờ khám, 'S3': Lịch sử đã khám
+            statusTab: 'S2', // 'S2': Chờ khám, 'S3': Lịch sử đã khám
+            doctorPrice: 0
         }
     }
 
     async componentDidMount() {
         this.getDataPatient();
+        this.fetchDoctorPrice();
+    }
+
+    fetchDoctorPrice = async () => {
+        let { user } = this.props;
+        if (user && user.id) {
+            try {
+                let res = await getProfileDoctorById(user.id);
+                if (res && res.errCode === 0 && res.data && res.data.Doctor_Infor && res.data.Doctor_Infor.priceTypeData) {
+                    let priceVal = Number(res.data.Doctor_Infor.priceTypeData.valueVi) || 0;
+                    this.setState({ doctorPrice: priceVal });
+                }
+            } catch (e) {
+                console.error("Lỗi fetchDoctorPrice:", e);
+            }
+        }
     }
 
     getDataPatient = () => {
         let { user } = this.props;
-        let { currentDate, statusTab } = this.state;
+        let { currentDate } = this.state;
 
         if (user && user.id) {
             let formatedDate = new Date(currentDate).getTime();
+            // Fetch ALL patients (S2 & S3) so dashboard stats are 100% stable and real-time!
             this.props.fetchAllPatientForDoctor({
                 doctorId: user.id,
                 date: formatedDate,
-                statusId: statusTab
+                statusId: 'ALL'
             });
         }
     }
@@ -53,14 +71,13 @@ class ManagePatient extends Component {
 
         if (prevProps.user !== this.props.user && this.props.user && this.props.user.id) {
             this.getDataPatient();
+            this.fetchDoctorPrice();
         }
     }
 
     handleChangeTab = (status) => {
         this.setState({
             statusTab: status
-        }, () => {
-            this.getDataPatient();
         });
     }
 
@@ -144,12 +161,21 @@ class ManagePatient extends Component {
     }
 
     render() {
-        let { dataPatient, isOpenRemedyModal, dataModal, isOpenChatModal, dataChatModal, isShowLoading, statusTab } = this.state;
+        let { dataPatient, isOpenRemedyModal, dataModal, isOpenChatModal, dataChatModal, isShowLoading, statusTab, doctorPrice } = this.state;
         let { language } = this.props;
 
+        // Categorize patient lists dynamically from database response
+        let listPending = dataPatient ? dataPatient.filter(item => item.statusId === 'S2') : [];
+        let listCompleted = dataPatient ? dataPatient.filter(item => item.statusId === 'S3') : [];
+
+        let countPending = listPending.length;
+        let countCompleted = listCompleted.length;
         let totalCount = dataPatient ? dataPatient.length : 0;
-        let pricePerPatient = 250000;
-        let estimatedRevenue = statusTab === 'S3' ? totalCount * pricePerPatient : 0;
+
+        // Calculate REAL estimated revenue using doctor's DB price * completed patient count S3
+        let estimatedRevenue = countCompleted * doctorPrice;
+
+        let currentDisplayList = statusTab === 'S2' ? listPending : listCompleted;
 
         return (
             <>
@@ -180,7 +206,7 @@ class ManagePatient extends Component {
                                     <div className="d-flex justify-content-between align-items-center">
                                         <div>
                                             <div style={{ fontSize: '11px', textTransform: 'uppercase', opacity: 0.9, fontWeight: '700' }}>CHỜ KHÁM (CHƯA GỬI ĐƠN)</div>
-                                            <div style={{ fontSize: '24px', fontWeight: 'bold', marginTop: '4px' }}>{statusTab === 'S2' ? totalCount : 0}</div>
+                                            <div style={{ fontSize: '24px', fontWeight: 'bold', marginTop: '4px' }}>{countPending}</div>
                                         </div>
                                         <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
                                             <i className="fas fa-user-clock"></i>
@@ -194,7 +220,7 @@ class ManagePatient extends Component {
                                     <div className="d-flex justify-content-between align-items-center">
                                         <div>
                                             <div style={{ fontSize: '11px', textTransform: 'uppercase', opacity: 0.9, fontWeight: '700' }}>ĐÃ KHÁM XONG (S3)</div>
-                                            <div style={{ fontSize: '24px', fontWeight: 'bold', marginTop: '4px' }}>{statusTab === 'S3' ? totalCount : 0}</div>
+                                            <div style={{ fontSize: '24px', fontWeight: 'bold', marginTop: '4px' }}>{countCompleted}</div>
                                         </div>
                                         <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
                                             <i className="fas fa-check-circle"></i>
@@ -208,7 +234,12 @@ class ManagePatient extends Component {
                                     <div className="d-flex justify-content-between align-items-center">
                                         <div>
                                             <div style={{ fontSize: '11px', textTransform: 'uppercase', opacity: 0.9, fontWeight: '700' }}>DOANH THU ƯỚC TÍNH</div>
-                                            <div style={{ fontSize: '18px', fontWeight: 'bold', marginTop: '6px' }}>{estimatedRevenue > 0 ? estimatedRevenue.toLocaleString('vi-VN') + ' VNĐ' : 'Chưa cập nhật'}</div>
+                                            <div style={{ fontSize: '18px', fontWeight: 'bold', marginTop: '6px' }}>
+                                                {doctorPrice > 0
+                                                    ? (estimatedRevenue > 0 ? estimatedRevenue.toLocaleString('vi-VN') + ' VNĐ' : '0 VNĐ')
+                                                    : 'Chưa cài giá khám'
+                                                }
+                                            </div>
                                         </div>
                                         <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
                                             <i className="fas fa-coins"></i>
@@ -243,7 +274,7 @@ class ManagePatient extends Component {
                                 }}
                                 onClick={() => this.handleChangeTab('S2')}
                             >
-                                <i className="fas fa-user-clock mr-2"></i> Bệnh nhân chờ khám (Xác nhận)
+                                <i className="fas fa-user-clock mr-2"></i> Bệnh nhân chờ khám ({countPending})
                             </button>
                             <button
                                 className="btn"
@@ -257,7 +288,7 @@ class ManagePatient extends Component {
                                 }}
                                 onClick={() => this.handleChangeTab('S3')}
                             >
-                                <i className="fas fa-history mr-2"></i> Lịch sử bệnh nhân đã khám xong
+                                <i className="fas fa-history mr-2"></i> Lịch sử bệnh nhân đã khám xong ({countCompleted})
                             </button>
                         </div>
 
@@ -274,8 +305,8 @@ class ManagePatient extends Component {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {dataPatient && dataPatient.length > 0 ?
-                                        dataPatient.map((item, index) => {
+                                    {currentDisplayList && currentDisplayList.length > 0 ?
+                                        currentDisplayList.map((item, index) => {
                                             let time = (item && item.timeTypeDataPatient)
                                                 ? (language === languages.VI ? item.timeTypeDataPatient.valueVi : item.timeTypeDataPatient.valueEn)
                                                 : '';

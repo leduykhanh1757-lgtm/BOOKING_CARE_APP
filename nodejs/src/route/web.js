@@ -52,6 +52,9 @@ let initWebRoute = (app) => {
     router.post('/api/toggle-like-doctor', doctorController.toggleLikeDoctor);
     router.get('/api/get-likes-by-doctor-id', doctorController.getLikesByDoctorId);
 
+    router.post('/api/send-private-message', doctorController.postPrivateMessage);
+    router.get('/api/get-private-messages', doctorController.getPrivateMessages);
+
     router.post('/api/ask-chatbot', userController.handleAskBot);
 
     router.post('/api/create-new-package', packageController.createNewPackage);

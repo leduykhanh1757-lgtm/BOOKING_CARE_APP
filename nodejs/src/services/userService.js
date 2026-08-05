@@ -268,7 +268,7 @@ let handleForgotPassword = (email, language) => {
                 resolve({ errCode: 2, errMessage: "Email does not exist in the system!" });
                 return;
             }
-            
+
             // Generate 6-digit OTP
             let otp = Math.floor(100000 + Math.random() * 900000).toString();
             let expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes

@@ -7,11 +7,21 @@ import cors from "cors";
 require('cross-fetch/polyfill');
 
 // Tải các biến môi trường từ file .env
+import rateLimit from "express-rate-limit";
+
 dotenv.config();
 
 let app = express();
-app.use(cors({ credentials: true, origin: true })); // Cho phép truy cập từ các domain khác
-// Cấu hình body-parser để server hiểu được dữ liệu client gửi lên
+
+// Giới hạn rate limit: Tối đa 1000 requests / 15 phút cho mỗi IP
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 1000,
+    message: { errCode: 429, errMessage: "Too many requests from this IP, please try again after 15 minutes." }
+});
+
+app.use('/api/', apiLimiter);
+app.use(cors({ credentials: true, origin: true }));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 

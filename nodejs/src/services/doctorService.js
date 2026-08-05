@@ -554,21 +554,78 @@ let getLikesByDoctorId = (doctorId, patientId) => {
             if (!doctorId) {
                 resolve({ errCode: 1, errMessage: 'Missing parameter' });
             } else {
-                // Đếm tổng số Like của Bác sĩ
                 let totalLikes = await db.Like.count({ where: { doctorId: doctorId } });
-
-                // Kiểm tra xem User hiện tại đã Like chưa
                 let isLiked = false;
                 if (patientId) {
                     let check = await db.Like.findOne({ where: { doctorId: doctorId, patientId: patientId } });
                     if (check) isLiked = true;
                 }
-
                 resolve({ errCode: 0, errMessage: 'Ok', data: { totalLikes, isLiked } });
             }
         } catch (e) { reject(e); }
     });
 }
+
+let postPrivateMessage = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.doctorId || !data.content) {
+                resolve({ errCode: 1, errMessage: 'Missing required parameter!' });
+            } else {
+                let newMsg = await db.Message.create({
+                    doctorId: data.doctorId,
+                    patientId: data.patientId || 0,
+                    senderRole: data.senderRole || 'DOCTOR',
+                    senderName: data.senderName || 'Bác sĩ',
+                    content: data.content
+                });
+                resolve({ errCode: 0, errMessage: 'Message sent successfully!', message: newMsg });
+            }
+        } catch (e) {
+            console.error("Error postPrivateMessage:", e);
+            reject(e);
+        }
+    });
+}
+
+let getPrivateMessages = (doctorId, patientId, limit, page) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let whereCondition = {};
+
+            if (doctorId && doctorId !== 'ALL' && doctorId !== '0') {
+                whereCondition.doctorId = doctorId;
+            }
+
+            if (patientId && Number(patientId) > 0) {
+                whereCondition[db.Sequelize.Op.or] = [
+                    { patientId: patientId },
+                    { patientId: 0 }
+                ];
+            }
+
+            let queryOptions = {
+                where: whereCondition,
+                order: [['createdAt', 'ASC']],
+                raw: true
+            };
+
+            if (limit && !isNaN(limit)) {
+                let parsedLimit = parseInt(limit);
+                let parsedPage = page && !isNaN(page) ? parseInt(page) : 1;
+                queryOptions.limit = parsedLimit;
+                queryOptions.offset = (parsedPage - 1) * parsedLimit;
+            }
+
+            let messages = await db.Message.findAll(queryOptions);
+            resolve({ errCode: 0, messages: messages || [] });
+        } catch (e) {
+            console.error("Error getPrivateMessages:", e);
+            reject(e);
+        }
+    });
+}
+
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
@@ -582,5 +639,7 @@ module.exports = {
     createNewComment: createNewComment,
     getCommentsByDoctorId: getCommentsByDoctorId,
     toggleLikeDoctor: toggleLikeDoctor,
-    getLikesByDoctorId: getLikesByDoctorId
+    getLikesByDoctorId: getLikesByDoctorId,
+    postPrivateMessage: postPrivateMessage,
+    getPrivateMessages: getPrivateMessages
 }

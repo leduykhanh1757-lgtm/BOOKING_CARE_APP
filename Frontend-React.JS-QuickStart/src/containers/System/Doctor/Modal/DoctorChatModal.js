@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { toast } from 'react-toastify';
 import './DoctorChatModal.scss';
-import { createNewCommentApi, getCommentsByIdApi } from '../../../../services/userService';
+import { sendPrivateMessageApi, getPrivateMessagesApi } from '../../../../services/userService';
 
 class DoctorChatModal extends Component {
     constructor(props) {
@@ -17,25 +17,23 @@ class DoctorChatModal extends Component {
 
     componentDidMount() {
         if (this.props.dataModal && this.props.dataModal.doctorId) {
-            this.fetchRealMessages(this.props.dataModal.doctorId);
+            this.fetchRealMessages(this.props.dataModal.doctorId, this.props.dataModal.patientId);
         }
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps.dataModal !== this.props.dataModal && this.props.dataModal && this.props.dataModal.doctorId) {
-            this.fetchRealMessages(this.props.dataModal.doctorId);
+            this.fetchRealMessages(this.props.dataModal.doctorId, this.props.dataModal.patientId);
         }
     }
 
-    fetchRealMessages = async (doctorId) => {
+    fetchRealMessages = async (doctorId, patientId) => {
         if (!doctorId) return;
         this.setState({ isLoading: true });
         try {
-            let res = await getCommentsByIdApi(doctorId);
-            if (res && res.errCode === 0 && res.comments) {
-                // Reverse to display oldest to newest
-                let sortedMsgs = res.comments.slice().reverse();
-                this.setState({ messages: sortedMsgs, isLoading: false });
+            let res = await getPrivateMessagesApi(doctorId, patientId);
+            if (res && res.errCode === 0 && res.messages) {
+                this.setState({ messages: res.messages, isLoading: false });
             } else {
                 this.setState({ messages: [], isLoading: false });
             }
@@ -59,16 +57,18 @@ class DoctorChatModal extends Component {
         let authorLabel = `BS. ${doctorName}`;
 
         try {
-            let res = await createNewCommentApi({
+            let res = await sendPrivateMessageApi({
                 doctorId: dataModal.doctorId,
-                authorName: authorLabel,
+                patientId: dataModal.patientId || 0,
+                senderRole: 'DOCTOR',
+                senderName: authorLabel,
                 content: messageText.trim()
             });
 
             if (res && res.errCode === 0) {
                 toast.success("Đã gửi tin nhắn dặn dò cho bệnh nhân!");
                 this.setState({ messageText: '' });
-                this.fetchRealMessages(dataModal.doctorId);
+                this.fetchRealMessages(dataModal.doctorId, dataModal.patientId);
             } else {
                 toast.error("Lỗi gửi tin nhắn: " + (res?.errMessage || ""));
             }
@@ -106,11 +106,12 @@ class DoctorChatModal extends Component {
                             </div>
                         ) : (messages && messages.length > 0 ? (
                             messages.map((msg, index) => {
-                                let isDoctorSender = msg.authorName && msg.authorName.startsWith('BS.');
+                                let isDoctorSender = msg.senderRole === 'DOCTOR' || (msg.senderName && msg.senderName.startsWith('BS.')) || (msg.authorName && msg.authorName.startsWith('BS.'));
+                                let displayName = msg.senderName || msg.authorName || (isDoctorSender ? 'Bác sĩ' : 'Bệnh nhân');
                                 return (
                                     <div key={index} className={`chat-bubble-wrapper ${isDoctorSender ? 'doctor-side' : 'patient-side'}`}>
                                         <div className="chat-bubble">
-                                            <div className="chat-sender">{msg.authorName || 'Người dùng'}</div>
+                                            <div className="chat-sender">{displayName}</div>
                                             <div className="chat-text">{msg.content}</div>
                                             <div className="chat-time">{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                                         </div>
@@ -151,8 +152,8 @@ class DoctorChatModal extends Component {
                                 }
                             }}
                         ></textarea>
-                        <Button color="primary" className="btn-send-message" onClick={this.handleSendMessage}>
-                            <i className="fas fa-paper-plane mr-1"></i> Gửi
+                        <Button color="primary" className="btn-send-message" onClick={this.handleSendMessage} title="Gửi tin nhắn">
+                            <i className="fas fa-paper-plane"></i>
                         </Button>
                     </div>
                 </ModalBody>

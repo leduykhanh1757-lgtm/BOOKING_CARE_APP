@@ -122,6 +122,8 @@ let postVerifyBookAppointment = (data) => {
     })
 }
 
+const { Op } = require('sequelize');
+
 let getListPatientForDoctor = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -137,11 +139,11 @@ let getListPatientForDoctor = (data) => {
                 };
 
                 if (data.statusId === 'ALL') {
-                    whereCondition.statusId = ['S2', 'S3'];
+                    whereCondition.statusId = { [Op.in]: ['S2', 'S3'] };
                 } else if (data.statusId) {
                     whereCondition.statusId = data.statusId;
                 } else {
-                    whereCondition.statusId = 'S2'; // Mặc định chỉ lấy S2 nếu không truyền
+                    whereCondition.statusId = 'S2';
                 }
 
                 let dataPatient = await db.Booking.findAll({
