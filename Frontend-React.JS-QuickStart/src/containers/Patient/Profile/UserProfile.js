@@ -202,16 +202,29 @@ class UserProfile extends Component {
     }
 
     handleSendReplyToDoctor = async () => {
-        let { patientReply, patientMessages } = this.state;
+        let { patientReply, patientMessages, selectedDoctorId } = this.state;
         let { userInfo } = this.props;
 
         if (!patientReply || !patientReply.trim()) return;
 
         let patientName = userInfo ? `${userInfo.lastName || ''} ${userInfo.firstName || ''}`.trim() : 'Bệnh nhân';
 
-        // Find doctorId from previous doctor messages, or default to 47
+        // Extract doctor list to determine current active doctor ID
+        let doctorList = [];
+        if (patientMessages && patientMessages.length > 0) {
+            patientMessages.forEach(msg => {
+                if (msg.doctorId && !doctorList.find(d => String(d.doctorId) === String(msg.doctorId))) {
+                    doctorList.push(msg);
+                }
+            });
+        }
+
+        let activeDocId = (selectedDoctorId && selectedDoctorId !== 'ALL')
+            ? selectedDoctorId
+            : (doctorList[0]?.doctorId || null);
+
         let lastDoctorMsg = patientMessages ? patientMessages.slice().reverse().find(msg => msg.senderRole === 'DOCTOR' || (msg.senderName && msg.senderName.startsWith('BS.'))) : null;
-        let targetDoctorId = lastDoctorMsg ? lastDoctorMsg.doctorId : 47;
+        let targetDoctorId = activeDocId || (lastDoctorMsg ? lastDoctorMsg.doctorId : 47);
 
         try {
             let res = await sendPrivateMessageApi({

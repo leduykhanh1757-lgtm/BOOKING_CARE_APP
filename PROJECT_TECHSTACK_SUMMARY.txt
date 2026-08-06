@@ -1,0 +1,82 @@
+================================================================================
+           BÁO CÁO TỔNG QUAN VÀ TÓM TẮT KỸ THUẬT DỰ ÁN (MASTER PROJECT SUMMARY)
+================================================================================
+
+1. TỔNG QUAN HỆ THỐNG (SYSTEM OVERVIEW)
+--------------------------------------------------------------------------------
+Dự án là một Hệ thống Nền tảng Y tế & Đặt lịch Khám bệnh Trực tuyến Full-Stack 
+(Mô hình tương tự BookingCare), xây dựng theo kiến trúc Decoupled Client-Server 
+Architecture (Frontend & Backend tách biệt hoàn toàn), cho phép kết nối linh hoạt 
+giữa 3 nhóm đối tượng: Bệnh nhân, Bác sĩ và Quản trị viên (Admin).
+
+[Client / Frontend (Vercel)] <---> [REST API + JWT] <---> [Node.js Express (Railway)] <---> [MySQL (Aiven Cloud)]
+
+================================================================================
+2. DANH MỤC TECH STACK CHI TIẾT (FULL TECH STACK)
+================================================================================
+
+--- A. PHÍA FRONTEND (CLIENT APP) ---
+* Thư mục mã nguồn: Frontend-React.JS-QuickStart
+* Nền tảng Deploy: Vercel Cloud (https://bookingcare-frontend.vercel.app)
+
+- Core Framework: React 17 (JavaScript ES6+, JSX) - Xây dựng UI dạng Component
+- Build Tool: Vite v6 & ESBuild - Trình đóng gói siêu nhanh, Classic JSX Transform
+- State Management: Redux, React-Redux, Redux-Thunk - Quản lý trạng thái toàn cục
+- State Persistence: Redux-Persist - Lưu trạng thái đăng nhập vào LocalStorage
+- Routing & Navigation: React Router v5 (react-router-dom) - Điều hướng trang SPA, Route Guard <Redirect />
+- HTTP Client: Axios - Gửi request API, tự động đính kèm Token Authorization Bearer <JWT> và interceptor bắt lỗi tập trung (401/403/500)
+- Styling & UI: SCSS (Sass), Bootstrap 4, FontAwesome Icons
+- Slider / Carousel: Slick Carousel (react-slick) - Trình chiếu Bác sĩ, Chuyên khoa, Cẩm nang
+- Đa ngôn ngữ (i18n): React-Intl - Chuyển đổi ngôn ngữ Tiếng Việt (VI) / Tiếng Anh (EN)
+- Thông báo (Toast): React-Toastify - Hiển thị thông báo nổi góc màn hình
+
+--- B. PHÍA BACKEND (SERVER API) ---
+* Thư mục mã nguồn: nodejs
+* Nền tảng Deploy: Railway Cloud (https://bookingcare-backend-production.up.railway.app)
+
+- Runtime Environment: Node.js v22 / ES6 - Môi trường chạy mã máy chủ
+- Web Framework: Express.js v5 (express ^5.2.1) - Framework dựng RESTful API
+- Compiler / Transpiler: Babel (@babel/core, @babel/node, @babel/preset-env) - Biên dịch ES6
+- Database: MySQL Database (Hosted on Aiven Cloud SSL) - Cơ sở dữ liệu quan hệ chính
+- ORM: Sequelize v6 & Sequelize-CLI - Ánh xạ Object-Relational, quản lý Migration
+- Xác thực (Authentication): JSON Web Token (jsonwebtoken v9) - Mã hóa/Giải mã JWT Token (hạn 24h)
+- Phân quyền (Authorization): Custom Role Middleware (JWTAction.js) - Kiểm tra vai trò (R1 Admin, R2 Bác sĩ, R3 Bệnh nhân)
+- Mã hóa Mật khẩu: bcryptjs - Mã hóa mật khẩu dạng Bcrypt Salt (Rounds 10)
+- Chống DDOS / Spam: express-rate-limit - Giới hạn 1000 requests / 15 phút cho mỗi IP
+- Bảo mật CORS: cors - Cho phép truy cập Cross-Origin và xử lý Preflight OPTIONS request
+- Gửi Email: Nodemailer - Gmail SMTP gửi email xác nhận lịch khám, gửi hóa đơn/đơn thuốc, mã OTP
+- Trí tuệ nhân tạo (AI): Google Gemini AI SDK (@google/generative-ai) - Chatbot tư vấn sức khỏe tự động
+
+================================================================================
+3. CÁC TÍNH NĂNG CHÍNH CỦA HỆ THỐNG (FEATURE MODULES)
+================================================================================
+
+1. Phân hệ Bệnh nhân (Patient Portal):
+   - Xem thông tin Bác sĩ nổi bật, Chuyên khoa, Cơ sở y tế, Cẩm nang sức khỏe, Gói khám.
+   - Đặt lịch khám bệnh theo ngày & khung giờ linh hoạt.
+   - Nhận Email tự động xác nhận lịch hẹn.
+   - Hộp thư cá nhân (Inbox): Quản lý hồ sơ và nhắn tin trực tiếp (Private Messaging) với Bác sĩ phụ trách.
+   - Quên mật khẩu & Xác thực qua mã OTP gửi về Email.
+   - Chatbot AI tư vấn sức khỏe tự động tích hợp Google Gemini AI.
+   - Đa ngôn ngữ (Việt - Anh).
+
+2. Phân hệ Bác sĩ (Doctor Portal):
+   - Đăng ký và quản lý lịch làm việc/lịch khám bệnh theo từng ngày.
+   - Xem danh sách bệnh nhân đã đăng ký khám theo ngày.
+   - Nhắn tin/trao đổi trực tiếp với bệnh nhân.
+   - Gửi đơn thuốc/lời dặn (Remedy) đính kèm file về Email bệnh nhân.
+
+3. Phân hệ Quản trị viên (Admin Portal):
+   - Quản lý người dùng (CRUD Users, phân quyền R1, R2, R3).
+   - Quản lý thông tin chi tiết Bác sĩ, chọn chuyên khoa, phòng khám, giá khám.
+   - Quản lý bài viết Chuyên khoa, Cơ sở y tế, Cẩm nang sức khỏe, Gói khám.
+
+================================================================================
+4. ĐÁNH GIÁ CHẤT LƯỢNG VÀ BẢO MẬT (SECURITY & STABILITY HIGHLIGHTS)
+================================================================================
+
+1. JWT Authentication & Role Authorization (RBAC) đã được triển khai hoàn chỉnh 100%.
+2. Cấu hình CORS chuẩn cho Vercel & Railway, hỗ trợ request OPTIONS.
+3. Tích hợp Rate Limiting (1000 req/15 min) bảo vệ server khỏi spam/DDOS.
+4. Xử lý lỗi Axios tập trung, Route Guard an toàn tuyệt đối không bị màn hình trắng.
+5. Mã nguồn chuẩn hóa tương thích Node v22, Express 5, React 17 và sẵn sàng chạy 24/7.

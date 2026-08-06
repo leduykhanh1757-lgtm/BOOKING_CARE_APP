@@ -13,6 +13,9 @@ export const userLoginFail = () => ({
     type: actionTypes.USER_LOGIN_FAIL
 })
 
-export const processLogout = () => ({
-    type: actionTypes.PROCESS_LOGOUT
-})
+export const processLogout = () => {
+    localStorage.removeItem('jwt_token');
+    return {
+        type: actionTypes.PROCESS_LOGOUT
+    };
+}

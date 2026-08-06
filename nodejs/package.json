@@ -4,6 +4,9 @@
   "description": "backend node js",
   "main": "server.js",
   "dependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/node": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
     "@google/generative-ai": "^0.24.1",
     "axios": "^1.7.9",
     "bcryptjs": "^3.0.3",
@@ -13,14 +16,19 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "express-rate-limit": "^8.6.2",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.18.2",
+    "node-fetch": "^2.7.0",
     "nodemailer": "^9.0.1",
+    "nodemon": "^3.1.14",
     "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.2.0",
     "uuid": "^8.3.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec babel-node src/server.js"
+    "start": "babel-node src/server.js",
+    "dev": "nodemon --exec babel-node src/server.js"
   },
   "keywords": [
     "fullstack",
@@ -30,11 +38,5 @@
   ],
   "author": "Khanh",
   "license": "ISC",
-  "devDependencies": {
-    "@babel/core": "^7.29.0",
-    "@babel/node": "^7.29.0",
-    "@babel/preset-env": "^7.29.0",
-    "nodemon": "^3.1.14",
-    "sequelize-cli": "^6.2.0"
-  }
+  "devDependencies": {}
 }

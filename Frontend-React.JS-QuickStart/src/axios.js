@@ -9,6 +9,17 @@ if (backendUrl && !backendUrl.startsWith('http://') && !backendUrl.startsWith('h
 const instance = axios.create({
     baseURL: backendUrl,
 });
+
+instance.interceptors.request.use(
+    (config) => {
+        let token = localStorage.getItem('jwt_token');
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
 instance.interceptors.response.use(
     (response) => {
         return response.data;

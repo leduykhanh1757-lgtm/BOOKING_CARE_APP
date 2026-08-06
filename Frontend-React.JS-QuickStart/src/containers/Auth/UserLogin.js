@@ -46,6 +46,9 @@ class UserLogin extends Component {
             }
 
             if (realData && realData.errCode === 0) {
+                if (realData.token) {
+                    localStorage.setItem('jwt_token', realData.token);
+                }
                 this.props.userLoginSuccess(realData.user);
                 this.props.navigate('/home');
             }

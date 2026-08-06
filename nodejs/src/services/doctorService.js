@@ -443,23 +443,26 @@ let sendRemedy = (data) => {
 let createNewComment = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.doctorId || !data.content) {
-                resolve({ errCode: 1, errMessage: 'Missing parameter' });
-            } else {
-                await db.Comment.create({
-                    doctorId: data.doctorId,
-                    authorName: data.authorName || 'Khách viếng thăm',
-                    authorAvatar: data.authorAvatar,
-                    content: data.content
-                });
-                if (data.authorAvatar && data.authorName) {
-                    await db.Comment.update(
-                        { authorAvatar: data.authorAvatar },
-                        { where: { authorName: data.authorName } }
-                    );
-                }
-                resolve({ errCode: 0, errMessage: 'Create comment succeed!' });
+            if (!data.doctorId || !data.content || typeof data.content !== 'string' || !data.content.trim()) {
+                return resolve({ errCode: 1, errMessage: 'Missing parameter content or doctorId' });
             }
+            let trimmedContent = data.content.trim();
+            if (trimmedContent.length > 2000) {
+                return resolve({ errCode: 2, errMessage: 'Comment content is too long (max 2000 characters)' });
+            }
+            await db.Comment.create({
+                doctorId: data.doctorId,
+                authorName: data.authorName || 'Khách viếng thăm',
+                authorAvatar: data.authorAvatar,
+                content: trimmedContent
+            });
+            if (data.authorAvatar && data.authorName) {
+                await db.Comment.update(
+                    { authorAvatar: data.authorAvatar },
+                    { where: { authorName: data.authorName } }
+                );
+            }
+            resolve({ errCode: 0, errMessage: 'Create comment succeed!' });
         } catch (e) { reject(e); }
     });
 }
@@ -569,18 +572,21 @@ let getLikesByDoctorId = (doctorId, patientId) => {
 let postPrivateMessage = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.doctorId || !data.content) {
-                resolve({ errCode: 1, errMessage: 'Missing required parameter!' });
-            } else {
-                let newMsg = await db.Message.create({
-                    doctorId: data.doctorId,
-                    patientId: data.patientId || 0,
-                    senderRole: data.senderRole || 'DOCTOR',
-                    senderName: data.senderName || 'Bác sĩ',
-                    content: data.content
-                });
-                resolve({ errCode: 0, errMessage: 'Message sent successfully!', message: newMsg });
+            if (!data.doctorId || !data.content || typeof data.content !== 'string' || !data.content.trim()) {
+                return resolve({ errCode: 1, errMessage: 'Missing required parameter!' });
             }
+            let trimmedContent = data.content.trim();
+            if (trimmedContent.length > 5000) {
+                return resolve({ errCode: 2, errMessage: 'Message content is too long (max 5000 characters)' });
+            }
+            let newMsg = await db.Message.create({
+                doctorId: data.doctorId,
+                patientId: data.patientId || 0,
+                senderRole: data.senderRole || 'DOCTOR',
+                senderName: data.senderName || 'Bác sĩ',
+                content: trimmedContent
+            });
+            resolve({ errCode: 0, errMessage: 'Message sent successfully!', message: newMsg });
         } catch (e) {
             console.error("Error postPrivateMessage:", e);
             reject(e);

@@ -1,6 +1,7 @@
 import db from '../models/index';
 import bcrypt from 'bcryptjs';
 import emailService from './emailService';
+import { createJWT } from '../middleware/JWTAction';
 
 const otpStore = new Map(); // Store OTPs in memory: email -> { otp, expiresAt }
 
@@ -35,9 +36,13 @@ let handleUserLogin = (email, password) => {
                         userData.errCode = 0;
                         userData.errMessage = 'Ok';
 
-                        // ✅ Cột image trong DB là kiểu BLOB nên Sequelize trả về dạng Buffer.
-                        // Buffer này chứa chính xác chuỗi "data:image/...;base64,..." đã lưu,
-                        // chỉ cần chuyển Buffer -> string (utf8), KHÔNG decode base64 gì thêm.
+                        let token = createJWT({
+                            id: user.id,
+                            email: user.email,
+                            roleId: user.roleId
+                        });
+                        userData.token = token;
+
                         if (user.image) {
                             if (Buffer.isBuffer(user.image)) {
                                 user.image = user.image.toString('utf8');
@@ -85,22 +90,29 @@ let checkUserEmail = (userEmail) => {
     })
 }
 
-let getAllUsers = (userId) => {
+let getAllUsers = (userId, limit, page) => {
     return new Promise(async (resolve, reject) => {
         try {
             let users = '';
-            if (userId === 'All') {
-                users = await db.User.findAll({
+            if (userId === 'ALL' || userId === 'All') {
+                let queryOptions = {
                     attributes: {
-                        exclude: ['password'] // Exclude password khi trả về cho React
+                        exclude: ['password']
                     }
-                });
+                };
+                if (limit && !isNaN(limit)) {
+                    let parsedLimit = parseInt(limit);
+                    let parsedPage = page && !isNaN(page) ? parseInt(page) : 1;
+                    queryOptions.limit = parsedLimit;
+                    queryOptions.offset = (parsedPage - 1) * parsedLimit;
+                }
+                users = await db.User.findAll(queryOptions);
             }
-            if (userId && userId !== 'All') {
+            if (userId && userId !== 'ALL' && userId !== 'All') {
                 users = await db.User.findOne({
                     where: { id: userId },
                     attributes: {
-                        exclude: ['password'] // Exclude password khi trả về cho React
+                        exclude: ['password']
                     }
                 });
             }
@@ -214,10 +226,10 @@ let deleteUser = (userId) => {
                 where: { id: userId }
             })
             if (!user) {
-                resolve({
+                return resolve({
                     errCode: 2,
                     errMessage: 'The user is not exist'
-                })
+                });
             }
             await db.User.destroy({
                 where: { id: userId }

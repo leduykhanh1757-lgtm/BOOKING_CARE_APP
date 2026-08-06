@@ -20,7 +20,8 @@ let handleLogin = async (req, res) => {
         return res.status(200).json({
             errCode: userData.errCode,
             message: userData.errMessage,
-            user: userData.user ? userData.user : {} // Nếu có user thì ném ra, không có thì ném object rỗng
+            user: userData.user ? userData.user : {},
+            token: userData.token ? userData.token : ''
         })
     } catch (e) {
         console.log("Error handleLogin: ", e);
@@ -41,7 +42,7 @@ let getAllUsers = async (req, res) => {
             users: []
         })
     }
-    let users = await userService.getAllUsers(id);
+    let users = await userService.getAllUsers(id, req.query.limit, req.query.page);
     return res.status(200).json({
         errCode: 0,
         errMessage: 'OK',
